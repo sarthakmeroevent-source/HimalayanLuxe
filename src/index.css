@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-color: #022E22;
+        /* Deep emerald base */
+    }
+
+    body {
+        @apply font-sans text-slate-100;
+        position: relative;
+        background-image:
+            radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.07) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.8) 0%, transparent 60%),
+            radial-gradient(150% 150% at -20% -20%, transparent 35%, rgba(255, 255, 255, 0.1) 42%, rgba(0, 0, 0, 0.7) 48%, transparent 65%),
+            radial-gradient(120% 120% at 100% 0%, transparent 40%, rgba(0, 0, 0, 0.6) 48%, rgba(255, 255, 255, 0.06) 55%, transparent 70%),
+            linear-gradient(115deg, transparent 25%, rgba(255, 255, 255, 0.05) 45%, rgba(0, 0, 0, 0.5) 60%, transparent 80%);
+        background-attachment: fixed;
+        background-size: 150% 150%;
+        animation: cloth-wave 25s ease-in-out infinite alternate;
+    }
+}
+
+@layer components {
+    .section-container {
+        @apply min-h-screen w-full relative overflow-hidden flex items-center justify-center;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+    }
+
+    .grainy-texture::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDVZEKqCE1pEa4xybVJ3jL-sQRKfuWxI_Y6brO_z8jflQoZA7r7GLkMJz1GIApKa8W-T1bhLJu9iDVMsEjPtoYdb2R9Qi15iVin8u1Wr1OZFB6QPzA-9yEexZ_wXd3tKW2wPvNAfBAkFjBefcY_xr8Wnj-KG-G0-12SiBbdYnb6Gi1AVK30bT2bwpNre7uFngCbYImE7kH4vlnFqqvGrUXCoAFdDpHuE6OZfbjekg2RHJFS8szzFX_c1yUvQp8EDRNiArycAqLNZg");
+        opacity: 0.03;
+        pointer-events: none;
+        z-index: 50;
+    }
+
+    .gold-flare {
+        position: absolute;
+        width: 50vw;
+        height: 50vw;
+        background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0) 70%);
+        filter: blur(100px);
+        pointer-events: none;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .luxury-button {
+        @apply border border-gold/40 text-gold px-10 py-4 text-[11px] font-medium uppercase tracking-[0.3em] transition-all duration-500 hover:bg-gold hover:text-emerald-deep backdrop-blur-sm;
+    }
+
+    .liquid-gold-text {
+        background: linear-gradient(135deg, #D4AF37 0%, #F1E5C3 50%, #D4AF37 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.2));
+    }
+
+    .hero-gradient-overlay {
+        background: linear-gradient(to top, rgba(1, 12, 8, 0.95) 0%, rgba(1, 12, 8, 0.4) 40%, transparent 100%);
+    }
+
+    .parallax-layer-back {
+        transform: translateZ(-10px) scale(2.1);
+        filter: brightness(0.7) blur(2px);
+    }
+
+    .parallax-layer-mid {
+        transform: translateZ(-5px) scale(1.6);
+    }
+
+    .parallax-layer-front {
+        transform: translateZ(0);
+    }
+
+    .perspective-container {
+        perspective: 1000px;
+        transform-style: preserve-3d;
+    }
+
+    .carousel-track {
+        display: flex;
+        gap: 2.5rem;
+        animation: scroll-infinite 60s linear infinite;
+    }
+
+    .particle {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        background: #D4AF37;
+        border-radius: 50%;
+        pointer-events: none;
+        opacity: 0.3;
+    }
+}
+
+@keyframes scroll-infinite {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes cloth-wave {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    100% {
+        background-position: 100% 100%;
+    }
+}
+
+@layer utilities {
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* Hide main scrollbar but keep scroll functionality */
+html {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+    display: none;
+}
