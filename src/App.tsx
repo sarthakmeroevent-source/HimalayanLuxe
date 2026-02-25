@@ -12,11 +12,40 @@ export default function App() {
     const [isDesktop, setIsDesktop] = useState(false);
     const [activeSection, setActiveSection] = useState('hero');
     const [isMuted, setIsMuted] = useState(true);
+    const [activePhilosophy, setActivePhilosophy] = useState(0);
 
     const isAnimatingRef = useRef(false);
     const lastScrollTimeRef = useRef(0);
     const activeSectionRef = useRef('hero');
+    const activePhilosophyRef = useRef(0);
     const videoRef = useRef<HTMLVideoElement>(null);
+
+    const philosophies = [
+        {
+            title: "The Legacy",
+            heading: <>We do not simply plan events. <br /><span className="italic text-white/50">We orchestrate</span> <span className="liquid-gold-text">legacies.</span></>,
+            description: "For the discerning few who demand nothing less than absolute perfection, we offer an uncompromising vision of luxury. Every detail is a meticulous brushstroke on the canvas of your history. We transform ephemeral moments into eternal memories.",
+            image: "/experience_image.png"
+        },
+        {
+            title: "The Artistry",
+            heading: <>Design is not a service. <br /><span className="italic text-white/50">It is a visual</span> <span className="liquid-gold-text">symphony.</span></>,
+            description: "We believe that true luxury lies in the unseen. Our designs are architectural masterpieces of emotion, blending traditional grandeur with avant-garde aesthetics to create environments that breathe and tell your unique story.",
+            image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80"
+        },
+        {
+            title: "The Precision",
+            heading: <>Perfection is in the <br /><span className="italic text-white/50">details you</span> <span className="liquid-gold-text">never see.</span></>,
+            description: "Excellence is not an accident; it is the result of relentless precision. From the acoustics of the hall to the timing of the reveal, we manage the invisible threads that make an event flawless and effortless.",
+            image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&q=80"
+        },
+        {
+            title: "The Soul",
+            heading: <>Every celebration <br /><span className="italic text-white/50">must have a</span> <span className="liquid-gold-text">heartbeat.</span></>,
+            description: "Beyond the gold and the silk lies the essence of the moment. We capture the soul of your journey, ensuring that every laugh, every tear, and every breath is felt deeply by every soul in attendance.",
+            image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800&q=80"
+        }
+    ];
 
     const sections = ['hero', 'experience', 'destinations', 'services', 'cta', 'footer'];
 
@@ -31,46 +60,127 @@ export default function App() {
             autoRaf: false,
         });
 
-        const scrollCooldown = 1200;
+        const scrollCooldown = 500;
+        let touchStartY = 0;
 
         const handleWheel = (e: globalThis.WheelEvent) => {
-            // Unconditionally stop native free-scrolling
             e.preventDefault();
-
-            // Ignore input if we are currently animating to a section
             if (isAnimatingRef.current) return;
 
             const now = Date.now();
-            // Wait out the animation and any leftover trackpad inertia
             if (now - lastScrollTimeRef.current < scrollCooldown) return;
-
-            // Require just a 'simple little scroll' to trigger jump
-            if (Math.abs(e.deltaY) < 15) return;
+            if (Math.abs(e.deltaY) < 1) return;
 
             const direction = e.deltaY > 0 ? 1 : -1;
+            scrollToSection(direction);
+        };
+
+        const handleTouchStart = (e: TouchEvent) => {
+            touchStartY = e.touches[0].clientY;
+        };
+
+        const handleTouchMove = (e: TouchEvent) => {
+            e.preventDefault();
+        };
+
+        const handleTouchEnd = (e: TouchEvent) => {
+            if (isAnimatingRef.current) return;
+
+            const touchEndY = e.changedTouches[0].clientY;
+            const deltaY = touchStartY - touchEndY;
+
+            if (Math.abs(deltaY) < 5) return;
+
+            const now = Date.now();
+            if (now - lastScrollTimeRef.current < scrollCooldown) return;
+
+            const direction = deltaY > 0 ? 1 : -1;
+            scrollToSection(direction);
+        };
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (isAnimatingRef.current) return;
+
+            const now = Date.now();
+            if (now - lastScrollTimeRef.current < scrollCooldown) return;
+
+            if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+                e.preventDefault();
+                scrollToSection(1);
+            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                e.preventDefault();
+                scrollToSection(-1);
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                scrollToSection(-sections.indexOf(activeSectionRef.current));
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                scrollToSection(sections.length - 1 - sections.indexOf(activeSectionRef.current));
+            }
+        };
+
+        const scrollToSection = (direction: number) => {
+            if (isAnimatingRef.current) return;
+
             const currentIndex = sections.indexOf(activeSectionRef.current);
+
+            // Handle internal philosophy transitions when in the experience section
+            if (activeSectionRef.current === 'experience') {
+                const nextPhilosophy = activePhilosophyRef.current + direction;
+                if (nextPhilosophy >= 0 && nextPhilosophy < philosophies.length) {
+                    isAnimatingRef.current = true;
+                    lastScrollTimeRef.current = Date.now();
+
+                    setActivePhilosophy(nextPhilosophy);
+                    activePhilosophyRef.current = nextPhilosophy;
+
+                    // Strictly lock to experience section during philosophy switch
+                    lenis.scrollTo('#experience', {
+                        duration: 0.8,
+                        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                        lock: true,
+                        onComplete: () => {
+                            setTimeout(() => {
+                                isAnimatingRef.current = false;
+                            }, 100);
+                        }
+                    });
+                    return;
+                }
+            }
+
             let nextIndex = currentIndex + direction;
 
-            // clamp
             if (nextIndex < 0) nextIndex = 0;
             if (nextIndex >= sections.length) nextIndex = sections.length - 1;
 
             if (nextIndex !== currentIndex) {
                 isAnimatingRef.current = true;
-                lastScrollTimeRef.current = now;
+                lastScrollTimeRef.current = Date.now();
 
-                setActiveSection(sections[nextIndex]);
-                activeSectionRef.current = sections[nextIndex];
+                const nextSectionId = sections[nextIndex];
+                setActiveSection(nextSectionId);
+                activeSectionRef.current = nextSectionId;
 
-                lenis.scrollTo(`#${sections[nextIndex]}`, {
+                // Reset philosophy index when entering experience section from elsewhere
+                if (nextSectionId === 'experience') {
+                    if (direction > 0) {
+                        setActivePhilosophy(0);
+                        activePhilosophyRef.current = 0;
+                    } else if (direction < 0) {
+                        setActivePhilosophy(philosophies.length - 1);
+                        activePhilosophyRef.current = philosophies.length - 1;
+                    }
+                }
+
+                lenis.scrollTo(`#${nextSectionId}`, {
                     duration: 1.2,
                     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
                     lock: true,
                     onComplete: () => {
-                        // Small delay to prevent trackpad tail-inertia from double-triggering
                         setTimeout(() => {
                             isAnimatingRef.current = false;
-                        }, 200);
+                        }, 100);
                     }
                 });
             }
@@ -107,11 +217,19 @@ export default function App() {
         }
 
         window.addEventListener('wheel', handleWheel, { passive: false });
+        window.addEventListener('touchstart', handleTouchStart, { passive: true });
+        window.addEventListener('touchmove', handleTouchMove, { passive: false });
+        window.addEventListener('touchend', handleTouchEnd, { passive: true });
+        window.addEventListener('keydown', handleKeyDown);
         window.addEventListener('scroll', handleScroll);
         const rafId = requestAnimationFrame(raf);
 
         return () => {
             window.removeEventListener('wheel', handleWheel);
+            window.removeEventListener('touchstart', handleTouchStart);
+            window.removeEventListener('touchmove', handleTouchMove);
+            window.removeEventListener('touchend', handleTouchEnd);
+            window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('scroll', handleScroll);
             observer.disconnect();
             cancelAnimationFrame(rafId);
@@ -144,7 +262,17 @@ export default function App() {
                             const element = document.getElementById(id);
                             if (element) {
                                 isAnimatingRef.current = true;
+                                lastScrollTimeRef.current = Date.now();
                                 element.scrollIntoView({ behavior: 'smooth' });
+                                setActiveSection(id);
+                                activeSectionRef.current = id;
+
+                                // Reset philosophy if jumping to experience
+                                if (id === 'experience') {
+                                    setActivePhilosophy(0);
+                                    activePhilosophyRef.current = 0;
+                                }
+
                                 // Reset animating flag after smooth scroll is likely done
                                 setTimeout(() => { isAnimatingRef.current = false; }, 1000);
                             }
@@ -211,7 +339,7 @@ export default function App() {
                             className="fixed z-[301]"
                             style={{ width: 'auto' }}
                             initial={{
-                                height: '18.72rem',
+                                height: '14rem',
                                 left: '50%',
                                 top: '50%',
                                 x: '-50%',
@@ -219,7 +347,7 @@ export default function App() {
                                 scale: 1
                             }}
                             animate={{
-                                height: '5rem',
+                                height: '4rem',
                                 left: isDesktop ? '3rem' : '2rem',
                                 top: '2.5rem',
                                 x: 0,
@@ -248,7 +376,7 @@ export default function App() {
                                 scale: { duration: 2.7, times: [0, 0.55, 1], ease: "easeInOut" }
                             }}
                         >
-                            <span className="liquid-gold-text text-[24px] lg:text-[38px] tracking-[0.1em] font-meno uppercase flex">
+                            <span className="liquid-gold-text text-[18px] lg:text-[28px] tracking-[0.1em] font-meno uppercase flex">
                                 {Array.from("HIMALAYAN").map((char, i) => {
                                     const totalDuration = 4.7;
                                     const typingDelay = 0.3 + (i * 0.08);
@@ -280,7 +408,7 @@ export default function App() {
                                     );
                                 })}
                             </span>
-                            <span className="font-cursive liquid-gold-text text-[48px] lg:text-[76px] font-medium pl-2 pr-2 tracking-wide flex">
+                            <span className="font-cursive liquid-gold-text text-[36px] lg:text-[56px] font-medium pl-2 pr-2 tracking-wide flex">
                                 {Array.from("Luxe").map((char, i) => {
                                     const totalDuration = 4.7;
                                     const delayOffset = 0.3 + ("HIMALAYAN".length * 0.08);
@@ -324,7 +452,7 @@ export default function App() {
                     layoutId="himalayan-logo"
                     src="/LOGO.svg"
                     alt="Himalayan Luxe"
-                    className="h-20 w-auto"
+                    className="h-16 w-auto"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: showLoader ? 0 : 1 }}
                     transition={{ duration: 0 }}
@@ -338,7 +466,7 @@ export default function App() {
                 >
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
-                        className="text-white hover:opacity-70 transition-opacity font-['Manrope'] text-[13px] tracking-[0.3em] uppercase font-medium"
+                        className="text-white hover:opacity-70 transition-opacity font-['Manrope'] text-[11px] md:text-[13px] tracking-[0.3em] uppercase font-medium"
                     >
                         MENU
                     </button>
@@ -387,7 +515,7 @@ export default function App() {
                                 transition={{ duration: 0.5, delay: 0.1 * (i + 1) }}
                                 href={`#${item === 'home' ? 'hero' : item}`}
                                 onClick={() => setMenuOpen(false)}
-                                className="text-white font-['Playfair_Display'] text-4xl md:text-5xl hover:text-gold transition-colors capitalize"
+                                className="text-white font-['Playfair_Display'] text-3xl md:text-5xl hover:text-gold transition-colors capitalize"
                             >
                                 {item}
                             </motion.a>
@@ -447,13 +575,13 @@ export default function App() {
                         </motion.button>
                     </div>
 
-                    <div className="absolute bottom-12 md:bottom-20 w-full px-8 md:px-16 flex flex-col items-start justify-end z-20">
+                    <div className="absolute bottom-10 md:bottom-12 w-full px-8 md:px-16 flex flex-col items-start justify-end z-20">
                         <motion.h2
                             initial={{ opacity: 0, y: 50 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ amount: 0.3 }}
                             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                            className="font-serif text-white/95 text-[48px] md:text-[72px] lg:text-[96px] font-normal leading-[1.05] max-w-7xl tracking-tight drop-shadow-2xl"
+                            className="font-serif text-white/95 text-[32px] md:text-[48px] lg:text-[64px] font-normal leading-[1.1] max-w-6xl tracking-tight drop-shadow-2xl"
                         >
                             <motion.span
                                 initial={{ opacity: 0, y: 30 }}
@@ -462,74 +590,138 @@ export default function App() {
                                 transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
                                 className="block mb-0 pr-12 pb-2 overflow-visible"
                             >
-                                <span className="liquid-gold-text text-[24px] md:text-[32px] lg:text-[38px] tracking-[0.1em] font-meno uppercase">Himalayan</span>
-                                <span className="font-cursive liquid-gold-text text-[48px] md:text-[72px] lg:text-[76px] font-medium pl-2 pr-2 tracking-wide">Luxe</span>
+                                <span className="liquid-gold-text text-[18px] md:text-[24px] lg:text-[28px] tracking-[0.1em] font-meno uppercase">Himalayan</span>
+                                <span className="font-cursive liquid-gold-text text-[36px] md:text-[48px] lg:text-[56px] font-medium pl-2 pr-2 tracking-wide">Luxe</span>
                             </motion.span>
                             the most sought after nuptial artist in the world
                         </motion.h2>
                     </div>
                 </section>
 
-                <section className="section-container relative min-h-[100vh] w-full flex items-center justify-center px-4 md:px-12 pt-40 pb-20 mt-32 overflow-hidden" id="experience">
+                <section className="section-container relative h-screen w-full flex flex-col px-8 md:px-24 overflow-hidden" id="experience">
+                    <div className="h-24 md:h-32 w-full flex-shrink-0"></div> {/* Nav Bar Spacer */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-                    <div className="relative z-10 w-full max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-16 md:gap-12">
-                        <motion.div
-                            initial={{ opacity: 0, x: -50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ margin: "-100px", amount: 0.3 }}
-                            transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-                            className="md:w-2/5 flex flex-col items-start text-left"
-                        >
-                            <span className="liquid-gold-text text-[10px] md:text-xs tracking-[0.4em] uppercase font-medium mb-8 block">
-                                The Philosophy
-                            </span>
-                            <h2 className="font-serif text-white/95 text-[40px] md:text-[56px] lg:text-[72px] leading-[1.1] font-normal tracking-tight mb-8">
-                                We do not simply <br className="hidden md:block" /> plan events. <br />
-                                <span className="italic text-white/50">We orchestrate</span> <br />
-                                <span className="liquid-gold-text">legacies.</span>
-                            </h2>
-                            <p className="text-white/50 font-sans max-w-md text-sm md:text-base leading-[2] tracking-wide mb-12">
-                                For the discerning few who demand nothing less than absolute perfection, we offer an uncompromising vision of luxury. Every detail is a meticulous brushstroke on the canvas of your history. We transform ephemeral moments into eternal memories.
-                            </p>
+                    <div className="relative z-10 w-full max-w-[1200px] mx-auto flex-grow flex flex-col md:flex-row items-center justify-between gap-8 md:gap-8 pb-12">
+                        <div className="md:w-1/2 flex flex-col items-start text-left">
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activePhilosophy}
+                                    initial={{ opacity: 0, x: -30 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 30 }}
+                                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                                    className="w-full"
+                                >
+                                    <span className="liquid-gold-text text-[10px] md:text-xs tracking-[0.4em] uppercase font-medium mb-8 block">
+                                        {philosophies[activePhilosophy].title}
+                                    </span>
+                                    <h2 className="font-serif text-white/95 text-[28px] md:text-[36px] lg:text-[48px] leading-[1.1] font-normal tracking-tight mb-8 max-w-xl">
+                                        {philosophies[activePhilosophy].heading}
+                                    </h2>
+                                    <p className="text-white/50 font-sans max-w-lg text-[12px] md:text-[13px] leading-[1.6] tracking-wide mb-10">
+                                        {philosophies[activePhilosophy].description}
+                                    </p>
+                                </motion.div>
+                            </AnimatePresence>
 
-                            <button className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10">
-                                <span className="relative z-10 text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
-                                    Discover The Art
-                                </span>
-                            </button>
-                        </motion.div>
+                            <div className="flex flex-col gap-8">
+                                <button className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10 w-fit">
+                                    <span className="relative z-10 text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
+                                        Discover The Art
+                                    </span>
+                                </button>
 
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ margin: "-100px", amount: 0.3 }}
-                            transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
-                            className="md:w-3/5 relative h-[600px] w-full max-w-3xl glass-card rounded-[40px] p-4 shadow-2xl flex-shrink-0"
-                        >
-                            <div className="relative w-full h-full rounded-[30px] overflow-hidden">
-                                <img
-                                    src="https://images.unsplash.com/photo-1533444211158-450f68045610?w=800&q=80"
-                                    alt="Luxury Details"
-                                    className="absolute inset-0 w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 hover:scale-105 transition-all duration-1000"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#022E22] via-transparent to-transparent opacity-80"></div>
+                                <div className="flex items-center gap-12">
+                                    <div className="flex items-center gap-4">
+                                        <button
+                                            onClick={() => {
+                                                const prev = (activePhilosophy - 1 + philosophies.length) % philosophies.length;
+                                                setActivePhilosophy(prev);
+                                                activePhilosophyRef.current = prev;
+                                            }}
+                                            className="group flex items-center justify-center p-3 rounded-full border border-white/10 hover:border-gold/50 transition-all duration-500"
+                                        >
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/40 group-hover:text-gold transition-colors">
+                                                <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                const next = (activePhilosophy + 1) % philosophies.length;
+                                                setActivePhilosophy(next);
+                                                activePhilosophyRef.current = next;
+                                            }}
+                                            className="group flex items-center justify-center p-3 rounded-full border border-white/10 hover:border-gold/50 transition-all duration-500"
+                                        >
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/40 group-hover:text-gold transition-colors">
+                                                <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        {philosophies.map((_, i) => (
+                                            <button
+                                                key={i}
+                                                onClick={() => {
+                                                    setActivePhilosophy(i);
+                                                    activePhilosophyRef.current = i;
+                                                }}
+                                                className="group relative py-4"
+                                            >
+                                                <div className={`h-[2px] transition-all duration-700 rounded-full ${activePhilosophy === i ? 'w-12 bg-gold' : 'w-4 bg-white/20 group-hover:bg-white/40'}`} />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
-                        </motion.div>
+                        </div>
+
+                        <div className="md:w-1/2 relative h-[300px] md:h-[50vh] w-full max-w-2xl glass-card rounded-[24px] md:rounded-[32px] p-2 md:p-3 shadow-2xl flex-shrink-0">
+                            <div className="relative w-full h-full rounded-[30px] overflow-hidden">
+                                <AnimatePresence mode="wait">
+                                    <motion.img
+                                        key={activePhilosophy}
+                                        src={philosophies[activePhilosophy].image}
+                                        alt={philosophies[activePhilosophy].title}
+                                        initial={{ opacity: 0, scale: 1.2, filter: 'grayscale(100%)' }}
+                                        animate={{ opacity: 0.8, scale: 1, filter: 'grayscale(80%)' }}
+                                        exit={{ opacity: 0, scale: 0.9, filter: 'grayscale(100%)' }}
+                                        whileHover={{ filter: 'grayscale(0%)', scale: 1.05 }}
+                                        transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                                        className="absolute inset-0 w-full h-full object-cover"
+                                    />
+                                </AnimatePresence>
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#022E22] via-transparent to-transparent opacity-80 pointer-events-none"></div>
+
+                                <div className="absolute bottom-8 left-8 z-10 hidden md:block">
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        key={activePhilosophy}
+                                        className="flex flex-col"
+                                    >
+                                        <span className="text-[40px] font-serif text-gold/20 leading-none mb-2">0{activePhilosophy + 1}</span>
+                                        <span className="text-[10px] tracking-[0.3em] uppercase text-white/40 font-medium">Philosophy</span>
+                                    </motion.div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
-                <section className="section-container relative h-screen w-full flex flex-col items-start justify-center px-8 md:px-12 pt-24" id="destinations">
-                    <div className="w-full flex flex-col items-start">
-                        <div className="w-full flex items-center justify-between mb-4">
+                <section className="section-container relative h-screen w-full flex flex-col items-center justify-center px-8 md:px-12 pt-24" id="destinations">
+                    <div className="w-full flex flex-col items-center max-w-[1400px] mx-auto">
+                        <div className="w-full flex items-center justify-center mb-4 relative">
                             <motion.div
                                 initial={{ opacity: 0, y: -30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ margin: "-100px", amount: 0.3 }}
                                 transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                                className="flex flex-col items-start"
+                                className="flex flex-col items-center"
                             >
-                                <span className="liquid-gold-text text-[10px] md:text-xs tracking-[0.4em] uppercase font-medium mb-4 block">
+                                <span className="liquid-gold-text text-[10px] md:text-xs tracking-[0.4em] uppercase font-medium block">
                                     Explore Us
                                 </span>
                             </motion.div>
@@ -540,7 +732,7 @@ export default function App() {
                                 viewport={{ margin: "-100px", amount: 0.3 }}
                                 transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
                                 href="#all-works"
-                                className="text-white/70 hover:text-gold text-sm md:text-base tracking-wide transition-colors duration-500 flex items-center gap-2 group"
+                                className="absolute right-0 text-white/70 hover:text-gold text-sm md:text-base tracking-wide transition-colors duration-500 flex items-center gap-2 group"
                             >
                                 View All
                                 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-500 ease-out" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -554,7 +746,7 @@ export default function App() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ margin: "-100px", amount: 0.3 }}
                             transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-                            className="font-serif text-white/95 text-[36px] md:text-[56px] lg:text-[72px] font-normal leading-[1.05] tracking-tight drop-shadow-2xl mb-16"
+                            className="font-serif text-white/95 text-[24px] md:text-[36px] lg:text-[48px] font-normal leading-[1.1] tracking-tight drop-shadow-2xl mb-10 text-center"
                         >
                             Crafting timeless <span className="liquid-gold-text">moments</span>
                         </motion.h2>
@@ -569,7 +761,7 @@ export default function App() {
                     </div>
                 </section>
 
-                <section className="section-container relative min-h-[100vh] w-full flex flex-col py-32 px-8 md:px-12" id="services">
+                <section className="section-container relative h-screen w-full flex flex-col py-20 px-8 md:px-12" id="services">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -578,7 +770,7 @@ export default function App() {
                         className="mb-24 flex flex-col items-center text-center"
                     >
                         <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-6">Masterpieces</span>
-                        <h2 className="font-serif text-white/95 text-[36px] md:text-[56px] lg:text-[64px] font-normal leading-tight">
+                        <h2 className="font-serif text-white/95 text-[24px] md:text-[36px] lg:text-[44px] font-normal leading-tight">
                             Curated <span className="italic text-white/50">Excellence</span>
                         </h2>
                     </motion.div>
@@ -599,11 +791,11 @@ export default function App() {
                             >
                                 <div className="flex items-center gap-8 md:gap-16 mb-6 md:mb-0">
                                     <span className="text-gold/40 text-sm font-light tracking-[0.2em] group-hover:text-gold transition-colors duration-700">{service.id}</span>
-                                    <h3 className="font-serif text-[32px] md:text-[48px] text-white/70 group-hover:text-white transition-all duration-700 group-hover:translate-x-4">
+                                    <h3 className="font-serif text-[20px] md:text-[32px] text-white/70 group-hover:text-white transition-all duration-700 group-hover:translate-x-4">
                                         {service.title}
                                     </h3>
                                 </div>
-                                <p className="text-white/40 text-sm md:text-base max-w-sm leading-relaxed md:text-right group-hover:text-white/70 transition-colors duration-700">
+                                <p className="text-white/40 text-[12px] md:text-[13px] max-w-sm leading-relaxed md:text-right group-hover:text-white/70 transition-colors duration-700">
                                     {service.desc}
                                 </p>
                             </motion.div>
@@ -611,17 +803,17 @@ export default function App() {
                     </div>
                 </section>
 
-                <section className="section-container relative min-h-[100vh] w-full flex items-center justify-center px-8 md:px-12 overflow-hidden" id="cta">
+                <section className="section-container relative h-screen w-full flex items-center justify-center px-8 md:px-12 overflow-hidden" id="cta">
                     <div className="absolute inset-0 bg-gold/5 pointer-events-none"></div>
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ margin: "-100px", amount: 0.3 }}
                         transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-                        className="glass-card max-w-5xl w-full p-16 md:p-32 rounded-[60px] text-center relative z-10"
+                        className="glass-card max-w-4xl w-full p-8 md:p-16 rounded-[30px] md:rounded-[40px] text-center relative z-10"
                     >
                         <span className="liquid-gold-text text-xs tracking-[0.5em] uppercase font-medium mb-12 block">Begin Your Legacy</span>
-                        <h2 className="font-serif text-white/95 text-[48px] md:text-[86px] lg:text-[110px] leading-[0.9] font-normal tracking-tight mb-16">
+                        <h2 className="font-serif text-white/95 text-[32px] md:text-[54px] lg:text-[72px] leading-[0.9] font-normal tracking-tight mb-10">
                             Shall we <br /> <span className="italic text-white/40">begin?</span>
                         </h2>
                         <div className="flex flex-col md:flex-row items-center justify-center gap-8">
@@ -638,8 +830,8 @@ export default function App() {
                 <section className="section-container relative min-h-[60vh] w-full flex flex-col items-center justify-between px-8 md:px-24 py-24 bg-black/40" id="footer">
                     <div className="w-full max-w-[1400px] flex flex-col md:flex-row items-start justify-between gap-24 md:gap-12">
                         <div className="flex flex-col items-start max-w-md">
-                            <img src="/LOGO.svg" alt="Himalayan Luxe" className="h-16 w-auto mb-10 opacity-80" />
-                            <p className="text-white/40 text-sm leading-relaxed tracking-wide font-sans mb-10">
+                            <img src="/LOGO.svg" alt="Himalayan Luxe" className="h-12 w-auto mb-10 opacity-80" />
+                            <p className="text-white/40 text-[12px] md:text-sm leading-relaxed tracking-wide font-sans mb-10">
                                 International award-winning nuptial artist, specializing in palatial celebrations for the world's most discerning families.
                             </p>
                             <div className="flex gap-8">
@@ -653,21 +845,21 @@ export default function App() {
 
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-16 md:gap-24">
                             <div className="flex flex-col gap-6">
-                                <span className="text-gold text-[10px] tracking-[0.3em] uppercase font-medium mb-2">Discover</span>
+                                <span className="text-gold text-[9px] md:text-[10px] tracking-[0.3em] uppercase font-medium mb-2">Discover</span>
                                 {['About', 'Gallery', 'Venues', 'Process'].map((link) => (
-                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-sm font-sans tracking-wide">{link}</a>
+                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-[13px] md:text-sm font-sans tracking-wide">{link}</a>
                                 ))}
                             </div>
                             <div className="flex flex-col gap-6">
-                                <span className="text-gold text-[10px] tracking-[0.3em] uppercase font-medium mb-2">Explore</span>
+                                <span className="text-gold text-[9px] md:text-[10px] tracking-[0.3em] uppercase font-medium mb-2">Explore</span>
                                 {['Destinations', 'Services', 'Artistry', 'Awards'].map((link) => (
-                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-sm font-sans tracking-wide">{link}</a>
+                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-[13px] md:text-sm font-sans tracking-wide">{link}</a>
                                 ))}
                             </div>
                             <div className="flex flex-col gap-6">
-                                <span className="text-gold text-[10px] tracking-[0.3em] uppercase font-medium mb-2">Legal</span>
+                                <span className="text-gold text-[9px] md:text-[10px] tracking-[0.3em] uppercase font-medium mb-2">Legal</span>
                                 {['Privacy', 'Terms', 'Concierge'].map((link) => (
-                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-sm font-sans tracking-wide">{link}</a>
+                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-[13px] md:text-sm font-sans tracking-wide">{link}</a>
                                 ))}
                             </div>
                         </div>
