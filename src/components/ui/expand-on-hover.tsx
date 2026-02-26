@@ -1,11 +1,23 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "swiper/css";
 import "swiper/css/effect-creative";
 import "swiper/css/pagination";
 import "swiper/css/autoplay";
 import { cn } from "@/lib/utils";
+
+function useWindowWidth() {
+  const [width, setWidth] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth : 1024
+  );
+  useEffect(() => {
+    const onResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return width;
+}
 
 const Skiper52 = () => {
   const images = [
@@ -79,6 +91,12 @@ const HoverExpand_001 = ({
 }) => {
   const [activeImage, setActiveImage] = useState<number | null>(1);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const width = useWindowWidth();
+  const isMobile = width < 1024;
+  const isSmall = width < 640;
+  const expandedWidth = isSmall ? "11rem" : isMobile ? "14rem" : "24rem";
+  const collapsedWidth = isSmall ? "3.5rem" : isMobile ? "4rem" : "6rem";
+  const cardHeight = isSmall ? "14rem" : isMobile ? "16rem" : "24rem";
 
   return (
     <motion.div
@@ -91,45 +109,39 @@ const HoverExpand_001 = ({
         duration: 0.3,
         delay: 0.5,
       }}
-      className={cn("relative w-full px-0", className)}
+      className={cn("relative w-full max-w-full min-w-0 px-0 overflow-hidden", className)}
     >
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="w-full overflow-x-auto scrollbar-hide"
+        className="w-full max-w-full overflow-x-auto overflow-y-hidden scrollbar-hide pb-2 -mb-2"
       >
-        <div className="flex w-max lg:w-full items-center justify-start gap-2 md:gap-3 py-4 lg:py-8">
-          {images.map((image, index) => {
-            const isWindowDefined = typeof window !== 'undefined';
-            const isMobile = isWindowDefined && window.innerWidth < 1024;
-
-            return (
+        <div className="flex w-max lg:w-full items-center justify-start gap-1.5 sm:gap-2 md:gap-3 py-4 lg:py-8">
+          {images.map((image, index) => (
               <motion.div
                 key={index}
                 className={cn(
-                  "relative cursor-pointer overflow-hidden rounded-2xl md:rounded-3xl border border-gold/30 hover:border-gold/60 flex-shrink-0"
+                  "relative cursor-pointer overflow-hidden rounded-xl sm:rounded-2xl md:rounded-3xl border border-gold/30 hover:border-gold/60 flex-shrink-0"
                 )}
-                style={{ willChange: 'transform, opacity, width' }}
+                style={{ willChange: "transform, opacity, width" }}
                 initial={{ opacity: 0, x: 200 }}
                 animate={hasAnimated ? {
                   opacity: 1,
                   x: 0,
-                  width: activeImage === index
-                    ? (isMobile ? "12rem" : "24rem")
-                    : (isMobile ? "4rem" : "6rem"),
-                  height: isMobile ? "15rem" : "24rem"
+                  width: activeImage === index ? expandedWidth : collapsedWidth,
+                  height: cardHeight,
                 } : {
                   opacity: 0,
                   x: 200,
-                  width: isMobile ? "4rem" : "6rem",
-                  height: isMobile ? "15rem" : "24rem"
+                  width: collapsedWidth,
+                  height: cardHeight,
                 }}
                 transition={{
                   opacity: { duration: 1, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] },
                   x: { duration: 1.2, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] },
                   width: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-                  height: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+                  height: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
                 }}
                 onClick={() => setActiveImage(index)}
                 onPointerEnter={() => setActiveImage(index)}
@@ -166,8 +178,7 @@ const HoverExpand_001 = ({
                   alt={image.alt}
                 />
               </motion.div>
-            );
-          })}
+          ))}
         </div>
       </motion.div>
     </motion.div>

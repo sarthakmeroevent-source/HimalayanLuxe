@@ -6,7 +6,23 @@ export default {
     ],
     darkMode: "class",
     theme: {
+        screens: {
+            sm: "640px",
+            md: "768px",
+            lg: "1024px",
+            xl: "1280px",
+            "2xl": "1536px",
+            "fullhd": "1920px",
+            "ultrawide": "2560px",
+            "superwide": "3440px",
+        },
         extend: {
+            maxWidth: {
+                "8xl": "88rem",
+                "9xl": "96rem",
+                "content": "min(100%, 90rem)",
+                "section": "min(100%, 85rem)",
+            },
             colors: {
                 primary: "#D4AF37",
                 "primary-light": "#F1E5C3",
