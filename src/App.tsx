@@ -479,7 +479,7 @@ export default function App() {
                         </div>
 
                         <div className="md:w-1/2 relative h-[clamp(300px,50vh,600px)] w-full max-w-2xl glass-card rounded-[24px] md:rounded-[32px] p-2 md:p-3 shadow-2xl flex-shrink-0">
-                            <div className="relative w-full h-full rounded-[30px] overflow-hidden">
+                            <div className="relative w-full h-full rounded-[20px] md:rounded-[28px] overflow-hidden">
                                 <AnimatePresence mode="wait">
                                     <motion.img
                                         key={activePhilosophy}
@@ -490,7 +490,7 @@ export default function App() {
                                         exit={{ opacity: 0, scale: 0.9, filter: 'grayscale(100%)' }}
                                         whileHover={{ filter: 'grayscale(0%)', scale: 1.05 }}
                                         transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-                                        className="absolute inset-0 w-full h-full object-cover"
+                                        className="absolute inset-0 w-full h-full object-cover rounded-[20px] md:rounded-[28px]"
                                     />
                                 </AnimatePresence>
                                 <div className="absolute inset-0 bg-gradient-to-t from-[#022E22] via-transparent to-transparent opacity-80 pointer-events-none"></div>
