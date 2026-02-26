@@ -4,6 +4,10 @@ import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import Silk from './Silk';
 import { Skiper52 } from './components/ui/expand-on-hover';
+import Loader from './components/ui/Loader';
+import Header from './components/layout/Header';
+import NavigationOverlay from './components/layout/NavigationOverlay';
+import Footer from './components/layout/Footer';
 
 export default function App() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -313,216 +317,12 @@ export default function App() {
             </div>
 
             {/* Logo Loader */}
-            <AnimatePresence>
-                {showLoader && (
-                    <>
-                        <motion.div
-                            className="fixed inset-0 z-[300] bg-black"
-                            initial={{ opacity: 1 }}
-                            animate={{ opacity: [1, 1, 0] }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 4.0, times: [0, 0.675, 1], ease: 'easeInOut' }}
-                        >
-                            <Silk
-                                speed={0.8}
-                                scale={0.8}
-                                color="#50C878"
-                                noiseIntensity={3.5}
-                                rotation={0}
-                            />
-                            <div className="absolute inset-0 bg-black/70"></div>
-                        </motion.div>
-                        <motion.img
-                            layoutId="himalayan-logo"
-                            src="/LOGO.svg"
-                            alt="Himalayan Luxe"
-                            className="fixed z-[301]"
-                            style={{ width: 'auto' }}
-                            initial={{
-                                height: '14rem',
-                                left: '50%',
-                                top: '50%',
-                                x: '-50%',
-                                y: '-50%',
-                                scale: 1
-                            }}
-                            animate={{
-                                height: '4rem',
-                                left: isDesktop ? '3rem' : '2rem',
-                                top: '2.5rem',
-                                x: 0,
-                                y: 0,
-                                scale: [1, 1.15, 1.15, 1]
-                            }}
-                            transition={{
-                                height: { duration: 2, delay: 2.7, ease: [0.16, 1, 0.3, 1] },
-                                left: { duration: 2, delay: 2.7, ease: [0.16, 1, 0.3, 1] },
-                                top: { duration: 2, delay: 2.7, ease: [0.16, 1, 0.3, 1] },
-                                x: { duration: 2, delay: 2.7, ease: [0.16, 1, 0.3, 1] },
-                                y: { duration: 2, delay: 2.7, ease: [0.16, 1, 0.3, 1] },
-                                scale: { duration: 4.7, times: [0, 0.32, 0.57, 1], ease: "easeInOut" }
-                            }}
-                        />
-                        <motion.div
-                            className="fixed z-[301] flex items-center gap-1"
-                            style={{
-                                left: '50%',
-                                top: 'calc(50% + 4.5rem)',
-                                transform: 'translateX(-50%)'
-                            }}
-                            initial={{ opacity: 1, scale: 1 }}
-                            animate={{ opacity: 1, scale: [1, 1.15, 1.15] }}
-                            transition={{
-                                scale: { duration: 2.7, times: [0, 0.55, 1], ease: "easeInOut" }
-                            }}
-                        >
-                            <span className="liquid-gold-text text-[18px] lg:text-[28px] tracking-[0.1em] font-meno uppercase flex">
-                                {Array.from("HIMALAYAN").map((char, i) => {
-                                    const totalDuration = 4.7;
-                                    const typingDelay = 0.3 + (i * 0.08);
-                                    const vaporizeStart = 2.7 + (i * 0.08);
-                                    const vaporizeEnd = vaporizeStart + 0.8;
-                                    const t1 = typingDelay / totalDuration;
-                                    const t2 = (typingDelay + 0.05) / totalDuration;
-                                    const t3 = vaporizeStart / totalDuration;
-                                    const t4 = vaporizeEnd / totalDuration;
-                                    const vaporX = (i % 2 === 0 ? 1 : -1) * (20 + i * 15);
-                                    const vaporY = -40 - (i % 3) * 20;
-                                    const vaporRotate = (i % 2 === 0 ? 45 : -45) + i * 5;
-                                    return (
-                                        <motion.span
-                                            key={`h-${i}`}
-                                            className="inline-block relative"
-                                            initial={{ opacity: 0, scale: 1, filter: "blur(0px)" }}
-                                            animate={{
-                                                opacity: [0, 0, 1, 1, 0, 0],
-                                                y: [0, 0, 0, 0, vaporY, vaporY],
-                                                x: [0, 0, 0, 0, vaporX, vaporX],
-                                                scale: [1, 1, 1, 1, 0, 0],
-                                                rotate: [0, 0, 0, 0, vaporRotate, vaporRotate]
-                                            }}
-                                            transition={{ duration: totalDuration, times: [0, t1, t2, t3, t4, 1], ease: "easeInOut" }}
-                                        >
-                                            {char === ' ' ? '\u00A0' : char}
-                                        </motion.span>
-                                    );
-                                })}
-                            </span>
-                            <span className="font-cursive liquid-gold-text text-[36px] lg:text-[56px] font-medium pl-2 pr-2 tracking-wide flex">
-                                {Array.from("Luxe").map((char, i) => {
-                                    const totalDuration = 4.7;
-                                    const delayOffset = 0.3 + ("HIMALAYAN".length * 0.08);
-                                    const typingDelay = delayOffset + (i * 0.08);
-                                    const vaporizeStart = 2.7 + ("HIMALAYAN".length * 0.08) + (i * 0.08);
-                                    const vaporizeEnd = vaporizeStart + 0.8;
-                                    const t1 = typingDelay / totalDuration;
-                                    const t2 = (typingDelay + 0.05) / totalDuration;
-                                    const t3 = vaporizeStart / totalDuration;
-                                    const t4 = vaporizeEnd / totalDuration;
-                                    const vaporX = (i % 2 === 0 ? 1 : -1) * (30 + i * 20);
-                                    const vaporY = -50 - (i % 2) * 20;
-                                    const vaporRotate = (i % 2 === 0 ? 60 : -60) - i * 10;
-                                    return (
-                                        <motion.span
-                                            key={`l-${i}`}
-                                            className="inline-block relative"
-                                            initial={{ opacity: 0, scale: 1, filter: "blur(0px)" }}
-                                            animate={{
-                                                opacity: [0, 0, 1, 1, 0, 0],
-                                                y: [0, 0, 0, 0, vaporY, vaporY],
-                                                x: [0, 0, 0, 0, vaporX, vaporX],
-                                                scale: [1, 1, 1, 1, 0, 0],
-                                                rotate: [0, 0, 0, 0, vaporRotate, vaporRotate]
-                                            }}
-                                            transition={{ duration: totalDuration, times: [0, t1, t2, t3, t4, 1], ease: "easeInOut" }}
-                                        >
-                                            {char === ' ' ? '\u00A0' : char}
-                                        </motion.span>
-                                    );
-                                })}
-                            </span>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+            <Loader showLoader={showLoader} isDesktop={isDesktop} />
 
-            <header className={`fixed top-0 w-full z-[100] px-8 md:px-12 flex items-center justify-between transition-all duration-700 ${isScrolled ? 'py-4' : 'py-10'
-                }`}>
-                <motion.img
-                    layoutId="himalayan-logo"
-                    src="/LOGO.svg"
-                    alt="Himalayan Luxe"
-                    className="h-16 w-auto"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: showLoader ? 0 : 1 }}
-                    transition={{ duration: 0 }}
-                />
-
-                <motion.div
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, delay: 3.3, ease: [0.22, 1, 0.36, 1] }}
-                    className="flex items-center gap-3"
-                >
-                    <button
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        className="text-white hover:opacity-70 transition-opacity font-['Manrope'] text-[11px] md:text-[13px] tracking-[0.3em] uppercase font-medium"
-                    >
-                        MENU
-                    </button>
-                    <button
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        className="text-white hover:opacity-70 transition-opacity flex flex-col items-end gap-[6px]"
-                    >
-                        <div className="w-8 h-[1px] bg-white opacity-80"></div>
-                        <div className="w-12 h-[1px] bg-white opacity-80"></div>
-                    </button>
-                </motion.div>
-            </header>
+            <Header isScrolled={isScrolled} showLoader={showLoader} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
             {/* Navigation Menu Overlay */}
-            <div
-                className={`fixed inset-0 z-[200] transition-transform duration-1000 ease-in-out overflow-hidden ${menuOpen ? 'translate-y-0' : '-translate-y-full'
-                    }`}
-                onClick={() => setMenuOpen(false)}
-            >
-                <div className="absolute inset-0">
-                    <Silk
-                        speed={0.8}
-                        scale={0.8}
-                        color="#50C878"
-                        noiseIntensity={3.5}
-                        rotation={0}
-                    />
-                </div>
-
-                <div className="absolute top-10 right-8 md:right-12 z-10">
-                    <button
-                        onClick={() => setMenuOpen(false)}
-                        className="text-white hover:opacity-70 transition-opacity text-5xl font-light leading-none"
-                    >
-                        ×
-                    </button>
-                </div>
-
-                <div className="h-full flex items-center justify-center relative z-10">
-                    <nav className="flex flex-col items-center gap-12" onClick={(e) => e.stopPropagation()}>
-                        {['home', 'experience', 'destinations', 'services'].map((item, i) => (
-                            <motion.a
-                                key={item}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 0.1 * (i + 1) }}
-                                href={`#${item === 'home' ? 'hero' : item}`}
-                                onClick={() => setMenuOpen(false)}
-                                className="text-white font-['Playfair_Display'] text-3xl md:text-5xl hover:text-gold transition-colors capitalize"
-                            >
-                                {item}
-                            </motion.a>
-                        ))}
-                    </nav>
-                </div>
-            </div>
+            <NavigationOverlay menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
             <div className="scroll-wrapper relative z-10">
                 <section className="section-container relative min-h-screen w-full flex items-center justify-center overflow-hidden" id="hero">
@@ -827,54 +627,7 @@ export default function App() {
                     </motion.div>
                 </section>
 
-                <section className="section-container relative min-h-[60vh] w-full flex flex-col items-center justify-between px-8 md:px-24 py-24 bg-black/40" id="footer">
-                    <div className="w-full max-w-[1400px] flex flex-col md:flex-row items-start justify-between gap-24 md:gap-12">
-                        <div className="flex flex-col items-start max-w-md">
-                            <img src="/LOGO.svg" alt="Himalayan Luxe" className="h-12 w-auto mb-10 opacity-80" />
-                            <p className="text-white/40 text-[12px] md:text-sm leading-relaxed tracking-wide font-sans mb-10">
-                                International award-winning nuptial artist, specializing in palatial celebrations for the world's most discerning families.
-                            </p>
-                            <div className="flex gap-8">
-                                {['Instagram', 'LinkedIn', 'Vimeo'].map((social) => (
-                                    <a key={social} href="#" className="text-[10px] tracking-[0.3em] uppercase font-medium text-white/40 hover:text-gold transition-colors duration-500">
-                                        {social}
-                                    </a>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-16 md:gap-24">
-                            <div className="flex flex-col gap-6">
-                                <span className="text-gold text-[9px] md:text-[10px] tracking-[0.3em] uppercase font-medium mb-2">Discover</span>
-                                {['About', 'Gallery', 'Venues', 'Process'].map((link) => (
-                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-[13px] md:text-sm font-sans tracking-wide">{link}</a>
-                                ))}
-                            </div>
-                            <div className="flex flex-col gap-6">
-                                <span className="text-gold text-[9px] md:text-[10px] tracking-[0.3em] uppercase font-medium mb-2">Explore</span>
-                                {['Destinations', 'Services', 'Artistry', 'Awards'].map((link) => (
-                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-[13px] md:text-sm font-sans tracking-wide">{link}</a>
-                                ))}
-                            </div>
-                            <div className="flex flex-col gap-6">
-                                <span className="text-gold text-[9px] md:text-[10px] tracking-[0.3em] uppercase font-medium mb-2">Legal</span>
-                                {['Privacy', 'Terms', 'Concierge'].map((link) => (
-                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-[13px] md:text-sm font-sans tracking-wide">{link}</a>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="w-full max-w-[1400px] flex flex-col md:flex-row items-center justify-between pt-24 border-t border-white/5">
-                        <span className="text-[10px] tracking-[0.3em] uppercase text-white/20 font-medium order-2 md:order-1">
-                            © 2026 Himalayan Luxe. All Rights Reserved.
-                        </span>
-                        <div className="flex items-center gap-2 mb-8 md:mb-0 order-1 md:order-2">
-                            <span className="text-[10px] tracking-[0.3em] uppercase text-white/40 font-medium">Bespoke Design By</span>
-                            <span className="liquid-gold-text text-[10px] tracking-[0.3em] uppercase font-bold">MeroEvent</span>
-                        </div>
-                    </div>
-                </section>
+                <Footer />
             </div>
         </div>
     );
