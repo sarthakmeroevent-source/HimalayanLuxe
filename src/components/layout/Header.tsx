@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
     isScrolled: boolean;
@@ -10,15 +11,17 @@ interface HeaderProps {
 export default function Header({ isScrolled, showLoader, menuOpen, setMenuOpen }: HeaderProps) {
     return (
         <header className={`fixed top-0 w-full z-[100] px-8 md:px-12 flex items-center justify-between transition-all duration-700 ${isScrolled ? 'py-4' : 'py-10'}`}>
-            <motion.img
-                layoutId="himalayan-logo"
-                src="/LOGO.svg"
-                alt="Himalayan Luxe"
-                className="h-16 w-auto"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: showLoader ? 0 : 1 }}
-                transition={{ duration: 0 }}
-            />
+            <Link to="/" className="cursor-pointer">
+                <motion.img
+                    layoutId="himalayan-logo"
+                    src="/LOGO.svg"
+                    alt="Himalayan Luxe"
+                    className="h-16 w-auto hover:opacity-80 transition-opacity duration-300"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: showLoader ? 0 : 1 }}
+                    transition={{ duration: 0 }}
+                />
+            </Link>
 
             <motion.div
                 initial={{ opacity: 0, x: 50 }}

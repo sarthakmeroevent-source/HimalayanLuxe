@@ -1,27 +1,36 @@
 import { motion } from 'framer-motion';
-import Silk from '../../Silk';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface NavigationOverlayProps {
     menuOpen: boolean;
     setMenuOpen: (open: boolean) => void;
 }
 
+const menuItems = [
+    { label: 'Home', path: '/', hash: '' },
+    { label: 'Experience', path: '/experience', hash: '' },
+    { label: 'Destinations', path: '/destinations', hash: '' },
+    { label: 'Services', path: '/services', hash: '' },
+    { label: 'About', path: '/about', hash: '' },
+    { label: 'Contact', path: '/contact', hash: '' }
+];
+
 export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationOverlayProps) {
+    const navigate = useNavigate();
+
+    const handleNavigation = (item: typeof menuItems[0]) => {
+        setMenuOpen(false);
+        navigate(item.path);
+    };
+
     return (
         <div
             className={`fixed inset-0 z-[200] transition-transform duration-1000 ease-in-out overflow-hidden ${menuOpen ? 'translate-y-0' : '-translate-y-full'
                 }`}
             onClick={() => setMenuOpen(false)}
         >
-            <div className="absolute inset-0">
-                <Silk
-                    speed={0.8}
-                    scale={0.8}
-                    color="#50C878"
-                    noiseIntensity={3.5}
-                    rotation={0}
-                />
-            </div>
+            {/* Plain dark emerald green background */}
+            <div className="absolute inset-0 bg-[#022E22]"></div>
 
             <div className="absolute top-10 left-8 md:left-12 z-10">
                 <motion.img
@@ -45,18 +54,17 @@ export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationO
 
             <div className="h-full flex items-center justify-center relative z-10">
                 <nav className="flex flex-col items-center gap-12" onClick={(e) => e.stopPropagation()}>
-                    {['home', 'experience', 'destinations', 'services'].map((item, i) => (
-                        <motion.a
-                            key={item}
+                    {menuItems.map((item, i) => (
+                        <motion.button
+                            key={item.label}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.1 * (i + 1) }}
-                            href={`#${item === 'home' ? 'hero' : item}`}
-                            onClick={() => setMenuOpen(false)}
-                            className="text-white font-['Playfair_Display'] text-3xl md:text-5xl hover:text-gold transition-colors capitalize"
+                            onClick={() => handleNavigation(item)}
+                            className="text-white font-['Playfair_Display'] text-2xl md:text-4xl hover:text-gold transition-colors"
                         >
-                            {item}
-                        </motion.a>
+                            {item.label}
+                        </motion.button>
                     ))}
                 </nav>
             </div>
