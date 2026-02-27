@@ -17,6 +17,9 @@ function ScrollToTop() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
+        // Also force scroll for any Lenis instance
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
     }, [pathname]);
 
     return null;
