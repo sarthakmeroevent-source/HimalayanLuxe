@@ -39,7 +39,7 @@ function AppContent() {
 
     const location = useLocation();
     const isHomePage = location.pathname === '/';
-    const sections = ['hero', 'experience', 'destinations', 'services', 'cta', 'footer'];
+    const sections = ['hero', 'experience', 'destinations', 'services', 'about', 'cta', 'footer'];
 
     useEffect(() => {
         setShowActiveLabel(true);

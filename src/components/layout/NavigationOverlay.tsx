@@ -8,10 +8,11 @@ interface NavigationOverlayProps {
 
 const menuItems = [
     { label: 'Home', path: '/', hash: '' },
-    { label: 'About', path: '/about', hash: '' },
     { label: 'Experience', path: '/experience', hash: '' },
     { label: 'Destinations', path: '/destinations', hash: '' },
-    { label: 'Services', path: '/services', hash: '' }
+    { label: 'Services', path: '/services', hash: '' },
+    { label: 'About', path: '/about', hash: '' },
+    { label: 'Contact', path: '/contact', hash: '' }
 ];
 
 export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationOverlayProps) {
@@ -60,7 +61,7 @@ export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationO
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.1 * (i + 1) }}
                             onClick={() => handleNavigation(item)}
-                            className="text-white font-['Playfair_Display'] text-3xl md:text-5xl hover:text-gold transition-colors"
+                            className="text-white font-['Playfair_Display'] text-2xl md:text-4xl hover:text-gold transition-colors"
                         >
                             {item.label}
                         </motion.button>

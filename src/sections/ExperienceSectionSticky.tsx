@@ -21,12 +21,12 @@ export default function ExperienceSectionSticky({
         if (!sectionRef.current) return;
         
         const section = sectionRef.current;
-        const sectionTop = section.offsetTop;
+        const sectionTop = section.getBoundingClientRect().top + window.pageYOffset;
         const navHeight = 100;
         const philosophyHeight = section.offsetHeight / philosophies.length;
         
         // Calculate target scroll position for this philosophy
-        const targetScroll = sectionTop + (philosophyHeight * index) - navHeight + (philosophyHeight * 0.5);
+        const targetScroll = sectionTop + (philosophyHeight * index) + (philosophyHeight * 0.3);
         
         window.scrollTo({
             top: targetScroll,
