@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import SimpleCTA from '../components/common/SimpleCTA';
 
 const portfolioItems = [
     {
@@ -153,6 +154,7 @@ export default function PortfolioPage() {
                     </motion.div>
                 </div>
             </section>
+            <SimpleCTA />
         </div>
     );
 }

@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import HeroSection from '../sections/HeroSection';
 import ExperienceSectionSticky from '../sections/ExperienceSectionSticky';
 import DestinationsSection from '../sections/DestinationsSection';
 import ServicesSection from '../sections/ServicesSection';
+import AboutSection from '../sections/AboutSection';
 import CTASection from '../sections/CTASection';
 
 interface HomePageProps {
@@ -37,6 +38,8 @@ export default function HomePage({
             <DestinationsSection />
 
             <ServicesSection />
+
+            <AboutSection />
 
             <CTASection />
         </>

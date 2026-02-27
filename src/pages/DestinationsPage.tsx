@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import SimpleCTA from '../components/common/SimpleCTA';
 
 const destinations = [
     {
@@ -130,6 +131,7 @@ export default function DestinationsPage() {
                     </motion.div>
                 </div>
             </section>
+            <SimpleCTA />
         </div>
     );
 }

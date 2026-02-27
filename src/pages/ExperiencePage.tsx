@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { philosophiesData } from '../data/philosophies';
+import SimpleCTA from '../components/common/SimpleCTA';
 
 export default function ExperiencePage() {
     const [activePhilosophy, setActivePhilosophy] = useState(0);
@@ -101,6 +102,7 @@ export default function ExperiencePage() {
                     </motion.div>
                 </div>
             </section>
+            <SimpleCTA />
         </div>
     );
 }

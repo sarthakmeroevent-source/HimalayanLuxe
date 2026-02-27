@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import SimpleCTA from '../components/common/SimpleCTA';
 
 export default function AboutPage() {
     return (
@@ -111,6 +112,7 @@ export default function AboutPage() {
                     </motion.div>
                 </div>
             </section>
+            <SimpleCTA />
         </div>
     );
 }

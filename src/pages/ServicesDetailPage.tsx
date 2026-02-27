@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import SimpleCTA from '../components/common/SimpleCTA';
 
 const services = [
     {
@@ -129,6 +130,7 @@ export default function ServicesDetailPage() {
                     </div>
                 </div>
             </section>
+            <SimpleCTA />
         </div>
     );
 }
