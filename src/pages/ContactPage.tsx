@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { CustomSelect } from '../components/ui/CustomSelect';
+import { CustomDatePicker } from '../components/ui/CustomDatePicker';
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -53,8 +55,8 @@ export default function ContactPage() {
                                     <input
                                         type="text"
                                         value={formData.name}
-                                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold/50 focus:outline-none transition-colors"
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold focus:ring-1 focus:ring-gold focus:outline-none transition-colors"
                                         required
                                     />
                                 </div>
@@ -66,8 +68,8 @@ export default function ContactPage() {
                                     <input
                                         type="email"
                                         value={formData.email}
-                                        onChange={(e) => setFormData({...formData, email: e.target.value})}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold/50 focus:outline-none transition-colors"
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold focus:ring-1 focus:ring-gold focus:outline-none transition-colors"
                                         required
                                     />
                                 </div>
@@ -79,38 +81,35 @@ export default function ContactPage() {
                                     <input
                                         type="tel"
                                         value={formData.phone}
-                                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold/50 focus:outline-none transition-colors"
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold focus:ring-1 focus:ring-gold focus:outline-none transition-colors"
                                     />
                                 </div>
 
-                                <div>
+                                <div className="z-50 relative">
                                     <label className="block text-white/70 text-sm mb-2 tracking-wide">
                                         Event Type
                                     </label>
-                                    <select
+                                    <CustomSelect
                                         value={formData.eventType}
-                                        onChange={(e) => setFormData({...formData, eventType: e.target.value})}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold/50 focus:outline-none transition-colors"
-                                        required
-                                    >
-                                        <option value="">Select Event Type</option>
-                                        <option value="wedding">Wedding</option>
-                                        <option value="destination">Destination Event</option>
-                                        <option value="corporate">Corporate Event</option>
-                                        <option value="other">Other</option>
-                                    </select>
+                                        onChange={(val) => setFormData({ ...formData, eventType: val })}
+                                        options={[
+                                            { value: 'wedding', label: 'Wedding' },
+                                            { value: 'destination', label: 'Destination Event' },
+                                            { value: 'corporate', label: 'Corporate Event' },
+                                            { value: 'other', label: 'Other' }
+                                        ]}
+                                        placeholder="Select Event Type"
+                                    />
                                 </div>
 
-                                <div>
+                                <div className="z-40 relative">
                                     <label className="block text-white/70 text-sm mb-2 tracking-wide">
                                         Preferred Date
                                     </label>
-                                    <input
-                                        type="date"
+                                    <CustomDatePicker
                                         value={formData.date}
-                                        onChange={(e) => setFormData({...formData, date: e.target.value})}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold/50 focus:outline-none transition-colors"
+                                        onChange={(val) => setFormData({ ...formData, date: val })}
                                     />
                                 </div>
 
@@ -120,9 +119,9 @@ export default function ContactPage() {
                                     </label>
                                     <textarea
                                         value={formData.message}
-                                        onChange={(e) => setFormData({...formData, message: e.target.value})}
+                                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                         rows={5}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold/50 focus:outline-none transition-colors resize-none"
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold focus:ring-1 focus:ring-gold focus:outline-none transition-colors resize-none"
                                         required
                                     ></textarea>
                                 </div>
