@@ -1,7 +1,74 @@
 import { motion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { servicesData } from '../data/services';
 
+gsap.registerPlugin(ScrollTrigger);
+
 export default function ServicesSection() {
+    const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+
+    useEffect(() => {
+        const cards = cardsRef.current.filter(Boolean);
+        const totalCards = cards.length;
+
+        cards.forEach((card, index) => {
+            if (!card) return;
+
+            const isLastCard = index === totalCards - 1;
+            const nextCard = cards[index + 1];
+
+            // Pin each card at the top
+            ScrollTrigger.create({
+                trigger: card,
+                start: 'top top',
+                end: isLastCard 
+                    ? `+=${window.innerHeight}` 
+                    : (nextCard ? `${nextCard.offsetTop - card.offsetTop}px` : `+=${window.innerHeight * 2}`),
+                pin: true,
+                pinSpacing: false,
+            });
+
+            // Scale down animation only for non-last cards when next card comes up
+            if (!isLastCard && nextCard) {
+                ScrollTrigger.create({
+                    trigger: nextCard,
+                    start: 'top bottom',
+                    end: 'top top',
+                    scrub: 1,
+                    onUpdate: (self) => {
+                        const progress = self.progress;
+
+                        // Scale from 1 to 0.85
+                        const scale = 1 - (progress * 0.15);
+
+                        // Move down to show stacking
+                        const y = progress * 40;
+
+                        // Slight fade
+                        const opacity = 1 - (progress * 0.3);
+
+                        gsap.set(card, {
+                            scale: scale,
+                            y: y,
+                            opacity: opacity,
+                            transformOrigin: 'center top'
+                        });
+                    }
+                });
+            }
+        });
+
+        return () => {
+            ScrollTrigger.getAll().forEach(trigger => {
+                if (trigger.vars.trigger && cardsRef.current.includes(trigger.vars.trigger as HTMLDivElement)) {
+                    trigger.kill();
+                }
+            });
+        };
+    }, []);
+
     return (
         <section className="relative w-full pt-20 pb-20 px-4 md:px-8" id="services">
             <motion.div
@@ -17,12 +84,17 @@ export default function ServicesSection() {
                 </h2>
             </motion.div>
 
-            <div className="w-full max-w-[1400px] mx-auto flex flex-col gap-[40vh] md:gap-[50vh] pb-0 relative z-10">
+            <div className="w-full max-w-[1400px] mx-auto relative z-10" style={{ minHeight: `${servicesData.length * 150}vh` }}>
                 {servicesData.map((service, i) => (
                     <div
                         key={service.id}
-                        className="sticky flex flex-col items-center justify-center w-full h-[70vh] md:h-[80vh] rounded-[24px] md:rounded-[40px] overflow-hidden shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border border-white/10"
-                        style={{ top: `calc(10vh + ${i * 24}px)` }}
+                        ref={(el) => (cardsRef.current[i] = el)}
+                        className="flex flex-col items-center justify-center w-full h-[70vh] md:h-[80vh] rounded-[24px] md:rounded-[40px] overflow-hidden shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border border-white/10 will-change-transform"
+                        style={{
+                            position: 'relative',
+                            marginBottom: i < servicesData.length - 1 ? '0' : '0',
+                            zIndex: i + 1
+                        }}
                     >
                         <img src={service.img} alt={service.title} className="absolute inset-0 w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/40"></div>

@@ -1,6 +1,10 @@
 import { useEffect } from 'react';
 import Lenis from 'lenis';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { philosophiesData } from '../data/philosophies';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface UseScrollHandlerProps {
     showLoader: boolean;
@@ -37,6 +41,15 @@ export function useScrollHandler({
             infinite: false,
         });
 
+        // Sync Lenis with GSAP ScrollTrigger
+        lenis.on('scroll', ScrollTrigger.update);
+
+        gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+        });
+
+        gsap.ticker.lagSmoothing(0);
+
         const handleScroll = () => {
             const scrollY = window.scrollY;
             setIsScrolled(scrollY > 100);
@@ -49,34 +62,7 @@ export function useScrollHandler({
                 setIsScrolled(scrollY > heroHeight - 100);
             }
 
-            const experienceSection = document.getElementById('experience');
-            if (experienceSection) {
-                const rect = experienceSection.getBoundingClientRect();
-                const navHeight = 100;
-                
-                if (rect.top <= navHeight && rect.bottom > window.innerHeight) {
-                    setActiveSection('experience');
-                    
-                    const sectionHeight = rect.height - window.innerHeight;
-                    const scrolledInSection = navHeight - rect.top;
-                    const sectionScrollProgress = scrolledInSection / sectionHeight;
-                    
-                    const philosophyThreshold = 1 / philosophiesData.length;
-                    const philosophyIndex = Math.max(0, Math.min(
-                        Math.floor(sectionScrollProgress / philosophyThreshold),
-                        philosophiesData.length - 1
-                    ));
-                    
-                    const progressInCurrentPhilosophy = (sectionScrollProgress % philosophyThreshold) / philosophyThreshold;
-                    
-                    if (progressInCurrentPhilosophy > 0.15 && philosophyIndex !== activePhilosophy) {
-                        setActivePhilosophy(philosophyIndex);
-                        activePhilosophyRef.current = philosophyIndex;
-                    }
-                }
-            }
-
-            const sections = ['hero', 'experience', 'destinations', 'services', 'cta', 'footer'];
+            const sections = ['hero', 'experience', 'destinations', 'services', 'about', 'cta', 'footer'];
             sections.forEach((sectionId) => {
                 const element = document.getElementById(sectionId);
                 if (element) {
@@ -102,6 +88,9 @@ export function useScrollHandler({
         return () => {
             lenis.destroy();
             cancelAnimationFrame(rafId);
+            gsap.ticker.remove((time) => {
+                lenis.raf(time * 1000);
+            });
         };
     }, [showLoader, activePhilosophy, isHomePage, setIsScrolled, setActiveSection, setActivePhilosophy, activeSectionRef, activePhilosophyRef]);
 }
