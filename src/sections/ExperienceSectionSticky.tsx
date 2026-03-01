@@ -29,6 +29,11 @@ export default function ExperienceSectionSticky({
         const section = sectionRef.current;
         const totalPhilosophies = philosophies.length;
 
+        // Set initial state for first image to be visible
+        if (imageRefs.current[0]) {
+            gsap.set(imageRefs.current[0], { opacity: 1 });
+        }
+
         // Create ScrollTrigger for the section
         const trigger = ScrollTrigger.create({
             trigger: section,
@@ -132,7 +137,7 @@ export default function ExperienceSectionSticky({
                     });
                 });
 
-                // Animate images with smooth crossfade
+                // Animate images with smooth crossfade - always at full brightness
                 imageRefs.current.forEach((img, index) => {
                     if (!img) return;
                     
@@ -143,13 +148,23 @@ export default function ExperienceSectionSticky({
                     
                     let opacity = 0;
                     
-                    // Crossfade with overlap
-                    const fadeRange = sectionSize * 0.3; // 30% overlap
-                    
-                    if (progress >= sectionStart - fadeRange && progress <= sectionEnd + fadeRange) {
-                        const distance = Math.abs(progress - sectionMid);
-                        const maxDistance = sectionSize / 2 + fadeRange;
-                        opacity = Math.max(0, 1 - (distance / maxDistance)) * 0.8;
+                    // Special handling for first image - always visible at start
+                    if (index === 0 && progress < sectionSize * 0.5) {
+                        opacity = 1;
+                    }
+                    // Special handling for last image - always visible at end
+                    else if (index === totalPhilosophies - 1 && progress > 1 - (sectionSize * 0.5)) {
+                        opacity = 1;
+                    }
+                    // Crossfade with overlap for middle transitions
+                    else {
+                        const fadeRange = sectionSize * 0.4;
+                        
+                        if (progress >= sectionStart - fadeRange && progress <= sectionEnd + fadeRange) {
+                            const distance = Math.abs(progress - sectionMid);
+                            const maxDistance = sectionSize / 2 + fadeRange;
+                            opacity = Math.max(0, 1 - (distance / maxDistance));
+                        }
                     }
                     
                     gsap.to(img, {
@@ -195,9 +210,9 @@ export default function ExperienceSectionSticky({
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(800px,100vw)] h-[min(800px,100vw)] bg-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
 
                 <div className="relative z-10 w-full max-w-[1600px] mx-auto flex-grow flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 px-12 md:px-32 py-12">
-                    <div className="md:w-1/2 flex flex-col items-start text-left relative">
+                    <div className="md:w-1/2 flex flex-col items-start text-left justify-center relative" style={{ minHeight: '70vh' }}>
                         {/* Scrollable container for entire left content */}
-                        <div className="relative w-full overflow-hidden" style={{ minHeight: '70vh' }}>
+                        <div className="relative w-full flex items-center justify-center overflow-hidden" style={{ minHeight: '70vh' }}>
                             {philosophies.map((philosophy, index) => (
                                 <div
                                     key={index}
@@ -243,41 +258,20 @@ export default function ExperienceSectionSticky({
                         </div>
                     </div>
 
-                    <div className="md:w-1/2 relative h-[clamp(300px,50vh,600px)] w-full max-w-2xl glass-card rounded-[24px] md:rounded-[32px] p-2 md:p-3 shadow-2xl flex-shrink-0">
-                        <div className="relative w-full h-full rounded-[20px] md:rounded-[28px] overflow-hidden">
+                    <div className="md:w-1/2 relative h-[clamp(400px,60vh,700px)] w-full max-w-2xl rounded-[24px] md:rounded-[32px] p-2 md:p-3 shadow-2xl flex-shrink-0 border border-gold/20" style={{ background: 'transparent' }}>
+                        <div className="relative w-full h-full rounded-[20px] md:rounded-[28px] overflow-hidden bg-transparent">
                             {philosophies.map((philosophy, index) => (
                                 <img
                                     key={index}
                                     ref={(el) => (imageRefs.current[index] = el)}
                                     src={philosophy.image}
                                     alt={philosophy.title}
-                                    className="absolute inset-0 w-full h-full object-cover rounded-[20px] md:rounded-[28px] will-change-opacity"
+                                    className="absolute inset-0 w-full h-full object-cover rounded-[20px] md:rounded-[28px] will-change-opacity brightness-100"
                                     style={{ 
-                                        opacity: 0,
-                                        filter: 'grayscale(80%)',
-                                        transition: 'filter 0.3s ease'
+                                        opacity: index === 0 ? 1 : 0,
                                     }}
-                                    onMouseEnter={(e) => e.currentTarget.style.filter = 'grayscale(0%)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.filter = 'grayscale(80%)'}
                                 />
                             ))}
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#022E22] via-transparent to-transparent opacity-80 pointer-events-none"></div>
-
-                            <div className="absolute bottom-8 left-8 z-10 hidden md:block">
-                                <AnimatePresence mode="wait">
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -20 }}
-                                        key={activePhilosophy}
-                                        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                                        className="flex flex-col"
-                                    >
-                                        <span className="text-[40px] font-serif text-gold/20 leading-none mb-2">0{activePhilosophy + 1}</span>
-                                        <span className="text-[10px] tracking-[0.3em] uppercase text-white/40 font-medium">Philosophy</span>
-                                    </motion.div>
-                                </AnimatePresence>
-                            </div>
                         </div>
                     </div>
                 </div>

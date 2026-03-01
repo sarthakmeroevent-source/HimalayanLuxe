@@ -91,15 +91,6 @@ function AppContent() {
 
     return (
         <div className="relative">
-            {isHomePage && (
-                <SectionPagination
-                    sections={sections}
-                    activeSection={activeSection}
-                    showActiveLabel={showActiveLabel}
-                    onSectionClick={handleSectionClick}
-                />
-            )}
-
             <AppLayout
                 showLoader={showLoader}
                 isDesktop={isDesktop}

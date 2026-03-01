@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Himalayan Luxe - Instagram Post</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --light-gold: #F1E5AC;
+            --dark-bg: #0A0A0A;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Outfit', sans-serif;
+            color: var(--white);
+        }
+
+        /* Instagram 4:5 Portrait Ratio */
+        .canvas {
+            width: 500px;
+            height: 625px;
+            background: var(--dark-bg);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.85;
+            transition: transform 10s ease-out;
+        }
+
+        .canvas:hover .background-image {
+            transform: scale(1.05);
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.3) 0%, 
+                transparent 40%, 
+                rgba(0,0,0,0.4) 60%, 
+                rgba(0,0,0,0.9) 100%);
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--white);
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tagline {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .main-message {
+            margin-bottom: 20px;
+        }
+
+        .motto-primary {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            line-height: 1.2;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+
+        .motto-primary .italic {
+            font-style: italic;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .motto-secondary {
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            color: rgba(255,255,255,0.8);
+            max-width: 80%;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .gold-line {
+            width: 40px;
+            height: 1px;
+            background: var(--gold);
+        }
+
+        .cta-text {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--white);
+            opacity: 0.7;
+        }
+
+        /* Decorative Elements */
+        .corner-border {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--gold);
+            z-index: 3;
+        }
+
+        .tl { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+        .tr { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+        .bl { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+        .br { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+        .image-credit {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 8px;
+            opacity: 0.3;
+            z-index: 4;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="canvas">
+        <div class="corner-border tl"></div>
+        <div class="corner-border tr"></div>
+        <div class="corner-border bl"></div>
+        <div class="corner-border br"></div>
+
+        <img src="./himalayan_luxe_wedding_instagram_1772348783622.png" alt="Himalayan Luxe Wedding" class="background-image">
+        <div class="overlay"></div>
+
+        <div class="content">
+            <div class="header">
+                <div class="logo-text">Himalayan Luxe</div>
+                <div class="tagline">Bespoke Excellence</div>
+            </div>
+
+            <div class="main-message">
+                <h1 class="motto-primary">
+                    Curating Memories <br>
+                    <span class="italic">Beyond Imagination</span>
+                </h1>
+                <p class="motto-secondary">
+                    Promoting Nepal as the world's premier wedding destination hub. Where Himalayan grandeur meets your eternal story.
+                </p>
+            </div>
+
+            <div class="footer">
+                <div class="gold-line"></div>
+                <div class="cta-text">himalayanluxe.com</div>
+            </div>
+        </div>
+        
+    </div>
+
+</body>
+</html>

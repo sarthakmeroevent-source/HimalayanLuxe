@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 export default function Footer() {
     return (
-        <section className="section-container relative w-full flex flex-col items-center justify-between px-8 md:px-16 pt-16 pb-8 bg-black/60 backdrop-blur-md" id="footer">
+        <section className="relative w-full flex flex-col items-center justify-between px-8 md:px-16 py-16 bg-black/60 backdrop-blur-md" id="footer">
             <div className="w-full max-w-[1400px] flex flex-col items-center gap-8 md:gap-12 relative z-10">
 
                 <motion.img

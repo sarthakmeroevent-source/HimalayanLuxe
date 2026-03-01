@@ -19,12 +19,12 @@ export default function ServicesSection() {
             const isLastCard = index === totalCards - 1;
             const nextCard = cards[index + 1];
 
-            // Pin each card at the top
+            // Pin each card below the navbar
             ScrollTrigger.create({
                 trigger: card,
-                start: 'top top',
+                start: 'top top+=100px',
                 end: isLastCard 
-                    ? `+=${window.innerHeight}` 
+                    ? '+=1' // Minimal pin duration for last card
                     : (nextCard ? `${nextCard.offsetTop - card.offsetTop}px` : `+=${window.innerHeight * 2}`),
                 pin: true,
                 pinSpacing: false,
@@ -70,7 +70,7 @@ export default function ServicesSection() {
     }, []);
 
     return (
-        <section className="relative w-full pt-20 pb-20 px-4 md:px-8" id="services">
+        <section className="relative w-full pt-20 pb-0 px-4 md:px-8" id="services">
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -84,7 +84,7 @@ export default function ServicesSection() {
                 </h2>
             </motion.div>
 
-            <div className="w-full max-w-[1400px] mx-auto relative z-10" style={{ minHeight: `${servicesData.length * 150}vh` }}>
+            <div className="w-full max-w-[1400px] mx-auto relative z-10">
                 {servicesData.map((service, i) => (
                     <div
                         key={service.id}

@@ -11,7 +11,7 @@ export default function DestinationsSection() {
                         initial={{ opacity: 0, y: -30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ margin: "-100px", amount: 0.3 }}
-                        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                         className="flex flex-col items-center"
                     >
                         <span className="liquid-gold-text text-[10px] md:text-xs tracking-[0.4em] uppercase font-medium block">
@@ -24,7 +24,7 @@ export default function DestinationsSection() {
                     initial={{ opacity: 0, y: -50 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ margin: "-100px", amount: 0.3 }}
-                    transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
                     className="font-serif text-white/95 text-[clamp(24px,3.5vw,48px)] font-normal leading-[1.1] tracking-tight drop-shadow-2xl mb-10 text-center"
                 >
                     Crafting timeless <span className="liquid-gold-text">moments</span>
@@ -43,7 +43,7 @@ export default function DestinationsSection() {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ margin: "-100px", amount: 0.3 }}
-                    transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.4 }}
+                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
                 >
                     <Link
                         to="/destinations"

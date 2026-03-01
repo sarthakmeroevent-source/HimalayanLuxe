@@ -54,11 +54,6 @@ const Skiper52 = () => {
       alt: "Wedding moments",
       code: "# 09",
     },
-    {
-      src: "https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=800",
-      alt: "Wedding elegance",
-      code: "# 10",
-    },
   ];
 
   return (
@@ -97,9 +92,9 @@ const HoverExpand_001 = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="w-full overflow-x-auto scrollbar-hide"
+        className="w-full"
       >
-        <div className="flex w-max lg:w-full items-center justify-start gap-2 md:gap-3 py-4 lg:py-8">
+        <div className="flex w-full items-center justify-center gap-2 md:gap-3 py-4 lg:py-8">
           {images.map((image, index) => {
             const isWindowDefined = typeof window !== 'undefined';
             const isMobile = isWindowDefined && window.innerWidth < 1024;
@@ -108,7 +103,7 @@ const HoverExpand_001 = ({
               <motion.div
                 key={index}
                 className={cn(
-                  "relative cursor-pointer overflow-hidden rounded-2xl md:rounded-3xl border border-gold/30 hover:border-gold/60 flex-shrink-0"
+                  "relative cursor-pointer overflow-hidden rounded-2xl md:rounded-3xl border border-gold/30 hover:border-gold/60"
                 )}
                 style={{ willChange: 'transform, opacity, width' }}
                 initial={{ opacity: 0, x: 200 }}
@@ -116,13 +111,13 @@ const HoverExpand_001 = ({
                   opacity: 1,
                   x: 0,
                   width: activeImage === index
-                    ? (isMobile ? "12rem" : "24rem")
-                    : (isMobile ? "4rem" : "6rem"),
+                    ? (isMobile ? "14rem" : "28rem")
+                    : (isMobile ? "5rem" : "7rem"),
                   height: isMobile ? "15rem" : "24rem"
                 } : {
                   opacity: 0,
                   x: 200,
-                  width: isMobile ? "4rem" : "6rem",
+                  width: isMobile ? "5rem" : "7rem",
                   height: isMobile ? "15rem" : "24rem"
                 }}
                 transition={{
