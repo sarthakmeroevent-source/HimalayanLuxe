@@ -55,7 +55,7 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
     }, [isMuted]);
 
     return (
-        <section ref={sectionRef} className="section-container relative min-h-[100dvh] w-full flex items-center justify-center overflow-hidden mb-20 md:mb-0" id="hero">
+        <section ref={sectionRef} className="section-container relative min-h-[100dvh] w-full flex items-center justify-center overflow-hidden bg-[#022E22] mb-20 md:mb-0" id="hero">
             <div className="absolute inset-0 z-0">
                 <video
                     ref={videoRef}
@@ -105,7 +105,7 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                 </motion.button>
             </div>
 
-            <div className="absolute bottom-0 w-full px-[clamp(1.5rem,4vw,4rem)] pb-8 md:pb-8 pt-[120px] flex flex-col items-start justify-end z-20">
+            <div className="absolute bottom-0 w-full px-[clamp(1.5rem,4vw,4rem)] pb-8 pt-[120px] flex flex-col items-start justify-end z-20">
                 <motion.h2
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
