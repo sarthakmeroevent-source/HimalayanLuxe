@@ -193,35 +193,35 @@ export default function ExperienceSectionSticky({
 
     // Auto-play logic for mobile carousel
     useEffect(() => {
-        if (isDesktop || isInteracting) return;
+        if (isDesktop || isInteracting || !carouselRef.current) return;
 
-        const interval = setInterval(() => {
-            const nextIndex = (activePhilosophyRef.current + 1) % philosophies.length;
+        const timer = setTimeout(() => {
+            const container = carouselRef.current;
+            if (isAnimatingRef.current || !container) return;
 
-            if (carouselRef.current && !isAnimatingRef.current) {
-                const cardWidth = carouselRef.current.offsetWidth * 0.85;
-                const gap = 24; // gap-6
+            const nextIndex = (activePhilosophy + 1) % philosophies.length;
+            const cardWidth = container.offsetWidth * 0.85;
+            const gap = 24; // gap-6
 
-                isAnimatingRef.current = true;
+            isAnimatingRef.current = true;
 
-                gsap.to(carouselRef.current, {
-                    scrollLeft: nextIndex * (cardWidth + gap),
-                    duration: 0.8,
-                    ease: "power2.inOut",
-                    onComplete: () => {
-                        isAnimatingRef.current = false;
-                        setActivePhilosophy(nextIndex);
-                        activePhilosophyRef.current = nextIndex;
-                    }
-                });
-            }
+            gsap.to(container, {
+                scrollLeft: nextIndex * (cardWidth + gap),
+                duration: 0.8,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    isAnimatingRef.current = false;
+                    setActivePhilosophy(nextIndex);
+                    activePhilosophyRef.current = nextIndex;
+                }
+            });
         }, 3000);
 
         return () => {
-            clearInterval(interval);
+            clearTimeout(timer);
             gsap.killTweensOf(carouselRef.current);
         };
-    }, [isDesktop, isInteracting, philosophies.length, setActivePhilosophy]);
+    }, [isDesktop, isInteracting, activePhilosophy, philosophies.length, setActivePhilosophy]);
 
     if (!isDesktop) {
         return (
@@ -293,7 +293,7 @@ export default function ExperienceSectionSticky({
     return (
         <section
             ref={sectionRef}
-            className="relative w-full mt-16 md:mt-0"
+            className="relative w-full mt-0"
             id="experience"
             style={{ height: `${philosophies.length * 100}vh` }}
         >
