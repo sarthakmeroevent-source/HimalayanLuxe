@@ -32,14 +32,15 @@
         margin: 0;
         padding: 0;
         min-height: 100vh;
-        background-color: #022E22;
-        /* Deep emerald base */
+        background-color: #000000;
+        overscroll-behavior: none;
+        /* Prevent elastic scroll gaps */
     }
 
     body {
         @apply font-sans text-slate-100;
         position: relative;
-        background-color: #022E22;
+        background-color: #000000;
     }
 }
 
@@ -168,8 +169,8 @@ html::-webkit-scrollbar {
 
 /* Prevent browser autofill from breaking the glassmorphism/dark theme backgrounds */
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
     -webkit-text-fill-color: white !important;
     transition: background-color 5000s ease-in-out 0s !important;
