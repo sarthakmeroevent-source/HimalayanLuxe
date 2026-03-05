@@ -8,13 +8,11 @@ interface LoaderProps {
     isDesktop: boolean;
 }
 
-export default function Loader({ showLoader }: LoaderProps) {
+export default function Loader({ showLoader, isDesktop }: LoaderProps) {
     const logoRef = useRef<HTMLImageElement>(null);
 
     useLayoutEffect(() => {
         if (!logoRef.current || !showLoader) return;
-
-        const isMd = window.innerWidth >= 768;
 
         const ctx = gsap.context(() => {
             const tl = gsap.timeline();
@@ -44,8 +42,8 @@ export default function Loader({ showLoader }: LoaderProps) {
             // Move to exactly match the header logo coordinates
             tl.to(logoRef.current, {
                 height: '4rem',
-                left: isMd ? '48px' : '32px',
-                top: isMd ? '40px' : '48px',
+                left: isDesktop ? '48px' : '32px',
+                top: isDesktop ? '40px' : '48px',
                 xPercent: 0,
                 yPercent: 0,
                 duration: 2.2,
@@ -56,7 +54,7 @@ export default function Loader({ showLoader }: LoaderProps) {
         return () => {
             ctx.revert();
         };
-    }, [showLoader]);
+    }, [showLoader, isDesktop]);
 
     return (
         <AnimatePresence>
@@ -89,7 +87,12 @@ export default function Loader({ showLoader }: LoaderProps) {
                             src="/LOGO.svg"
                             alt="Himalayan Luxe"
                             className="absolute pointer-events-auto"
-                            style={{ width: 'auto' }}
+                            style={{
+                                width: 'auto',
+                                height: '4rem',
+                                left: isDesktop ? '48px' : '32px',
+                                top: isDesktop ? '40px' : '48px'
+                            }}
                         />
                     </motion.div>
 
