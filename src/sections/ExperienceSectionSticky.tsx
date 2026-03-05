@@ -225,7 +225,7 @@ export default function ExperienceSectionSticky({
 
     if (!isDesktop) {
         return (
-            <section className="relative w-full py-12 px-6 overflow-hidden bg-transparent" id="experience">
+            <section className="relative w-full pt-24 pb-12 px-6 overflow-hidden bg-transparent" id="experience">
                 <div className="flex flex-col items-center text-center gap-6 mb-12">
                     <span className="liquid-gold-text text-[10px] tracking-[0.3em] uppercase font-medium">Experience</span>
                     <h2 className="font-serif text-white/95 text-4xl leading-[1.1] font-normal tracking-tight mx-auto max-w-[280px]">The Art of <span className="italic text-white/50">Details</span></h2>

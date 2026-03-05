@@ -32,4 +32,4 @@ public/Video.mp4
 .fuse_*
 
 # PR templates and descriptions
-PR_DESCRIPTION.md
+*.md
