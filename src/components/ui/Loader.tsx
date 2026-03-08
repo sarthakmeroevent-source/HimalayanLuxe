@@ -68,7 +68,7 @@ export default function Loader({ showLoader, isDesktop }: LoaderProps) {
             {showLoader && (
                 <>
                     <motion.div
-                        className={`fixed inset-0 z-[300] bg-black ${allowInteraction ? 'pointer-events-none' : 'pointer-events-auto'}`}
+                        className="fixed inset-0 z-[300] bg-black pointer-events-none"
                         initial={{ opacity: 1 }}
                         animate={{ opacity: 0 }}
                         exit={{ opacity: 0 }}

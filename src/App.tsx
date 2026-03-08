@@ -13,14 +13,29 @@ import ContactPage from './pages/ContactPage';
 import { useScrollHandler } from './hooks/useScrollHandler';
 
 function ScrollToTop() {
-    const { pathname } = useLocation();
+    const { pathname, search } = useLocation();
 
     useEffect(() => {
-        window.scrollTo(0, 0);
-        // Also force scroll for any Lenis instance
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-    }, [pathname]);
+        // Disable browser's automatic scroll restoration to prevent flickering
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
+
+        // Force an immediate scroll to top on every route change
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'instant' as ScrollBehavior
+        });
+
+        // Also scroll the primary scroll container if it exists
+        const scrollContainer = document.querySelector('main') || document.documentElement;
+        if (scrollContainer) {
+            scrollContainer.scrollTop = 0;
+        }
+
+        // Re-enable for the next interaction if needed, though 'manual' is usually best for SPAs with Lenis
+    }, [pathname, search]);
 
     return null;
 }

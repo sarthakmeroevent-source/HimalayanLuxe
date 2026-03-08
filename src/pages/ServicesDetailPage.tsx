@@ -3,132 +3,159 @@ import SimpleCTA from '../components/common/SimpleCTA';
 
 const services = [
     {
-        title: 'Wedding Planning',
-        subtitle: 'Complete Orchestration',
-        description: 'From intimate ceremonies to grand celebrations, we handle every detail with precision and artistry.',
+        id: '01',
+        title: 'Bespoke Weddings',
+        subtitle: "GRAND NUPTIALS & PALATIAL CEREMONIES",
+        description: 'Palatial transformations executed with microscopic precision. We don\'t just plan weddings; we architect legends, ensuring every glance, every petal, and every note resonates with your family\'s legacy.',
         features: [
-            'Venue Selection & Design',
-            'Vendor Coordination',
-            'Timeline Management',
-            'Guest Experience',
-            'Day-of Coordination'
+            'Architectural Venue Transformation',
+            'Bespoke Scenography Design',
+            'Global Logistics Orchestration',
+            'Discerning Vendor Curation',
+            'Full Concierge Guest Experience'
         ],
-        image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1200&q=80'
+        image: '/experience_image.png',
+        quote: '"To plan a wedding here is to curate a legacy of emotion and grandeur."'
     },
     {
-        title: 'Destination Events',
-        subtitle: 'Global Experiences',
-        description: 'Transform exotic locations into unforgettable venues with our worldwide network and expertise.',
+        id: '02',
+        title: 'Destination Weddings',
+        subtitle: 'GLOBAL NUPTIALS REDEFINED',
+        description: "From the peaks of the Himalayas to the world's most secluded shores, we sculpt worlds that seamlessly blend nature and luxury. Each location becomes a living canvas for your celebration.",
         features: [
-            'Location Scouting',
-            'Travel Coordination',
-            'Accommodation Management',
-            'Cultural Integration',
-            'Logistics Planning'
+            'Exclusive Location Scouting',
+            'Global Charter Management',
+            'Destination Protocol Handling',
+            'Luxury Accommodation Buyouts',
+            'Bespoke Excursion Design'
         ],
-        image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200&q=80'
+        image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=1600',
+        quote: '"The horizon is our canvas; your journey is the masterpiece."'
     },
     {
-        title: 'Design & Decor',
-        subtitle: 'Visual Masterpieces',
-        description: 'Our design team creates immersive environments that tell your unique story.',
+        id: '03',
+        title: 'Luxury Events',
+        subtitle: 'EXTRAORDINARY GALAS & PRIVATE PARTIES',
+        description: 'Bespoke event architecture curated by internationally acclaimed artists. We create immersive environments that engage every sense, where every texture and light is considered with absolute precision.',
         features: [
-            'Concept Development',
-            'Floral Architecture',
-            'Lighting Design',
-            'Custom Installations',
-            'Spatial Planning'
+            'Artistic Table Scenography',
+            'Lighting & Atmospheric Design',
+            'Custom Furniture Fabrication',
+            'Textile & Surface Engineering',
+            'World-Class Catering Management'
         ],
-        image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1200&q=80'
+        image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1600&q=80',
+        quote: '"Design is not just what you see, but the atmosphere you breathe."'
     },
     {
-        title: 'Entertainment',
-        subtitle: 'Curated Performances',
-        description: 'From international artists to intimate ensembles, we curate entertainment that captivates.',
+        id: '04',
+        title: 'Corporate Seminars',
+        subtitle: 'ELITE EXECUTIVE GATHERINGS',
+        description: 'From global summits to intimate executive retreats. We curate journeys through high-end knowledge and sound, ensuring the rhythm of your corporate gathering is both productive and prestigious.',
         features: [
-            'Artist Booking',
-            'Performance Curation',
-            'Technical Production',
-            'Sound & Lighting',
-            'Stage Management'
+            'Executive Protocol Direction',
+            'Immersive Presentation Tech',
+            'Bespoke Sound Sculpting',
+            'Gourmet Networking Lounges',
+            'Seamless Logistics Orchestration'
         ],
-        image: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=1200&q=80'
+        image: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=1600',
+        quote: '"Precision and prestige meet in every boardroom and banquet hall."'
     }
 ];
 
 export default function ServicesDetailPage() {
     return (
         <div className="relative min-h-screen pt-32 pb-0">
-            <section className="relative w-full px-8 md:px-16 py-20">
-                <div className="max-w-[1400px] mx-auto">
-                    {/* Header */}
+            {/* Header Section */}
+            <section className="relative w-full px-8 md:px-16 pt-20 pb-12 flex flex-col items-center justify-center">
+                <div className="max-w-[1200px] mx-auto text-center relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-center mb-20"
+                        transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
                     >
                         <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-6 block">
-                            What We Offer
+                            The Masterlist
                         </span>
-                        <h1 className="font-serif text-white/95 text-[clamp(32px,5vw,72px)] leading-[1.1] font-normal tracking-tight mb-8">
-                            Our <span className="liquid-gold-text">Services</span>
+                        <h1 className="font-serif text-white text-[clamp(40px,5vw,80px)] leading-[1.1] font-normal tracking-tight mb-8">
+                            Our <span className="liquid-gold-text italic">Services</span>
                         </h1>
                         <p className="text-white/60 text-lg max-w-3xl mx-auto leading-relaxed">
-                            Comprehensive luxury event services tailored to your vision
+                            Crafting palatial transformations executed with microscopic precision and grand vision.
                         </p>
                     </motion.div>
-
-                    {/* Services List */}
-                    <div className="space-y-32">
-                        {services.map((service, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 50 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, amount: 0.2 }}
-                                transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                                className={`grid md:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''
-                                    }`}
-                            >
-                                <div className={`${index % 2 === 1 ? 'md:order-2' : ''}`}>
-                                    <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-4 block">
-                                        {service.subtitle}
-                                    </span>
-                                    <h2 className="font-serif text-white/95 text-4xl md:text-5xl mb-6">
-                                        {service.title}
-                                    </h2>
-                                    <p className="text-white/60 text-lg leading-relaxed mb-8">
-                                        {service.description}
-                                    </p>
-                                    <ul className="space-y-3 mb-8">
-                                        {service.features.map((feature, i) => (
-                                            <li key={i} className="flex items-center gap-3 text-white/70">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-gold"></div>
-                                                {feature}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    <button className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10">
-                                        <span className="relative z-10 text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
-                                            Learn More
-                                        </span>
-                                    </button>
-                                </div>
-                                <div className={`${index % 2 === 1 ? 'md:order-1' : ''}`}>
-                                    <div className="relative aspect-[4/5] rounded-[32px] overflow-hidden glass-card p-3">
-                                        <img
-                                            src={service.image}
-                                            alt={service.title}
-                                            className="w-full h-full object-cover rounded-[28px]"
-                                        />
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
                 </div>
             </section>
+
+            {/* Services Showcase - Full Width Container */}
+            <div className="w-full px-6 md:px-12 lg:px-16 pb-32">
+                {services.map((service, index) => (
+                    <motion.section 
+                        key={service.id || index}
+                        initial={{ opacity: 0, y: 100 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                        className="relative py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center"
+                    >
+                        {/* Service Media: Takes up 6 columns */}
+                        <div className={`lg:col-span-6 relative ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                            <div className={`relative aspect-[10/12] rounded-[32px] md:rounded-[48px] overflow-hidden group max-w-[85%] ${index % 2 === 0 ? 'lg:ml-auto lg:mr-0' : 'lg:mr-auto lg:ml-0'}`}>
+                                <motion.img 
+                                    initial={{ scale: 1.2 }}
+                                    whileInView={{ scale: 1 }}
+                                    transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                                    src={service.image} 
+                                    alt={service.title} 
+                                    className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" 
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#02140F]/80 via-transparent to-transparent opacity-60" />
+                            </div>
+                        </div>
+
+                        {/* Service Content: Takes up 6 columns */}
+                        <div className={`lg:col-span-6 ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
+                            <div className={`relative z-10 max-w-[85%] ${index % 2 === 0 ? 'lg:mr-auto lg:ml-0' : 'lg:ml-auto lg:mr-0'}`}>
+                                <span className="liquid-gold-text text-[10px] tracking-[0.4em] uppercase font-bold mb-6 block">
+                                    {service.subtitle}
+                                </span>
+                                <h2 className="font-serif text-white text-[clamp(28px,4vw,56px)] leading-[1.1] mb-8">
+                                    {service.title}
+                                </h2>
+                                <p className="text-white/50 text-base md:text-xl leading-relaxed mb-10 font-light tracking-wide italic">
+                                    {service.description}
+                                </p>
+                                
+                                <ul className="grid grid-cols-1 gap-4 mb-12">
+                                    {service.features.map((feature, fIndex) => (
+                                        <motion.li 
+                                            key={fIndex}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ delay: 0.1 * fIndex }}
+                                            className="flex items-center gap-4 group/item"
+                                        >
+                                            <div className="w-1.5 h-1.5 rounded-full bg-gold/50 group-hover/item:bg-gold transition-colors shadow-[0_0_8px_rgba(212,175,55,0.3)]" />
+                                            <span className="text-white/40 text-xs md:text-sm tracking-[0.1em] uppercase group-hover/item:text-white/70 transition-colors">
+                                                {feature}
+                                            </span>
+                                        </motion.li>
+                                    ))}
+                                </ul>
+
+                                <div className="pt-8 border-t border-white/5">
+                                    <p className="text-gold/60 font-serif italic text-lg leading-relaxed">
+                                        {service.quote}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.section>
+                ))}
+            </div>
+
             <SimpleCTA />
         </div>
     );
