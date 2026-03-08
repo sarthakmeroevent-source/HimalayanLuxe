@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import SimpleCTA from '../components/common/SimpleCTA';
 
 const services = [
@@ -65,6 +67,26 @@ const services = [
 ];
 
 export default function ServicesDetailPage() {
+    const [searchParams] = useSearchParams();
+    const activeServiceId = searchParams.get('service');
+
+    // Scroll to top on mount, then scroll to specific service if provided
+    useEffect(() => {
+        // First scroll to top immediately
+        window.scrollTo(0, 0);
+        
+        // If there's a service ID, scroll to it after a delay
+        if (activeServiceId) {
+            const timer = setTimeout(() => {
+                const element = document.getElementById(activeServiceId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [activeServiceId]);
+
     return (
         <div className="relative min-h-screen pt-32 pb-0">
             {/* Header Section */}
