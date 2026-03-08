@@ -49,6 +49,11 @@ const Skiper52 = () => {
       alt: "Gorkha",
       code: "GORKHA",
     },
+    {
+      src: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=2674&auto=format&fit=crop",
+      alt: "Lumbini",
+      code: "LUMBINI",
+    },
   ];
 
   return (
@@ -209,36 +214,38 @@ const HoverExpand_001 = ({
           </div>
 
           {/* Row 5: Final large card */}
-          <motion.div
-            className="relative overflow-hidden rounded-3xl border border-gold/30 h-[360px] w-full"
-            initial={{ opacity: 0, y: 30 }}
-            animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="absolute h-full w-full bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
-            <motion.div 
-              className="absolute flex h-full w-full flex-col items-start justify-end p-6 z-20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
+          {images.length > 8 && (
+            <motion.div
+              className="relative overflow-hidden rounded-3xl border border-gold/30 h-[360px] w-full"
+              initial={{ opacity: 0, y: 30 }}
+              animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="w-16 h-[2px] bg-gold mb-4" />
-              <p className="text-base text-gold font-medium tracking-[0.2em] uppercase mb-2">
-                {images[8].code}
-              </p>
-              <p className="text-sm text-white/70 tracking-wide">
-                {images[8].alt}
-              </p>
+              <div className="absolute h-full w-full bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+              <motion.div 
+                className="absolute flex h-full w-full flex-col items-start justify-end p-6 z-20"
+                initial={{ opacity: 0, y: 20 }}
+                animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.6, delay: 0.7 }}
+              >
+                <div className="w-16 h-[2px] bg-gold mb-4" />
+                <p className="text-base text-gold font-medium tracking-[0.2em] uppercase mb-2">
+                  {images[8].code}
+                </p>
+                <p className="text-sm text-white/70 tracking-wide">
+                  {images[8].alt}
+                </p>
+              </motion.div>
+              <motion.img
+                src={images[8].src}
+                className="size-full object-cover"
+                alt={images[8].alt}
+                initial={{ scale: 1.1 }}
+                animate={hasAnimated ? { scale: 1 } : { scale: 1.1 }}
+                transition={{ duration: 1.2, delay: 0.4 }}
+              />
             </motion.div>
-            <motion.img
-              src={images[8].src}
-              className="size-full object-cover"
-              alt={images[8].alt}
-              initial={{ scale: 1.1 }}
-              animate={hasAnimated ? { scale: 1 } : { scale: 1.1 }}
-              transition={{ duration: 1.2, delay: 0.4 }}
-            />
-          </motion.div>
+          )}
         </div>
 
         {/* Desktop Expand on Hover Layout */}
