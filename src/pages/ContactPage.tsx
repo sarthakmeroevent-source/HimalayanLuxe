@@ -20,7 +20,7 @@ export default function ContactPage() {
     };
 
     return (
-        <div className="relative min-h-screen pt-32 pb-20">
+        <div className="relative min-h-screen pt-32 pb-0">
             <section className="relative w-full px-8 md:px-16 py-20">
                 <div className="max-w-[1400px] mx-auto">
                     {/* Header */}

@@ -8,7 +8,7 @@ export default function ExperiencePage() {
     const philosophies = philosophiesData;
 
     return (
-        <div className="relative min-h-screen pt-32 pb-20">
+        <div className="relative min-h-screen pt-32 pb-0">
             <section className="relative w-full px-8 md:px-16 py-20">
                 <div className="max-w-[1600px] mx-auto">
                     {/* Header */}
@@ -40,11 +40,10 @@ export default function ExperiencePage() {
                             <button
                                 key={index}
                                 onClick={() => setActivePhilosophy(index)}
-                                className={`px-6 py-3 rounded-full text-xs uppercase tracking-[0.2em] font-medium transition-all duration-500 ${
-                                    activePhilosophy === index
+                                className={`px-6 py-3 rounded-full text-xs uppercase tracking-[0.2em] font-medium transition-all duration-500 ${activePhilosophy === index
                                         ? 'bg-gold/20 border border-gold text-gold'
                                         : 'border border-white/20 text-white/60 hover:border-gold/50 hover:text-gold'
-                                }`}
+                                    }`}
                             >
                                 {phil.title}
                             </button>
@@ -71,8 +70,8 @@ export default function ExperiencePage() {
                             </p>
                         </div>
                         <div className="relative aspect-[4/5] rounded-[32px] overflow-hidden glass-card p-3">
-                            <img 
-                                src={philosophies[activePhilosophy].image} 
+                            <img
+                                src={philosophies[activePhilosophy].image}
                                 alt={philosophies[activePhilosophy].title}
                                 className="w-full h-full object-cover rounded-[28px]"
                             />
@@ -91,7 +90,7 @@ export default function ExperiencePage() {
                             Experience the Difference
                         </h3>
                         <p className="text-white/60 text-lg max-w-3xl mx-auto leading-relaxed mb-8">
-                            Our philosophy isn't just words on a page—it's the foundation of every event we create. 
+                            Our philosophy isn't just words on a page—it's the foundation of every event we create.
                             From the first consultation to the final farewell, these principles guide our every decision.
                         </p>
                         <button className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10">

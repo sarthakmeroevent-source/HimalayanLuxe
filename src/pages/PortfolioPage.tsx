@@ -58,12 +58,12 @@ const categories = ['All', 'Wedding', 'Destination', 'Corporate'];
 export default function PortfolioPage() {
     const [activeCategory, setActiveCategory] = useState('All');
 
-    const filteredItems = activeCategory === 'All' 
-        ? portfolioItems 
+    const filteredItems = activeCategory === 'All'
+        ? portfolioItems
         : portfolioItems.filter(item => item.category === activeCategory);
 
     return (
-        <div className="relative min-h-screen pt-32 pb-20">
+        <div className="relative min-h-screen pt-32 pb-0">
             <section className="relative w-full px-8 md:px-16 py-20">
                 <div className="max-w-[1600px] mx-auto">
                     {/* Header */}
@@ -95,11 +95,10 @@ export default function PortfolioPage() {
                             <button
                                 key={category}
                                 onClick={() => setActiveCategory(category)}
-                                className={`px-6 py-3 rounded-full text-xs uppercase tracking-[0.2em] font-medium transition-all duration-500 ${
-                                    activeCategory === category
+                                className={`px-6 py-3 rounded-full text-xs uppercase tracking-[0.2em] font-medium transition-all duration-500 ${activeCategory === category
                                         ? 'bg-gold/20 border border-gold text-gold'
                                         : 'border border-white/20 text-white/60 hover:border-gold/50 hover:text-gold'
-                                }`}
+                                    }`}
                             >
                                 {category}
                             </button>
@@ -107,7 +106,7 @@ export default function PortfolioPage() {
                     </motion.div>
 
                     {/* Portfolio Grid */}
-                    <motion.div 
+                    <motion.div
                         layout
                         className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
                     >
@@ -121,13 +120,13 @@ export default function PortfolioPage() {
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
                                 className="group relative overflow-hidden rounded-[24px] aspect-[4/5] cursor-pointer"
                             >
-                                <img 
-                                    src={item.image} 
+                                <img
+                                    src={item.image}
                                     alt={item.title}
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500"></div>
-                                
+
                                 <div className="absolute inset-0 p-8 flex flex-col justify-end">
                                     <motion.div
                                         initial={{ y: 20, opacity: 0 }}

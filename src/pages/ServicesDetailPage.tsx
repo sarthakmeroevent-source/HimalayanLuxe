@@ -58,7 +58,7 @@ const services = [
 
 export default function ServicesDetailPage() {
     return (
-        <div className="relative min-h-screen pt-32 pb-20">
+        <div className="relative min-h-screen pt-32 pb-0">
             <section className="relative w-full px-8 md:px-16 py-20">
                 <div className="max-w-[1400px] mx-auto">
                     {/* Header */}
@@ -88,9 +88,8 @@ export default function ServicesDetailPage() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true, amount: 0.2 }}
                                 transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                                className={`grid md:grid-cols-2 gap-12 items-center ${
-                                    index % 2 === 1 ? 'md:flex-row-reverse' : ''
-                                }`}
+                                className={`grid md:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''
+                                    }`}
                             >
                                 <div className={`${index % 2 === 1 ? 'md:order-2' : ''}`}>
                                     <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-4 block">
@@ -118,8 +117,8 @@ export default function ServicesDetailPage() {
                                 </div>
                                 <div className={`${index % 2 === 1 ? 'md:order-1' : ''}`}>
                                     <div className="relative aspect-[4/5] rounded-[32px] overflow-hidden glass-card p-3">
-                                        <img 
-                                            src={service.image} 
+                                        <img
+                                            src={service.image}
                                             alt={service.title}
                                             className="w-full h-full object-cover rounded-[28px]"
                                         />
