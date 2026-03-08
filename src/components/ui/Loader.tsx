@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from 'gsap';
 import Silk from '../../Silk';
@@ -10,9 +10,15 @@ interface LoaderProps {
 
 export default function Loader({ showLoader, isDesktop }: LoaderProps) {
     const logoRef = useRef<HTMLImageElement>(null);
+    const [allowInteraction, setAllowInteraction] = useState(false);
 
     useLayoutEffect(() => {
         if (!logoRef.current || !showLoader) return;
+
+        // Allow interaction after 3.5 seconds (when loader starts fading)
+        const interactionTimer = setTimeout(() => {
+            setAllowInteraction(true);
+        }, 3500);
 
         const ctx = gsap.context(() => {
             const tl = gsap.timeline();
@@ -53,6 +59,7 @@ export default function Loader({ showLoader, isDesktop }: LoaderProps) {
 
         return () => {
             ctx.revert();
+            clearTimeout(interactionTimer);
         };
     }, [showLoader, isDesktop]);
 
@@ -61,7 +68,7 @@ export default function Loader({ showLoader, isDesktop }: LoaderProps) {
             {showLoader && (
                 <>
                     <motion.div
-                        className="fixed inset-0 z-[300] bg-black"
+                        className={`fixed inset-0 z-[300] bg-black ${allowInteraction ? 'pointer-events-none' : 'pointer-events-auto'}`}
                         initial={{ opacity: 1 }}
                         animate={{ opacity: 0 }}
                         exit={{ opacity: 0 }}
