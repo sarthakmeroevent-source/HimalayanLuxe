@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useLayoutEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { servicesData } from '../data/services';
@@ -8,6 +9,11 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function ServicesSection() {
     const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+    const navigate = useNavigate();
+
+    const handleCardClick = (serviceId: string) => {
+        navigate(`/services?service=${serviceId}`);
+    };
 
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
@@ -70,7 +76,7 @@ export default function ServicesSection() {
     }, []);
 
     return (
-        <section className="relative w-full pt-20 pb-0 px-4 md:px-8" id="services">
+        <section className="relative w-full pt-20 pb-20 px-4 md:px-8" id="services">
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -89,7 +95,8 @@ export default function ServicesSection() {
                     <div
                         key={service.id}
                         ref={(el) => (cardsRef.current[i] = el)}
-                        className="flex flex-col items-center justify-center w-full h-[70vh] md:h-[80vh] rounded-[24px] md:rounded-[40px] overflow-hidden shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border border-white/10 will-change-transform"
+                        onClick={() => handleCardClick(service.id)}
+                        className="flex flex-col items-center justify-center w-full h-[70vh] md:h-[80vh] rounded-[24px] md:rounded-[40px] overflow-hidden shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border border-white/10 will-change-transform cursor-pointer"
                         style={{
                             position: 'relative',
                             marginBottom: i < servicesData.length - 1 ? '0' : '0',
