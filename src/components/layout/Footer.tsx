@@ -1,4 +1,14 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+
+const footerLinks = [
+    { label: 'Home', path: '/' },
+    { label: 'Experience', path: '/experience' },
+    { label: 'Destinations', path: '/destinations' },
+    { label: 'Services', path: '/services' },
+    { label: 'About', path: '/about' },
+    { label: 'Contact', path: '/contact' }
+];
 
 export default function Footer() {
     return (
@@ -16,18 +26,21 @@ export default function Footer() {
                 />
 
                 <div className="flex flex-wrap items-center justify-center gap-x-8 md:gap-x-16 gap-y-8">
-                    {['Experience', 'Destinations', 'Services', 'Artistry', 'Awards', 'Contact'].map((link, i) => (
-                        <motion.a
-                            key={link}
-                            href={`#${link.toLowerCase()}`}
+                    {footerLinks.map((link, i) => (
+                        <motion.div
+                            key={link.label}
                             initial={{ opacity: 0, y: 10 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8, delay: 0.1 * i }}
-                            className="text-[10px] md:text-[12px] tracking-[0.3em] md:tracking-[0.4em] uppercase font-medium text-white/70 hover:text-gold transition-colors duration-500"
                         >
-                            {link}
-                        </motion.a>
+                            <Link
+                                to={link.path}
+                                className="text-[10px] md:text-[12px] tracking-[0.3em] md:tracking-[0.4em] uppercase font-medium text-white/70 hover:text-gold transition-colors duration-500"
+                            >
+                                {link.label}
+                            </Link>
+                        </motion.div>
                     ))}
                 </div>
 

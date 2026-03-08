@@ -20,7 +20,11 @@ export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationO
 
     const handleNavigation = (item: typeof menuItems[0]) => {
         setMenuOpen(false);
-        navigate(item.path);
+        if (item.path === '/' && window.location.pathname !== '/') {
+            window.location.href = '/';
+        } else {
+            navigate(item.path);
+        }
     };
 
     return (

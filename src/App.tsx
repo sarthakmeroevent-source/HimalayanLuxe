@@ -28,6 +28,7 @@ function ScrollToTop() {
 function AppContent() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    // Show loader on first mount only (not on route changes)
     const [showLoader, setShowLoader] = useState(true);
     const [isDesktop, setIsDesktop] = useState(false);
     const [activeSection, setActiveSection] = useState('hero');
@@ -36,6 +37,7 @@ function AppContent() {
 
     const activeSectionRef = useRef('hero');
     const activePhilosophyRef = useRef(0);
+    const hasShownLoader = useRef(false);
 
     const location = useLocation();
     const isHomePage = location.pathname === '/';
@@ -65,10 +67,23 @@ function AppContent() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Show loader when entering the home page
     useEffect(() => {
-        const timer = setTimeout(() => setShowLoader(false), 4700);
-        return () => clearTimeout(timer);
-    }, []);
+        if (isHomePage) {
+            if (!hasShownLoader.current) {
+                setShowLoader(true);
+                hasShownLoader.current = true;
+                const timer = setTimeout(() => {
+                    setShowLoader(false);
+                }, 4700);
+                return () => clearTimeout(timer);
+            }
+        } else {
+            // Reset loader tracker when leaving home so it shows again on next return
+            hasShownLoader.current = false;
+            setShowLoader(false);
+        }
+    }, [isHomePage]);
 
     const handleSectionClick = (id: string) => {
         const element = document.getElementById(id);
@@ -76,9 +91,9 @@ function AppContent() {
             const navHeight = 0;
             const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
             const offsetPosition = elementPosition - navHeight;
-            
+
             window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-            
+
             setActiveSection(id);
             activeSectionRef.current = id;
 
@@ -99,10 +114,10 @@ function AppContent() {
                 setMenuOpen={setMenuOpen}
             >
                 <Routes>
-                    <Route 
-                        path="/" 
+                    <Route
+                        path="/"
                         element={
-                            <HomePage 
+                            <HomePage
                                 activeSection={activeSection}
                                 setActiveSection={setActiveSection}
                                 activeSectionRef={activeSectionRef}
@@ -110,7 +125,7 @@ function AppContent() {
                                 setActivePhilosophy={setActivePhilosophy}
                                 activePhilosophyRef={activePhilosophyRef}
                             />
-                        } 
+                        }
                     />
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/experience" element={<ExperiencePage />} />

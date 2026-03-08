@@ -85,6 +85,9 @@ export function useScrollHandler({
         const rafId = requestAnimationFrame(raf);
         handleScroll();
 
+        // Refresh ScrollTrigger to ensure all section positions are accurate
+        ScrollTrigger.refresh();
+
         return () => {
             lenis.destroy();
             cancelAnimationFrame(rafId);

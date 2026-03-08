@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export default function DestinationsSection() {
     return (
-        <section className="section-container relative min-h-[100dvh] w-full flex flex-col items-center justify-center pt-32 pb-20 px-8 md:px-12" id="destinations">
+        <section className="section-container relative min-h-[100dvh] w-full flex flex-col items-center justify-center py-12 md:py-20 px-8 md:px-12" id="destinations">
             <div className="w-full flex flex-col items-center max-w-[1400px] mx-auto">
                 <div className="w-full flex items-center justify-center mb-4">
                     <motion.div
@@ -25,7 +25,7 @@ export default function DestinationsSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ margin: "-100px", amount: 0.3 }}
                     transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-                    className="font-serif text-white/95 text-[clamp(24px,3.5vw,48px)] font-normal leading-[1.1] tracking-tight drop-shadow-2xl mb-10 text-center"
+                    className="font-serif text-white/95 text-[32px] md:text-[clamp(28px,3vw,48px)] font-normal leading-[1.15] md:leading-[1.1] tracking-tight drop-shadow-2xl mb-10 text-center"
                 >
                     Crafting timeless <span className="liquid-gold-text">moments</span>
                 </motion.h2>

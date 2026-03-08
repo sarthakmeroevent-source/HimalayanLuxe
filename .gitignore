@@ -30,3 +30,6 @@ dist-ssr
 public/Video.mp4
 .fuse_hidden*
 .fuse_*
+
+# PR templates and descriptions
+*.md

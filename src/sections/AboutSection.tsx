@@ -19,7 +19,7 @@ export default function AboutSection() {
                         Crafting <span className="liquid-gold-text">Legacies</span> Since 2010
                     </h2>
                     <p className="text-white/60 text-lg max-w-3xl mx-auto leading-relaxed mb-12">
-                        We are not event planners. We are architects of emotion, curators of the extraordinary, 
+                        We are not event planners. We are architects of emotion, curators of the extraordinary,
                         and guardians of your most precious moments.
                     </p>
                 </motion.div>

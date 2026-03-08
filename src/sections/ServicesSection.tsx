@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { servicesData } from '../data/services';
@@ -9,63 +9,63 @@ gsap.registerPlugin(ScrollTrigger);
 export default function ServicesSection() {
     const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-    useEffect(() => {
-        const cards = cardsRef.current.filter(Boolean);
-        const totalCards = cards.length;
+    useLayoutEffect(() => {
+        const ctx = gsap.context(() => {
+            const cards = cardsRef.current.filter(Boolean) as HTMLDivElement[];
+            const totalCards = cards.length;
 
-        cards.forEach((card, index) => {
-            if (!card) return;
+            cards.forEach((card, index) => {
+                const isLastCard = index === totalCards - 1;
+                const nextCard = cards[index + 1];
 
-            const isLastCard = index === totalCards - 1;
-            const nextCard = cards[index + 1];
-
-            // Pin each card below the navbar
-            ScrollTrigger.create({
-                trigger: card,
-                start: 'top top+=100px',
-                end: isLastCard 
-                    ? '+=1' // Minimal pin duration for last card
-                    : (nextCard ? `${nextCard.offsetTop - card.offsetTop}px` : `+=${window.innerHeight * 2}`),
-                pin: true,
-                pinSpacing: false,
-            });
-
-            // Scale down animation only for non-last cards when next card comes up
-            if (!isLastCard && nextCard) {
+                // Pin each card below the navbar
                 ScrollTrigger.create({
-                    trigger: nextCard,
-                    start: 'top bottom',
-                    end: 'top top',
-                    scrub: 1,
-                    onUpdate: (self) => {
-                        const progress = self.progress;
-
-                        // Scale from 1 to 0.85
-                        const scale = 1 - (progress * 0.15);
-
-                        // Move down to show stacking
-                        const y = progress * 40;
-
-                        // Slight fade
-                        const opacity = 1 - (progress * 0.3);
-
-                        gsap.set(card, {
-                            scale: scale,
-                            y: y,
-                            opacity: opacity,
-                            transformOrigin: 'center top'
-                        });
-                    }
+                    trigger: card,
+                    start: 'top top+=100px',
+                    end: isLastCard
+                        ? '+=1'
+                        : (nextCard ? `${nextCard.offsetTop - card.offsetTop}px` : `+=${window.innerHeight * 2}`),
+                    pin: true,
+                    pinSpacing: false,
+                    id: `card-${index}`
                 });
-            }
-        });
 
-        return () => {
-            ScrollTrigger.getAll().forEach(trigger => {
-                if (trigger.vars.trigger && cardsRef.current.includes(trigger.vars.trigger as HTMLDivElement)) {
-                    trigger.kill();
+                // Scale down animation only for non-last cards when next card comes up
+                if (!isLastCard && nextCard) {
+                    ScrollTrigger.create({
+                        trigger: nextCard,
+                        start: 'top bottom',
+                        end: 'top top',
+                        scrub: 1,
+                        onUpdate: (self) => {
+                            const progress = self.progress;
+                            const scale = 1 - (progress * 0.15);
+                            const y = progress * 40;
+                            const opacity = 1 - (progress * 0.3);
+
+                            gsap.set(card, {
+                                scale: scale,
+                                y: y,
+                                opacity: opacity,
+                                transformOrigin: 'center top'
+                            });
+                        }
+                    });
                 }
             });
+
+            // Refresh ScrollTrigger once everything is rendered
+            ScrollTrigger.refresh();
+        });
+
+        // Additional refresh after a short delay for safety in SPA
+        const refreshTimer = setTimeout(() => {
+            ScrollTrigger.refresh();
+        }, 100);
+
+        return () => {
+            ctx.revert();
+            clearTimeout(refreshTimer);
         };
     }, []);
 
@@ -79,7 +79,7 @@ export default function ServicesSection() {
                 className="mb-16 flex flex-col items-center text-center"
             >
                 <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-6">Masterpieces</span>
-                <h2 className="font-serif text-white/95 text-[clamp(24px,3.5vw,44px)] font-normal leading-tight">
+                <h2 className="font-serif text-white/95 text-[32px] md:text-[clamp(28px,3vw,48px)] font-normal leading-[1.15] md:leading-[1.1] tracking-tight">
                     Curated <span className="italic text-white/50">Excellence</span>
                 </h2>
             </motion.div>

@@ -15,14 +15,15 @@ interface HomePageProps {
     activePhilosophyRef: React.MutableRefObject<number>;
 }
 
-export default function HomePage({ 
-    activeSection, 
-    setActiveSection, 
+export default function HomePage({
+    activeSection,
+    setActiveSection,
     activeSectionRef,
     activePhilosophy,
     setActivePhilosophy,
     activePhilosophyRef
 }: HomePageProps) {
+    // Start muted to ensure autoplay works on all devices (especially mobile)
     const [isMuted, setIsMuted] = useState(true);
 
     return (

@@ -23,7 +23,7 @@ export default function AppLayout({
     setMenuOpen
 }: AppLayoutProps) {
     return (
-        <>
+        <div className="relative min-h-screen">
             <div className="fixed inset-0 z-0">
                 <Silk
                     speed={0.8}
@@ -37,11 +37,11 @@ export default function AppLayout({
 
             <Loader showLoader={showLoader} isDesktop={isDesktop} />
 
-            <Header 
-                isScrolled={isScrolled} 
-                showLoader={showLoader} 
-                menuOpen={menuOpen} 
-                setMenuOpen={setMenuOpen} 
+            <Header
+                isScrolled={isScrolled}
+                showLoader={showLoader}
+                menuOpen={menuOpen}
+                setMenuOpen={setMenuOpen}
             />
 
             <NavigationOverlay menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
@@ -50,6 +50,6 @@ export default function AppLayout({
                 {children}
                 <Footer />
             </div>
-        </>
+        </div>
     );
 }
