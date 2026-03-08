@@ -5,56 +5,17 @@ import "swiper/css";
 import "swiper/css/effect-creative";
 import "swiper/css/pagination";
 import "swiper/css/autoplay";
-import { cn } from "../../lib/utils";
+import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
+import { destinationsData } from "@/data/destinations";
 
 const Skiper52 = () => {
-  const images = [
-    {
-      src: "https://unsplash.com/photos/yDtB8FppNK0/download?force=true",
-      alt: "Phewa Lake",
-      code: "PHEWA LAKE",
-    },
-    {
-      src: "https://unsplash.com/photos/PbCCnvId660/download?force=true",
-      alt: "Annapurna Himalaya",
-      code: "ANNAPURNA",
-    },
-    {
-      src: "https://unsplash.com/photos/KM1QLHnxA4c/download?force=true",
-      alt: "Mustang",
-      code: "MUSTANG",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80",
-      alt: "Illam",
-      code: "ILLAM",
-    },
-    {
-      src: "https://unsplash.com/photos/LoFYw82KdjY/download?force=true",
-      alt: "Badimalika",
-      code: "BADIMALIKA",
-    },
-    {
-      src: "https://unsplash.com/photos/AJ3_RYsJs94/download?force=true",
-      alt: "Manang",
-      code: "MANANG",
-    },
-    {
-      src: "https://unsplash.com/photos/Q5YNyu88_RU/download?force=true",
-      alt: "Solukhumbu",
-      code: "SOLUKHUMBU",
-    },
-    {
-      src: "https://unsplash.com/photos/xXrH3Oj5HZI/download?force=true",
-      alt: "Gorkha",
-      code: "GORKHA",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=2674&auto=format&fit=crop",
-      alt: "Lumbini",
-      code: "LUMBINI",
-    },
-  ];
+  const images = destinationsData.map((d) => ({
+    src: d.image,
+    alt: d.name,
+    code: d.code,
+    id: d.id,
+  }));
 
   return (
     <div className="flex h-full w-full items-center justify-center overflow-hidden bg-transparent">
@@ -69,11 +30,12 @@ const HoverExpand_001 = ({
   images,
   className,
 }: {
-  images: { src: string; alt: string; code: string }[];
+  images: { src: string; alt: string; code: string; id: string }[];
   className?: string;
 }) => {
-  const [activeImage, setActiveImage] = useState<number | null>(1);
+  const [activeImage, setActiveImage] = useState<number>(1);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <motion.div
@@ -103,7 +65,7 @@ const HoverExpand_001 = ({
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="absolute h-full w-full bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
-            <motion.div 
+            <motion.div
               className="absolute flex h-full w-full flex-col items-start justify-end p-6 z-20"
               initial={{ opacity: 0, y: 20 }}
               animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -121,6 +83,8 @@ const HoverExpand_001 = ({
               src={images[0].src}
               className="size-full object-cover"
               alt={images[0].alt}
+              loading="lazy"
+              decoding="async"
               initial={{ scale: 1.1 }}
               animate={hasAnimated ? { scale: 1 } : { scale: 1.1 }}
               transition={{ duration: 1.2 }}
@@ -148,6 +112,8 @@ const HoverExpand_001 = ({
                   src={image.src}
                   className="size-full object-cover"
                   alt={image.alt}
+                  loading="lazy"
+                  decoding="async"
                   initial={{ scale: 1.1 }}
                   animate={hasAnimated ? { scale: 1 } : { scale: 1.1 }}
                   transition={{ duration: 1.2, delay: 0.1 + (idx * 0.1) }}
@@ -176,6 +142,8 @@ const HoverExpand_001 = ({
                   src={image.src}
                   className="size-full object-cover"
                   alt={image.alt}
+                  loading="lazy"
+                  decoding="async"
                   initial={{ scale: 1.1 }}
                   animate={hasAnimated ? { scale: 1 } : { scale: 1.1 }}
                   transition={{ duration: 1.2, delay: 0.2 + (idx * 0.08) }}
@@ -205,6 +173,8 @@ const HoverExpand_001 = ({
                   src={image.src}
                   className="size-full object-cover"
                   alt={image.alt}
+                  loading="lazy"
+                  decoding="async"
                   initial={{ scale: 1.1 }}
                   animate={hasAnimated ? { scale: 1 } : { scale: 1.1 }}
                   transition={{ duration: 1.2, delay: 0.3 + (idx * 0.1) }}
@@ -222,7 +192,7 @@ const HoverExpand_001 = ({
               transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="absolute h-full w-full bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
-              <motion.div 
+              <motion.div
                 className="absolute flex h-full w-full flex-col items-start justify-end p-6 z-20"
                 initial={{ opacity: 0, y: 20 }}
                 animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -240,6 +210,8 @@ const HoverExpand_001 = ({
                 src={images[8].src}
                 className="size-full object-cover"
                 alt={images[8].alt}
+                loading="lazy"
+                decoding="async"
                 initial={{ scale: 1.1 }}
                 animate={hasAnimated ? { scale: 1 } : { scale: 1.1 }}
                 transition={{ duration: 1.2, delay: 0.4 }}
@@ -276,13 +248,12 @@ const HoverExpand_001 = ({
                   height: isMobile ? "15rem" : "24rem"
                 }}
                 transition={{
-                  opacity: { duration: 1, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] },
-                  x: { duration: 1.2, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] },
-                  width: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-                  height: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+                  opacity: { duration: 1.2, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] },
+                  x: { duration: 1.2, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] },
+                  width: { duration: 1.0, ease: [0.16, 1, 0.3, 1] },
+                  height: { duration: 1.0, ease: [0.16, 1, 0.3, 1] }
                 }}
                 onClick={() => setActiveImage(index)}
-                onPointerEnter={() => setActiveImage(index)}
               >
                 <AnimatePresence>
                   {activeImage === index && (
@@ -301,18 +272,30 @@ const HoverExpand_001 = ({
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="absolute flex h-full w-full flex-col items-end justify-end p-4"
+                      transition={{ duration: 0.5 }}
+                      className="absolute flex h-full w-full flex-col items-end justify-end p-4 pointer-events-none"
                     >
-                      <p className="text-left text-xs text-gold/80 font-medium tracking-wider">
+                      <p className="text-left text-xs text-gold/80 font-medium tracking-wider mb-2">
                         {image.code}
                       </p>
+                      <button 
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          navigate(`/destinations/${image.id}`); 
+                        }}
+                        className="pointer-events-auto px-4 py-2 bg-gold text-black rounded-full text-[10px] uppercase tracking-widest hover:bg-[#F2D06B] transition-colors"
+                      >
+                         View Details
+                      </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
                 <img
                   src={image.src}
-                  className="size-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  className="size-full object-cover transition-transform duration-[2s] ease-out hover:scale-110"
                   alt={image.alt}
                 />
               </motion.div>
