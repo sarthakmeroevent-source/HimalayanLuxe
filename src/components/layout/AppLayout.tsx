@@ -24,7 +24,7 @@ export default function AppLayout({
 }: AppLayoutProps) {
     return (
         <div className="relative min-h-screen">
-            <div className="fixed inset-0 z-0">
+            <div className="fixed inset-0 z-0 pointer-events-none">
                 <Silk
                     speed={0.8}
                     scale={0.8}

@@ -144,7 +144,27 @@ const Silk: React.FC<SilkProps> = ({ speed = 5, scale = 1, color = '#7B7481', no
     );
 
     return (
-        <Canvas dpr={[1, 2]} frameloop="always">
+        <Canvas 
+            dpr={[1, 2]} 
+            frameloop="always"
+            gl={{ 
+                antialias: false,
+                powerPreference: "high-performance",
+                failIfMajorPerformanceCaveat: false
+            }}
+            onCreated={({ gl }) => {
+                // Handle context loss
+                gl.domElement.addEventListener('webglcontextlost', (event) => {
+                    event.preventDefault();
+                    console.warn('WebGL context lost, attempting to restore...');
+                }, false);
+
+                gl.domElement.addEventListener('webglcontextrestored', () => {
+                    console.log('WebGL context restored');
+                }, false);
+            }}
+            style={{ pointerEvents: 'none' }}
+        >
             <SilkPlane ref={meshRef} uniforms={uniforms} />
         </Canvas>
     );
