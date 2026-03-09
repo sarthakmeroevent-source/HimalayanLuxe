@@ -12,6 +12,7 @@ import PortfolioPage from './pages/PortfolioPage';
 import ServicesDetailPage from './pages/ServicesDetailPage';
 import ContactPage from './pages/ContactPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import CookiesPage from './pages/CookiesPage';
 import { useScrollHandler } from './hooks/useScrollHandler';
 
 function ScrollToTop() {
@@ -157,6 +158,7 @@ function AppContent() {
                     <Route path="/services" element={<ServicesDetailPage />} />
                     <Route path="/contact" element={<ContactPage />} />
                     <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                    <Route path="/cookies" element={<CookiesPage />} />
                 </Routes>
             </AppLayout>
         </div>
