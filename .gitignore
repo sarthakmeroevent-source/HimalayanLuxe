@@ -33,3 +33,6 @@ public/Video.mp4
 
 # PR templates and descriptions
 *.md
+
+# Environment variables
+.env*
