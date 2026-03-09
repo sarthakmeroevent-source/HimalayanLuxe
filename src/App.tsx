@@ -9,6 +9,7 @@ import ExperiencePage from './pages/ExperiencePage';
 import DestinationsPage from './pages/DestinationsPage';
 import DestinationDetailPage from './pages/DestinationDetailPage';
 import PortfolioPage from './pages/PortfolioPage';
+import GalleryPage from './pages/GalleryPage';
 import ServicesDetailPage from './pages/ServicesDetailPage';
 import ContactPage from './pages/ContactPage';
 import { useScrollHandler } from './hooks/useScrollHandler';
@@ -153,6 +154,7 @@ function AppContent() {
                     <Route path="/destinations" element={<DestinationsPage />} />
                     <Route path="/destinations/:id" element={<DestinationDetailPage />} />
                     <Route path="/portfolio" element={<PortfolioPage />} />
+                    <Route path="/gallery" element={<GalleryPage />} />
                     <Route path="/services" element={<ServicesDetailPage />} />
                     <Route path="/contact" element={<ContactPage />} />
                 </Routes>

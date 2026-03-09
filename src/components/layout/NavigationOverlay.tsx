@@ -8,13 +8,13 @@ interface NavigationOverlayProps {
 }
 
 const menuItems = [
-    { label: 'Home', path: '/' },
-    { label: 'Destinations', path: '/destinations' },
-    { label: 'Experience', path: '/experience' },
-    { label: 'Services', path: '/services' },
-    { label: 'Gallery', path: '/gallery' },
-    { label: 'About', path: '/about' },
-    { label: 'Contact', path: '/contact' }
+    { label: 'Home', path: '/', hash: '' },
+    { label: 'Experience', path: '/experience', hash: '' },
+    { label: 'Destinations', path: '/destinations', hash: '' },
+    { label: 'Gallery', path: '/gallery', hash: '' },
+    { label: 'Services', path: '/services', hash: '' },
+    { label: 'About', path: '/about', hash: '' },
+    { label: 'Contact', path: '/contact', hash: '' }
 ];
 
 export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationOverlayProps) {
