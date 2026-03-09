@@ -80,7 +80,7 @@ export default function ServicesSection() {
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ margin: "-100px", amount: 0.3 }}
+                viewport={{ once: true, margin: "-100px", amount: 0.3 }}
                 transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                 className="mb-16 flex flex-col items-center text-center"
             >
@@ -110,7 +110,7 @@ export default function ServicesSection() {
                         <motion.div
                             initial={{ opacity: 0, y: 50 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ amount: 0.4 }}
+                            viewport={{ once: true, amount: 0.4 }}
                             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                             className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl w-full"
                         >

@@ -37,6 +37,26 @@ export default function AboutPage() {
     const heroRef = useRef(null);
     const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
+    // Scroll to top on mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        
+        const timers = [
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+            }, 10),
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+            }, 50)
+        ];
+
+        return () => timers.forEach(timer => clearTimeout(timer));
+    }, []);
+
     useEffect(() => {
         const cards = cardsRef.current.filter(Boolean);
         const totalCards = cards.length;

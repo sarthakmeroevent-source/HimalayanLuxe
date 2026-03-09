@@ -16,20 +16,12 @@ export default function CTASection() {
                 <h2 className="font-serif text-white/95 text-[40px] md:text-[clamp(32px,5vw,72px)] leading-[1.2] md:leading-[0.9] font-normal tracking-tight mb-[clamp(1.5rem,4vh,2.5rem)]">
                     Shall we <br /> <span className="italic text-white/40">begin?</span>
                 </h2>
-                <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-                    <Link 
-                        to="/contact"
-                        className="luxury-button rounded-full w-full md:w-auto inline-block text-center"
-                    >
-                        Contact Us
-                    </Link>
-                    <Link
-                        to="/portfolio"
-                        className="text-white/60 hover:text-gold text-xs tracking-[0.3em] font-medium uppercase transition-colors duration-500"
-                    >
-                        View Lookbook
-                    </Link>
-                </div>
+                <Link 
+                    to="/contact"
+                    className="luxury-button rounded-full w-full md:w-auto inline-block text-center"
+                >
+                    Contact Us
+                </Link>
             </motion.div>
         </section>
     );

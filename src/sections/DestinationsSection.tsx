@@ -10,7 +10,7 @@ export default function DestinationsSection() {
                     <motion.div
                         initial={{ opacity: 0, y: -30 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ margin: "-100px", amount: 0.3 }}
+                        viewport={{ once: true, margin: "-100px", amount: 0.3 }}
                         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                         className="flex flex-col items-center"
                     >
@@ -23,16 +23,17 @@ export default function DestinationsSection() {
                 <motion.h2
                     initial={{ opacity: 0, y: -50 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ margin: "-100px", amount: 0.3 }}
+                    viewport={{ once: true, margin: "-100px", amount: 0.3 }}
                     transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
                     className="font-serif text-white/95 text-[32px] md:text-[clamp(28px,3vw,48px)] font-normal leading-[1.15] md:leading-[1.1] tracking-tight drop-shadow-2xl mb-10 text-center"
                 >
                     Crafting timeless <span className="liquid-gold-text">moments</span>
                 </motion.h2>
                 <motion.div
-                    initial={{ opacity: 1 }}
+                    initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
-                    viewport={{ margin: "-100px" }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     className="w-full mb-12"
                 >
                     <Skiper52 />
@@ -42,7 +43,7 @@ export default function DestinationsSection() {
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ margin: "-100px", amount: 0.3 }}
+                    viewport={{ once: true, margin: "-100px", amount: 0.3 }}
                     transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
                 >
                     <Link

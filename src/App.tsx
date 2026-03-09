@@ -22,12 +22,10 @@ function ScrollToTop() {
             window.history.scrollRestoration = 'manual';
         }
 
-        // Force an immediate scroll to top on every route change
-        window.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: 'instant' as ScrollBehavior
-        });
+        // Multiple aggressive scroll resets
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
 
         // Also scroll the primary scroll container if it exists
         const scrollContainer = document.querySelector('main') || document.documentElement;
@@ -35,7 +33,14 @@ function ScrollToTop() {
             scrollContainer.scrollTop = 0;
         }
 
-        // Re-enable for the next interaction if needed, though 'manual' is usually best for SPAs with Lenis
+        // Additional reset after a tiny delay to catch any post-render adjustments
+        const timer = setTimeout(() => {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        }, 10);
+
+        return () => clearTimeout(timer);
     }, [pathname, search]);
 
     return null;

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CustomSelect } from '../components/ui/CustomSelect';
 import { CustomDatePicker } from '../components/ui/CustomDatePicker';
 import { Instagram, Facebook } from 'lucide-react';
@@ -13,6 +13,32 @@ export default function ContactPage() {
         date: '',
         message: ''
     });
+
+    // Scroll to top on mount
+    useEffect(() => {
+        // Immediate scroll
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        
+        // Additional resets to handle Lenis
+        const timers = [
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+            }, 10),
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+            }, 50),
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+            }, 100)
+        ];
+
+        return () => timers.forEach(timer => clearTimeout(timer));
+    }, []);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

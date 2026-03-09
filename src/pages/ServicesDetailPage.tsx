@@ -72,10 +72,24 @@ export default function ServicesDetailPage() {
 
     // Scroll to top on mount, then scroll to specific service if provided
     useEffect(() => {
-        // First scroll to top immediately
+        // Immediate scroll to top
         window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
         
-        // If there's a service ID, scroll to it after a delay
+        // Additional resets to handle Lenis
+        const immediateTimers = [
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+            }, 10),
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+            }, 50)
+        ];
+        
+        // If there's a service ID, scroll to it after page loads
         if (activeServiceId) {
             const timer = setTimeout(() => {
                 const element = document.getElementById(activeServiceId);
@@ -83,8 +97,13 @@ export default function ServicesDetailPage() {
                     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }, 500);
-            return () => clearTimeout(timer);
+            return () => {
+                immediateTimers.forEach(t => clearTimeout(t));
+                clearTimeout(timer);
+            };
         }
+
+        return () => immediateTimers.forEach(t => clearTimeout(t));
     }, [activeServiceId]);
 
     return (
