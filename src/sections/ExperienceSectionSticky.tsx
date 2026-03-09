@@ -300,7 +300,7 @@ export default function ExperienceSectionSticky({
             <div className="experience-sticky-content sticky top-0 left-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden pt-[80px] md:pt-0">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(800px,100vw)] h-[min(800px,100vw)] bg-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-                <div className="relative z-10 w-full max-w-[1600px] mx-auto flex-grow flex flex-col md:flex-row items-center justify-center md:justify-between gap-6 md:gap-8 px-6 md:px-12">
+                <div className="relative z-10 w-full max-w-[1400px] mx-auto flex-grow flex flex-col md:flex-row items-center justify-center md:justify-between gap-6 md:gap-12 px-8 md:px-16 lg:px-20">
                     {/* Image Section - First on Mobile, Second on Desktop */}
                     <div className="w-full md:w-1/2 order-1 md:order-2 flex justify-center items-center">
                         <div className="relative w-full aspect-[4/3] md:h-[clamp(400px,60vh,700px)] max-w-2xl rounded-[16px] md:rounded-[32px] p-1 md:p-3 shadow-2xl border border-gold/20 bg-transparent flex-shrink-0">
