@@ -2,14 +2,24 @@ import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { MapPin, ArrowLeft, Calendar, Image as ImageIcon, CheckCircle, Sparkles, Users, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
-import { destinationsData } from '../data/destinations';
+import { MapPin, ArrowLeft, Calendar, CheckCircle, Sparkles, Users, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import { useDestinationBySlug, useDestinationGallery } from '../hooks/useDestinations';
 import SimpleCTA from '../components/common/SimpleCTA';
 
 export default function DestinationDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const [destination, setDestination] = useState<typeof destinationsData[0] | null>(null);
+    const [destination, setDestination] = useState<{
+        id: string;
+        name: string;
+        code: string;
+        description: string;
+        fullDescription: string;
+        image: string;
+        events: string;
+        features: string[];
+        gallery: string[];
+    } | null>(null);
     const [visibleImages, setVisibleImages] = useState(4);
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -56,15 +66,27 @@ export default function DestinationDetailPage() {
     const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
     const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
+    const { data: dbDestination } = useDestinationBySlug(id);
+    const { data: dbGallery } = useDestinationGallery(dbDestination?.id);
+
     useEffect(() => {
-        const found = destinationsData.find(d => d.id === id);
-        if (found) {
-            setDestination(found);
-        } else {
+        if (dbDestination) {
+            setDestination({
+                id: dbDestination.slug || dbDestination.id,
+                name: dbDestination.name,
+                code: dbDestination.code || dbDestination.name.toUpperCase(),
+                description: dbDestination.description,
+                fullDescription: dbDestination.full_description || dbDestination.description,
+                image: dbDestination.cover_image_url,
+                events: dbDestination.events || '',
+                features: dbDestination.features || [],
+                gallery: dbGallery?.map(g => g.image_url) || [],
+            });
+        } else if (dbDestination === null) {
             navigate('/destinations');
         }
         window.scrollTo(0, 0);
-    }, [id, navigate]);
+    }, [id, navigate, dbDestination, dbGallery]);
 
     // Keyboard navigation for image modal
     useEffect(() => {

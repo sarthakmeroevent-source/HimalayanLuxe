@@ -7,19 +7,45 @@ import "swiper/css/pagination";
 import "swiper/css/autoplay";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { destinationsData } from "@/data/destinations";
+import { useDestinations } from "@/hooks/useDestinations";
 
 const Skiper52 = () => {
-  const images = destinationsData.map((d) => ({
-    src: d.image,
+  const { data: dbDestinations, isLoading, error, refetch } = useDestinations();
+
+  const destinations = (dbDestinations || []).map(d => ({
+    src: d.cover_image_url,
     alt: d.name,
-    code: d.code,
-    id: d.id,
+    code: d.code || d.name.toUpperCase(),
+    id: d.slug || d.id,
   }));
+
+  if (isLoading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center py-20">
+        <p className="text-white/40 text-sm tracking-widest uppercase">Loading destinations...</p>
+      </div>
+    );
+  }
+
+  if (error || destinations.length === 0) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center py-20 gap-4">
+        <p className="text-white/40 text-sm tracking-widest uppercase">
+          {error ? 'Failed to load destinations' : 'No destinations yet'}
+        </p>
+        {error && (
+          <button onClick={() => refetch()}
+            className="px-5 py-2 rounded-full border border-gold/30 text-gold text-[10px] uppercase tracking-widest hover:bg-gold/10 transition-colors">
+            Retry
+          </button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full w-full items-center justify-center overflow-hidden bg-transparent">
-      <HoverExpand_001 className="" images={images} />
+      <HoverExpand_001 className="" images={destinations} />
     </div>
   );
 };

@@ -1,10 +1,14 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { usePhilosophies } from '../hooks/usePhilosophies';
 import { philosophiesData } from '../data/philosophies';
 import SimpleCTA from '../components/common/SimpleCTA';
 
 export default function ExperiencePage() {
-    const philosophies = philosophiesData;
+    const { data: dbPhilosophies } = usePhilosophies();
+
+    const philosophies = dbPhilosophies && dbPhilosophies.length > 0
+        ? dbPhilosophies.map(p => ({ title: p.title, heading: p.heading, description: p.description, image: p.image_url }))
+        : philosophiesData.map(p => ({ title: p.title, heading: p.title, description: p.description, image: p.image }));
 
     return (
         <div className="relative min-h-screen pt-32 pb-0">

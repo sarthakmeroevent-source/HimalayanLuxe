@@ -3,14 +3,44 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { MapPin, Sparkles, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SimpleCTA from '../components/common/SimpleCTA';
-import { destinationsData as destinations } from '../data/destinations';
+import { useDestinations } from '../hooks/useDestinations';
+
+/**
+ * Map DB destinations to the shape the UI expects
+ */
+function mapDestinations(dbData: ReturnType<typeof useDestinations>['data']) {
+    if (!dbData || dbData.length === 0) return [];
+    return dbData.map(d => ({
+        id: d.slug || d.id,
+        name: d.name,
+        code: d.code || d.name.toUpperCase(),
+        description: d.description,
+        fullDescription: d.full_description || d.description,
+        image: d.cover_image_url,
+        events: d.events || '',
+        features: d.features || [],
+        gallery: [] as string[], // gallery loaded on detail page
+    }));
+}
+
+type DestinationDisplay = {
+    id: string;
+    name: string;
+    code: string;
+    description: string;
+    fullDescription: string;
+    image: string;
+    events: string;
+    features: string[];
+    gallery: string[];
+};
 
 /**
  * Reorder logic: selected card moves to the front of its row,
  * remaining row-mates shift down. Other rows stay untouched.
  */
 function buildDisplayOrder(
-    items: typeof destinations,
+    items: DestinationDisplay[],
     selectedIndex: number | null,
     columns: number
 ) {
@@ -35,7 +65,7 @@ function CollapsedCard({
     onClick,
     index,
 }: {
-    destination: typeof destinations[0];
+    destination: DestinationDisplay;
     onClick: () => void;
     index: number;
 }) {
@@ -45,11 +75,10 @@ function CollapsedCard({
             key={destination.id}
             onClick={onClick}
             initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{
-                opacity: { duration: 0.6, delay: index * 0.05 },
-                y: { duration: 0.6, delay: index * 0.05 },
+                opacity: { duration: 0.6, delay: index * 0.08 },
+                y: { duration: 0.6, delay: index * 0.08 },
                 layout: { type: 'spring', stiffness: 200, damping: 30, mass: 0.8 },
             }}
             className="group relative overflow-hidden rounded-[24px] cursor-pointer aspect-[4/5] border border-gold/10 hover:border-gold/40 list-none transform-gpu"
@@ -86,7 +115,7 @@ function ExpandedCard({
     destination,
     onClose,
 }: {
-    destination: typeof destinations[0];
+    destination: DestinationDisplay;
     onClose: () => void;
 }) {
     const expandedRef = useRef<HTMLLIElement>(null);
@@ -154,7 +183,7 @@ function ExpandedCard({
                         transition={{ delay: 0.25, duration: 0.4 }}
                         className="flex flex-wrap gap-2 md:gap-3"
                     >
-                        {destination.features.map(feature => (
+                        {destination.features.map((feature: string) => (
                             <span
                                 key={feature}
                                 className="flex items-center gap-2 text-[11px] md:text-xs text-white bg-white/10 px-4 py-2 rounded-full border border-white/15 hover:bg-white/20 transition-colors duration-200"
@@ -203,6 +232,8 @@ function ExpandedCard({
 export default function DestinationsPage() {
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [columns, setColumns] = useState(3);
+    const { data: dbDestinations, isLoading, error, refetch } = useDestinations();
+    const destinations = mapDestinations(dbDestinations);
 
     useEffect(() => {
         const updateCols = () => {
@@ -221,7 +252,7 @@ export default function DestinationsPage() {
 
     const displayOrder = useMemo(
         () => buildDisplayOrder(destinations, selectedOriginalIndex, columns),
-        [selectedOriginalIndex, columns]
+        [destinations, selectedOriginalIndex, columns]
     );
 
     return (
@@ -247,8 +278,27 @@ export default function DestinationsPage() {
                     </motion.div>
 
                     {/* Grid — no layout animation on the container itself */}
+                    {isLoading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className="aspect-[4/5] rounded-[24px] bg-white/5 animate-pulse border border-gold/10" />
+                            ))}
+                        </div>
+                    ) : destinations.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 mb-20">
+                            <p className="text-white/40 text-sm tracking-widest uppercase mb-4">
+                                {error ? 'Failed to load destinations' : 'No destinations available'}
+                            </p>
+                            {error && (
+                                <button onClick={() => refetch()}
+                                    className="px-6 py-2 rounded-full border border-gold/30 text-gold text-xs uppercase tracking-widest hover:bg-gold/10 transition-colors">
+                                    Try Again
+                                </button>
+                            )}
+                        </div>
+                    ) : (
                     <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-                        <AnimatePresence mode="popLayout">
+                        <AnimatePresence mode="sync">
                             {displayOrder.map((destination, renderIndex) => {
                                 const isExpanded = destination.id === expandedId;
 
@@ -273,6 +323,7 @@ export default function DestinationsPage() {
                             })}
                         </AnimatePresence>
                     </ul>
+                    )}
                 </div>
             </section>
 

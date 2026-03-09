@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { usePhilosophies } from '../hooks/usePhilosophies';
 import { philosophiesData } from '../data/philosophies';
 import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -18,7 +19,11 @@ export default function ExperienceSectionSticky({
     setActivePhilosophy,
     activePhilosophyRef
 }: ExperienceSectionStickyProps) {
-    const philosophies = philosophiesData;
+    const { data: dbPhilosophies } = usePhilosophies();
+
+    const philosophies = dbPhilosophies && dbPhilosophies.length > 0
+        ? dbPhilosophies.map(p => ({ title: p.title, heading: p.heading, description: p.description, image: p.image_url }))
+        : philosophiesData.map(p => ({ title: p.title, heading: p.title, description: p.description, image: p.image }));
     const sectionRef = useRef<HTMLElement>(null);
     const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
     const imageRefs = useRef<(HTMLImageElement | null)[]>([]);

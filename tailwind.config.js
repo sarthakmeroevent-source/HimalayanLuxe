@@ -1,3 +1,6 @@
+import containerQueries from '@tailwindcss/container-queries';
+import forms from '@tailwindcss/forms';
+
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
@@ -41,7 +44,7 @@ export default {
         }
     },
     plugins: [
-        require('@tailwindcss/container-queries'),
-        require('@tailwindcss/forms')
+        containerQueries,
+        forms
     ],
 };
