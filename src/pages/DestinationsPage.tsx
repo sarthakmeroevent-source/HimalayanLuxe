@@ -1,108 +1,232 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { MapPin, Sparkles, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import SimpleCTA from '../components/common/SimpleCTA';
+import { destinationsData as destinations } from '../data/destinations';
 
-const destinations = [
-    {
-        name: 'Phewa Lake',
-        description: 'Serene waters reflecting the majestic Annapurna range',
-        image: 'https://unsplash.com/photos/yDtB8FppNK0/download?force=true',
-        events: '50+ Events'
-    },
-    {
-        name: 'Annapurna Himalaya',
-        description: 'Snow-capped peaks setting an awe-inspiring backdrop',
-        image: 'https://unsplash.com/photos/PbCCnvId660/download?force=true',
-        events: '40+ Events'
-    },
-    {
-        name: 'Mustang',
-        description: 'Mystical desert landscapes and ancient Tibetan culture',
-        image: 'https://unsplash.com/photos/KM1QLHnxA4c/download?force=true',
-        events: '35+ Events'
-    },
-    {
-        name: 'Illam',
-        description: 'Lush tea gardens rolling across misty emerald hills',
-        image: 'https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=1200&q=80',
-        events: '45+ Events'
-    },
-    {
-        name: 'Badimalika',
-        description: 'Pristine meadows offering untouched natural elegance',
-        image: 'https://unsplash.com/photos/LoFYw82KdjY/download?force=true',
-        events: '30+ Events'
-    },
-    {
-        name: 'Manang',
-        description: 'High altitude serenity hidden within the rocky passes',
-        image: 'https://unsplash.com/photos/AJ3_RYsJs94/download?force=true',
-        events: '55+ Events'
-    },
-    {
-        name: 'Solukhumbu',
-        description: 'The roof of the world in the legendary Everest region',
-        image: 'https://unsplash.com/photos/Q5YNyu88_RU/download?force=true',
-        events: '25+ Events'
-    },
-    {
-        name: 'Gorkha',
-        description: 'Historic grandeur steeped in rich royal heritage',
-        image: 'https://unsplash.com/photos/xXrH3Oj5HZI/download?force=true',
-        events: '20+ Events'
+/**
+ * Reorder logic: selected card moves to the front of its row,
+ * remaining row-mates shift down. Other rows stay untouched.
+ */
+function buildDisplayOrder(
+    items: typeof destinations,
+    selectedIndex: number | null,
+    columns: number
+) {
+    if (selectedIndex === null || selectedIndex < 0 || selectedIndex >= items.length) {
+        return items;
     }
-];
+    const selectedRow = Math.floor(selectedIndex / columns);
+    const rowStart = selectedRow * columns;
+    const rowEnd = Math.min(rowStart + columns, items.length);
+    const before = items.slice(0, rowStart);
+    const selected = items[selectedIndex];
+    const rowRemainder = items
+        .slice(rowStart, rowEnd)
+        .filter((_, i) => rowStart + i !== selectedIndex);
+    const after = items.slice(rowEnd);
+    return [...before, selected, ...rowRemainder, ...after];
+}
 
-export default function DestinationsPage() {
-    const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-    const [selectedDestination, setSelectedDestination] = useState<typeof destinations[0] | null>(null);
-    const [isMobile, setIsMobile] = useState(false);
+/* ─────────────────────────── Collapsed Card ─────────────────────────── */
+function CollapsedCard({
+    destination,
+    onClick,
+    index,
+}: {
+    destination: typeof destinations[0];
+    onClick: () => void;
+    index: number;
+}) {
+    return (
+        <motion.li
+            layout
+            key={destination.id}
+            onClick={onClick}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{
+                opacity: { duration: 0.6, delay: index * 0.05 },
+                y: { duration: 0.6, delay: index * 0.05 },
+                layout: { type: 'spring', stiffness: 200, damping: 30, mass: 0.8 },
+            }}
+            className="group relative overflow-hidden rounded-[24px] cursor-pointer aspect-[4/5] border border-gold/10 hover:border-gold/40 list-none transform-gpu"
+            style={{ willChange: 'transform' }}
+        >
+            <div className="absolute inset-0 z-0 overflow-hidden">
+                <img
+                    src={destination.image}
+                    alt={destination.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover transform-gpu transition-transform duration-[1.2s] ease-out group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+            </div>
 
-    const getOrder = (index: number) => {
-        if (expandedIndex === null) return index;
-        if (index === expandedIndex) {
-            return Math.floor(expandedIndex / 3) * 3 - 1;
-        }
-        return index;
-    };
+            <div className="absolute inset-0 p-8 flex flex-col justify-end z-10 pointer-events-none">
+                <span className="text-gold text-xs tracking-[0.3em] uppercase mb-3 block">
+                    {destination.events}
+                </span>
+                <h3 className="font-serif text-white text-3xl mb-3 group-hover:text-gold transition-colors duration-400">
+                    {destination.name}
+                </h3>
+                <p className="text-white/60 text-sm line-clamp-2">
+                    {destination.description}
+                </p>
+            </div>
+        </motion.li>
+    );
+}
+
+/* ─────────────────────────── Expanded Card ─────────────────────────── */
+function ExpandedCard({
+    destination,
+    onClose,
+}: {
+    destination: typeof destinations[0];
+    onClose: () => void;
+}) {
+    const expandedRef = useRef<HTMLLIElement>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        if (expandedIndex === null) return;
-
-        const initialScrollY = window.scrollY;
-
-        const handleClose = () => setExpandedIndex(null);
-
-        const handleScroll = () => {
-            // Close only if user scrolls away by more than 150px
-            if (Math.abs(window.scrollY - initialScrollY) > 150) {
-                setExpandedIndex(null);
-            }
-        };
-
         const timer = setTimeout(() => {
-            window.addEventListener('click', handleClose);
-            window.addEventListener('scroll', handleScroll, { passive: true });
-        }, 100);
-
-        return () => {
-            clearTimeout(timer);
-            window.removeEventListener('click', handleClose);
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, [expandedIndex]);
-
-    useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth < 768);
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
+            if (!expandedRef.current) return;
+            const rect = expandedRef.current.getBoundingClientRect();
+            const navbarOffset = 120;
+            const targetTop = window.scrollY + rect.top - navbarOffset;
+            window.scrollTo({ top: targetTop, behavior: 'smooth' });
+        }, 300);
+        return () => clearTimeout(timer);
     }, []);
 
     return (
+        <motion.li
+            ref={expandedRef}
+            layout
+            key={destination.id}
+            onClick={onClose}
+            transition={{ layout: { type: 'spring', stiffness: 200, damping: 30, mass: 0.8 } }}
+            className="relative overflow-hidden rounded-[28px] cursor-pointer col-span-1 md:col-span-2 lg:col-span-3 border border-gold/30 list-none transform-gpu"
+            style={{ zIndex: 10, willChange: 'transform' }}
+        >
+            {/* Background image */}
+            <div className="absolute inset-0 z-0 overflow-hidden">
+                <img
+                    src={destination.image}
+                    alt={destination.name}
+                    className="w-full h-full object-cover scale-[1.02] transform-gpu"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/20" />
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10 flex flex-col md:flex-row md:items-end md:justify-between p-8 md:p-12 lg:p-16 min-h-[420px] md:min-h-[520px] lg:min-h-[580px]">
+                {/* Left: Text content */}
+                <div className="flex flex-col md:w-3/5 lg:w-2/3">
+                    <span className="text-gold text-xs tracking-[0.3em] uppercase mb-4 block">
+                        {destination.events}
+                    </span>
+                    <h3 className="font-serif text-gold/90 text-4xl md:text-5xl lg:text-6xl leading-[1.1] mb-4">
+                        {destination.name}
+                    </h3>
+                    <p className="text-white/80 text-base md:text-lg font-medium mb-6">
+                        {destination.description}
+                    </p>
+
+                    {/* Full description */}
+                    <motion.p
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.15, duration: 0.4 }}
+                        className="text-white/70 text-sm md:text-base leading-relaxed mb-8 max-w-2xl"
+                    >
+                        {destination.fullDescription}
+                    </motion.p>
+
+                    {/* Features */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.25, duration: 0.4 }}
+                        className="flex flex-wrap gap-2 md:gap-3"
+                    >
+                        {destination.features.map(feature => (
+                            <span
+                                key={feature}
+                                className="flex items-center gap-2 text-[11px] md:text-xs text-white bg-white/10 px-4 py-2 rounded-full border border-white/15 hover:bg-white/20 transition-colors duration-200"
+                            >
+                                <Sparkles size={12} className="text-gold" />
+                                {feature}
+                            </span>
+                        ))}
+                    </motion.div>
+                </div>
+
+                {/* Right: Buttons */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.4 }}
+                    className="mt-8 md:mt-0 md:pl-8 shrink-0 flex flex-col gap-3 md:w-56"
+                >
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/destinations/${destination.id}`);
+                        }}
+                        className="w-full py-3.5 px-6 rounded-full bg-gold hover:bg-[#F2D06B] transition-colors duration-200 text-black text-[11px] uppercase tracking-[0.2em] font-medium flex items-center justify-center gap-2"
+                    >
+                        <MapPin size={16} />
+                        Plan Event
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onClose();
+                        }}
+                        className="w-full py-3.5 px-6 rounded-full border border-white/30 hover:bg-white/10 transition-colors duration-200 text-white text-[11px] uppercase tracking-[0.2em] font-medium flex items-center justify-center gap-2"
+                    >
+                        <X size={16} />
+                        Close
+                    </button>
+                </motion.div>
+            </div>
+        </motion.li>
+    );
+}
+
+/* ─────────────────────────── Main Page ─────────────────────────── */
+export default function DestinationsPage() {
+    const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [columns, setColumns] = useState(3);
+
+    useEffect(() => {
+        const updateCols = () => {
+            if (window.innerWidth < 768) setColumns(1);
+            else if (window.innerWidth < 1024) setColumns(2);
+            else setColumns(3);
+        };
+        updateCols();
+        window.addEventListener('resize', updateCols);
+        return () => window.removeEventListener('resize', updateCols);
+    }, []);
+
+    const selectedOriginalIndex = expandedId !== null
+        ? destinations.findIndex(d => d.id === expandedId)
+        : null;
+
+    const displayOrder = useMemo(
+        () => buildDisplayOrder(destinations, selectedOriginalIndex, columns),
+        [selectedOriginalIndex, columns]
+    );
+
+    return (
         <div className="relative min-h-screen pt-32 pb-0">
-            <section className="relative w-full px-8 md:px-16 py-20">
+            <section className="relative w-full px-8 md:px-16 py-20 z-10">
                 <div className="max-w-[1600px] mx-auto">
                     {/* Header */}
                     <motion.div
@@ -122,130 +246,35 @@ export default function DestinationsPage() {
                         </p>
                     </motion.div>
 
-                    {/* Destinations Grid */}
-                    <motion.div layout className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-                        {destinations.map((destination, index) => (
-                            <motion.div
-                                layout
-                                key={destination.name}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, amount: 0.2 }}
-                                transition={{ duration: 0.8, delay: index * 0.1, layout: { duration: 1.0, type: 'spring', bounce: 0.1 } }}
-                                style={{ order: getOrder(index) }}
-                                className={`group relative overflow-hidden rounded-[24px] cursor-pointer ${!isMobile && expandedIndex === index
-                                    ? 'md:col-span-2 lg:col-span-3 aspect-video lg:aspect-[21/9]'
-                                    : 'col-span-1 aspect-[4/5]'
-                                    }`}
-                                onClick={(e) => {
-                                    if (isMobile) {
-                                        setSelectedDestination(destination);
-                                    } else {
-                                        e.stopPropagation();
-                                        setExpandedIndex(index === expandedIndex ? null : index);
-                                    }
-                                }}
-                            >
-                                <motion.img
-                                    layout="position"
-                                    src={destination.image}
-                                    alt={destination.name}
-                                    className={`absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] ${!isMobile && expandedIndex === index ? 'scale-105' : 'group-hover:scale-110'
-                                        }`}
-                                />
-                                <div className={`absolute inset-0 bg-gradient-to-t transition-opacity duration-700 ${!isMobile && expandedIndex === index
-                                    ? 'from-black/80 via-black/20 to-transparent opacity-100'
-                                    : 'from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90'
-                                    }`}></div>
+                    {/* Grid — no layout animation on the container itself */}
+                    <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+                        <AnimatePresence mode="popLayout">
+                            {displayOrder.map((destination, renderIndex) => {
+                                const isExpanded = destination.id === expandedId;
 
-                                <motion.div layout="position" className="absolute inset-0 p-8 flex flex-col justify-end pointer-events-none">
-                                    <span className="text-gold text-xs tracking-[0.3em] uppercase mb-2 block">
-                                        {destination.events}
-                                    </span>
-                                    <h3 className={`font-serif text-white transition-all duration-500 ${!isMobile && expandedIndex === index ? 'text-4xl lg:text-5xl mb-4' : 'text-2xl mb-2'}`}>
-                                        {destination.name}
-                                    </h3>
-                                    <p className={`text-white/80 transition-all duration-500 ${!isMobile && expandedIndex === index ? 'text-lg max-w-2xl' : 'text-sm text-white/60'}`}>
-                                        {destination.description}
-                                    </p>
+                                if (isExpanded) {
+                                    return (
+                                        <ExpandedCard
+                                            key={destination.id}
+                                            destination={destination}
+                                            onClose={() => setExpandedId(null)}
+                                        />
+                                    );
+                                }
 
-                                    <AnimatePresence>
-                                        {!isMobile && expandedIndex === index && (
-                                            <motion.div
-                                                initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                                                animate={{ opacity: 1, height: 'auto', marginTop: 24 }}
-                                                exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                                                className="overflow-hidden"
-                                            >
-                                                <button className="flex items-center gap-3 px-6 py-3 rounded-full border border-gold/40 text-gold text-xs uppercase tracking-widest hover:bg-gold/10 transition-colors pointer-events-auto">
-                                                    Plan an event here
-                                                </button>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </motion.div>
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                                return (
+                                    <CollapsedCard
+                                        key={destination.id}
+                                        destination={destination}
+                                        onClick={() => setExpandedId(destination.id)}
+                                        index={renderIndex}
+                                    />
+                                );
+                            })}
+                        </AnimatePresence>
+                    </ul>
                 </div>
-
             </section>
-
-
-            {/* Mobile Modal Overlay */}
-            <AnimatePresence>
-                {selectedDestination && isMobile && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
-                        onClick={() => setSelectedDestination(null)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, y: 50, opacity: 0 }}
-                            animate={{ scale: 1, y: 0, opacity: 1 }}
-                            exit={{ scale: 0.9, y: 50, opacity: 0 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="relative w-full max-w-sm overflow-hidden bg-emerald-deep border border-gold/20 rounded-[32px] shadow-2xl flex flex-col max-h-[90vh]"
-                            onClick={e => e.stopPropagation()}
-                        >
-                            {/* Close Button */}
-                            <button
-                                onClick={() => setSelectedDestination(null)}
-                                className="absolute top-4 right-4 z-20 p-2 bg-black/40 hover:bg-black/60 rounded-full text-white/80 transition-colors backdrop-blur-sm"
-                            >
-                                <X size={20} />
-                            </button>
-
-                            <div className="relative aspect-[4/3] w-full shrink-0">
-                                <img
-                                    src={selectedDestination.image}
-                                    alt={selectedDestination.name}
-                                    className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-transparent to-transparent opacity-100"></div>
-                            </div>
-
-                            <div className="p-8 pt-4 flex flex-col overflow-y-auto">
-                                <span className="text-gold text-[10px] tracking-[0.3em] uppercase mb-2 block">
-                                    {selectedDestination.events}
-                                </span>
-                                <h3 className="font-serif text-white/95 text-3xl mb-4">
-                                    {selectedDestination.name}
-                                </h3>
-                                <p className="text-white/60 text-sm leading-relaxed mb-8">
-                                    {selectedDestination.description}
-                                </p>
-
-                                <button className="w-full py-4 rounded-full border border-gold/30 hover:border-gold bg-gold/5 transition-colors text-gold text-xs uppercase tracking-widest font-medium">
-                                    Plan Event Here
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
 
             <SimpleCTA
                 label="Custom Destinations"

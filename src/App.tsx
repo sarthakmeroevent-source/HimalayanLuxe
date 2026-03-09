@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ExperiencePage from './pages/ExperiencePage';
 import DestinationsPage from './pages/DestinationsPage';
+import DestinationDetailPage from './pages/DestinationDetailPage';
 import PortfolioPage from './pages/PortfolioPage';
 import ServicesDetailPage from './pages/ServicesDetailPage';
 import ContactPage from './pages/ContactPage';
@@ -145,6 +146,7 @@ function AppContent() {
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/experience" element={<ExperiencePage />} />
                     <Route path="/destinations" element={<DestinationsPage />} />
+                    <Route path="/destinations/:id" element={<DestinationDetailPage />} />
                     <Route path="/portfolio" element={<PortfolioPage />} />
                     <Route path="/services" element={<ServicesDetailPage />} />
                     <Route path="/contact" element={<ContactPage />} />
