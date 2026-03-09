@@ -1,15 +1,25 @@
 import { motion } from 'framer-motion';
 import { useRef, useEffect, useState, useLayoutEffect } from 'react';
+import { useActiveHero } from '../hooks/useHeroSettings';
 
 interface HeroSectionProps {
     isMuted: boolean;
     setIsMuted: (muted: boolean) => void;
 }
 
+const FALLBACK_VIDEO = '/Video.mp4';
+const FALLBACK_TAGLINE = 'the most sought after nuptial artist in the world';
+
 export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const sectionRef = useRef<HTMLElement>(null);
     const [fixedHeight, setFixedHeight] = useState<string | number>('100dvh');
+    const { data: hero } = useActiveHero();
+    const [mediaError, setMediaError] = useState(false);
+
+    const mediaUrl = (!mediaError && hero?.media_url) || FALLBACK_VIDEO;
+    const tagline = hero?.tagline || FALLBACK_TAGLINE;
+    const isVideo = mediaError ? true : (hero ? hero.media_type === 'video' : true);
 
     // Lock height on mobile to prevent address bar resizing jumps
     useLayoutEffect(() => {
@@ -17,7 +27,6 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
 
         const lockHeight = () => {
             if (window.innerWidth < 768) {
-                // Fixed height based on initial viewport to ignore address bar shifts
                 setFixedHeight(window.innerHeight);
             } else {
                 setFixedHeight('100dvh');
@@ -27,7 +36,6 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
         lockHeight();
 
         const handleResize = () => {
-            // Only re-lock if the width changed significantly (orientation change)
             if (Math.abs(window.innerWidth - initialWidth) > 50) {
                 initialWidth = window.innerWidth;
                 lockHeight();
@@ -41,7 +49,7 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
     useEffect(() => {
         const video = videoRef.current;
         if (video) {
-            video.muted = true; // Always start muted for autoplay
+            video.muted = true;
             video.play().catch(error => {
                 console.log("Autoplay prevented:", error);
             });
@@ -58,21 +66,17 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        // Hero section is in view
                         if (!isMuted) {
                             video.muted = false;
                         } else {
                             video.muted = true;
                         }
                     } else {
-                        // Hero section is out of view - always mute
                         video.muted = true;
                     }
                 });
             },
-            {
-                threshold: 0.1, // Trigger earlier
-            }
+            { threshold: 0.1 }
         );
 
         observer.observe(section);
@@ -90,16 +94,22 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
             style={{ minHeight: fixedHeight }}
         >
             <div className="absolute inset-0 z-0" style={{ height: fixedHeight }}>
-                <video
-                    ref={videoRef}
-                    autoPlay
-                    loop
-                    playsInline
-                    muted={isMuted}
-                    className="w-full h-full object-cover"
-                >
-                    <source src="/Video.mp4" type="video/mp4" />
-                </video>
+                {isVideo ? (
+                    <video
+                        key={mediaUrl}
+                        ref={videoRef}
+                        autoPlay
+                        loop
+                        playsInline
+                        muted={isMuted}
+                        className="w-full h-full object-cover"
+                        onError={() => setMediaError(true)}
+                    >
+                        <source src={mediaUrl} type="video/mp4" onError={() => setMediaError(true)} />
+                    </video>
+                ) : (
+                    <img key={mediaUrl} src={mediaUrl} alt="Hero" className="w-full h-full object-cover" onError={() => setMediaError(true)} />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/10 to-black/80"></div>
             </div>
 
@@ -127,19 +137,11 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                             </svg>
                         )}
                     </div>
-                    {!isMuted && (
-                        <motion.div
-                            initial={{ scale: 0, opacity: 0.5 }}
-                            animate={{ scale: 2, opacity: 0 }}
-                            transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
-                            className="absolute inset-0 border border-gold rounded-full"
-                        />
-                    )}
                 </motion.button>
             </div>
 
             <div className="w-full px-[clamp(1.5rem,4vw,4rem)] pb-6 md:pb-14 pt-[120px] flex flex-col items-start justify-end z-20" style={{ height: fixedHeight }}>
-                {/* Mobile Sound Button - Positioned above the text on the left */}
+                {/* Mobile Sound Button */}
                 <div className="md:hidden mb-6">
                     <motion.button
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -192,10 +194,9 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                         <span className="liquid-gold-text text-[clamp(18px,1.5vw,28px)] tracking-[0.1em] font-meno uppercase">Himalayan</span>
                         <span className="font-cursive liquid-gold-text text-[clamp(40px,3.5vw,56px)] font-medium pl-2 pr-2 tracking-wide">Luxe</span>
                     </motion.span>
-                    the most sought after nuptial artist in the world
+                    {tagline}
                 </motion.h2>
             </div>
-
         </section>
     );
 }

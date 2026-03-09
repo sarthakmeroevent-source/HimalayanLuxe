@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePhilosophies } from '../hooks/usePhilosophies';
 import { philosophiesData } from '../data/philosophies';
 
 interface ExperienceSectionProps {
@@ -12,7 +13,12 @@ export default function ExperienceSection({
     setActivePhilosophy, 
     activePhilosophyRef 
 }: ExperienceSectionProps) {
-    const philosophies = philosophiesData;
+    const { data: dbPhilosophies } = usePhilosophies();
+
+    // Use DB data if available, fallback to hardcoded
+    const philosophies = dbPhilosophies && dbPhilosophies.length > 0
+        ? dbPhilosophies.map(p => ({ title: p.title, heading: p.heading, description: p.description, image: p.image_url }))
+        : philosophiesData.map(p => ({ title: p.title, heading: p.title, description: p.description, image: p.image }));
 
     return (
         <section className="section-container relative min-h-[100dvh] py-12 md:py-24 w-full flex flex-col px-8 md:px-24 overflow-hidden" id="experience">
