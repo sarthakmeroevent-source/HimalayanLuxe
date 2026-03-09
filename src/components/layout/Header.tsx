@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -9,8 +10,23 @@ interface HeaderProps {
 }
 
 export default function Header({ isScrolled, showLoader, menuOpen, setMenuOpen }: HeaderProps) {
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement;
+            // Don't trigger if typing in an input or textarea
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+
+            if (e.key.toLowerCase() === 'm' && !menuOpen) {
+                setMenuOpen(true);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [menuOpen, setMenuOpen]);
+
     return (
-        <header className={`fixed top-0 w-full z-[100] px-6 md:px-12 flex items-center justify-between transition-all duration-700 ${isScrolled ? 'py-3 md:py-5 bg-transparent backdrop-blur-lg md:backdrop-blur-none' : 'py-8 md:py-10 bg-transparent'}`}>
+        <header className={`fixed top-0 w-full z-[100] px-6 md:px-12 flex items-center justify-between transition-all duration-700 ease-in-out ${isScrolled ? 'py-3 md:py-4 bg-[#022E22]/30 backdrop-blur-lg shadow-[0_4px_30px_rgba(0,0,0,0.1)]' : 'py-8 md:py-10 bg-gradient-to-b from-black/40 to-transparent'}`}>
             <a
                 href="/"
                 className="cursor-pointer"
@@ -39,13 +55,13 @@ export default function Header({ isScrolled, showLoader, menuOpen, setMenuOpen }
             >
                 <button
                     onClick={() => setMenuOpen(!menuOpen)}
-                    className="text-white hover:opacity-70 transition-opacity font-['Manrope'] text-[11px] md:text-[13px] tracking-[0.3em] uppercase font-medium"
+                    className="text-white hover:opacity-70 transition-opacity font-['Manrope'] text-[11px] md:text-[13px] tracking-[0.3em] uppercase font-medium focus:outline-none"
                 >
                     MENU
                 </button>
                 <button
                     onClick={() => setMenuOpen(!menuOpen)}
-                    className="text-white hover:opacity-70 transition-opacity flex flex-col items-end gap-[6px]"
+                    className="text-white hover:opacity-70 transition-opacity flex flex-col items-end gap-[6px] focus:outline-none"
                 >
                     <div className="w-8 h-[1px] bg-white opacity-80"></div>
                     <div className="w-12 h-[1px] bg-white opacity-80"></div>
