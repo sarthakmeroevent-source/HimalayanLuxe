@@ -14,6 +14,13 @@ interface ExperienceSectionStickyProps {
     activePhilosophyRef: React.MutableRefObject<number>;
 }
 
+interface PhilosophyDisplayItem {
+    title: string;
+    heading: string | React.ReactNode;
+    description: string;
+    image: string;
+}
+
 export default function ExperienceSectionSticky({
     activePhilosophy,
     setActivePhilosophy,
@@ -21,13 +28,13 @@ export default function ExperienceSectionSticky({
 }: ExperienceSectionStickyProps) {
     const { data: dbPhilosophies } = usePhilosophies();
 
-    const philosophies = dbPhilosophies && dbPhilosophies.length > 0
-        ? dbPhilosophies.map(p => ({ title: p.title, heading: p.heading, description: p.description, image: p.image_url }))
-        : philosophiesData.map(p => ({ title: p.title, heading: p.title, description: p.description, image: p.image }));
+    const philosophies: PhilosophyDisplayItem[] = dbPhilosophies && dbPhilosophies.length > 0
+        ? dbPhilosophies.map((p: any) => ({ title: p.title, heading: p.heading, description: p.description, image: p.image_url }))
+        : (philosophiesData as any[]).map((p: any) => ({ title: p.title, heading: p.heading, description: p.description, image: p.image }));
     const sectionRef = useRef<HTMLElement>(null);
     const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
     const imageRefs = useRef<(HTMLImageElement | null)[]>([]);
-    const [isDesktop, setIsDesktop] = useState(true);
+    const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 768 : true);
     const [isInteracting, setIsInteracting] = useState(false);
     const carouselRef = useRef<HTMLDivElement>(null);
 
@@ -35,7 +42,6 @@ export default function ExperienceSectionSticky({
         const checkMobile = () => {
             setIsDesktop(window.innerWidth >= 768);
         };
-        checkMobile();
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
@@ -256,7 +262,7 @@ export default function ExperienceSectionSticky({
                         }
                     }}
                 >
-                    {philosophies.map((philosophy, index) => (
+                    {philosophies.map((philosophy: PhilosophyDisplayItem, index: number) => (
                         <div key={index} className="flex-shrink-0 w-[85vw] snap-center flex flex-col gap-6">
                             <div className="relative aspect-[4/5] rounded-[24px] overflow-hidden border border-gold/20 shadow-2xl p-1 bg-transparent">
                                 <img src={philosophy.image} alt={philosophy.title} className="w-full h-full object-cover rounded-[20px] brightness-105" />
@@ -279,7 +285,7 @@ export default function ExperienceSectionSticky({
                                     </Link>
 
                                     <div className="flex gap-1.5 px-2">
-                                        {philosophies.map((_, i) => (
+                                        {philosophies.map((_: PhilosophyDisplayItem, i: number) => (
                                             <div
                                                 key={i}
                                                 className={`h-[1px] rounded-full transition-all duration-500 ${activePhilosophy === i ? 'w-6 bg-gold' : 'w-2 bg-white/20'}`}
@@ -302,7 +308,7 @@ export default function ExperienceSectionSticky({
             id="experience"
             style={{ height: `${philosophies.length * 100}vh` }}
         >
-            <div className="experience-sticky-content sticky top-0 left-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden pt-[80px] md:pt-0">
+            <div className="experience-sticky-content w-full h-[100dvh] flex items-center justify-center overflow-hidden pt-[80px] md:pt-0">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(800px,100vw)] h-[min(800px,100vw)] bg-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
 
                 <div className="relative z-10 w-full max-w-[1400px] mx-auto flex-grow flex flex-col md:flex-row items-center justify-center md:justify-between gap-6 md:gap-12 px-8 md:px-16 lg:px-20">
@@ -310,7 +316,7 @@ export default function ExperienceSectionSticky({
                     <div className="w-full md:w-1/2 order-1 md:order-2 flex justify-center items-center">
                         <div className="relative w-full aspect-[4/3] md:h-[clamp(400px,60vh,700px)] max-w-2xl rounded-[16px] md:rounded-[32px] p-1 md:p-3 shadow-2xl border border-gold/20 bg-transparent flex-shrink-0">
                             <div className="relative w-full h-full rounded-[14px] md:rounded-[28px] overflow-hidden bg-transparent">
-                                {philosophies.map((philosophy, index) => (
+                                {philosophies.map((philosophy: PhilosophyDisplayItem, index: number) => (
                                     <img
                                         key={index}
                                         ref={(el) => (imageRefs.current[index] = el)}
@@ -329,7 +335,7 @@ export default function ExperienceSectionSticky({
                     {/* Content Section - Second on Mobile, First on Desktop */}
                     <div className="w-full md:w-1/2 order-2 md:order-1 flex flex-col items-start text-left justify-center relative">
                         <div className="relative w-full flex items-start justify-start overflow-hidden min-h-[400px] md:min-h-[60vh] pt-4 md:pt-0">
-                            {philosophies.map((philosophy, index) => (
+                            {philosophies.map((philosophy: PhilosophyDisplayItem, index: number) => (
                                 <div
                                     key={index}
                                     ref={(el) => (contentRefs.current[index] = el)}
@@ -357,7 +363,7 @@ export default function ExperienceSectionSticky({
                                         </Link>
 
                                         <div className="flex items-center gap-2.5 md:gap-3">
-                                            {philosophies.map((_, i) => (
+                                            {philosophies.map((_: PhilosophyDisplayItem, i: number) => (
                                                 <button
                                                     key={i}
                                                     onClick={() => scrollToPhilosophy(i)}

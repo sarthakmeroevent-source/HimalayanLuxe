@@ -71,17 +71,17 @@ export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationO
             onClick={() => setMenuOpen(false)}
         >
             {/* Premium darker glass emerald gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#022E22]/60 via-[#011F17]/85 to-[#010C08]/95 border-b border-white/5"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-[#022E22]/60 via-[#011F17]/85 to-[#010C08]/95 border-b border-white/5 pointer-events-none"></div>
             {/* Subtle radial glow in the center behind the links */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.12)_0%,transparent_60%)]"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.12)_0%,transparent_60%)] pointer-events-none"></div>
 
             {/* Navigation Overlay Header - pointer-events-none to prevent blocking centered links */}
             <div className="absolute top-0 left-0 w-full z-20 px-8 md:px-12 py-10 pointer-events-none">
-                <div className="max-w-[1600px] mx-auto flex items-center justify-between pointer-events-auto">
+                <div className="max-w-[1600px] mx-auto flex items-center justify-between">
                     <motion.img
                         src="/LOGO.svg"
                         alt="Himalayan Luxe"
-                        className="h-16 w-auto drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] cursor-pointer"
+                        className="h-16 w-auto drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] cursor-pointer pointer-events-auto"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: menuOpen ? 1 : 0 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
@@ -90,7 +90,7 @@ export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationO
 
                     <button
                         onClick={() => setMenuOpen(false)}
-                        className="text-white hover:text-yellow-400 transition-colors duration-500 text-5xl font-light leading-none pointer-events-auto focus:outline-none"
+                        className="text-white hover:text-yellow-400 transition-colors duration-500 text-5xl font-light leading-none pointer-events-auto focus:outline-none px-4 py-2"
                         aria-label="Close menu"
                     >
                         ×
@@ -99,7 +99,7 @@ export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationO
             </div>
 
             <div className="h-full flex items-center justify-center relative z-10 pointer-events-auto">
-                <nav className="flex flex-col items-center gap-10 md:gap-12" onClick={(e) => e.stopPropagation()}>
+                <nav className="flex flex-col items-center gap-6 md:gap-8" onClick={(e) => e.stopPropagation()}>
                     {menuItems.map((item, i) => (
                         <motion.button
                             key={item.label}
@@ -110,7 +110,7 @@ export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationO
                             onMouseEnter={() => setFocusedIndex(i)}
                             onMouseLeave={() => setFocusedIndex(-1)}
                             onFocus={() => setFocusedIndex(i)}
-                            className={`relative font-['Playfair_Display'] text-2xl md:text-3xl lg:text-4xl transition-all duration-300 ${focusedIndex === i ? 'text-yellow-400 tracking-widest' : 'text-white hover:text-yellow-400 hover:tracking-widest'}`}
+                            className={`relative font-['Playfair_Display'] text-2xl md:text-3xl lg:text-4xl transition-all duration-300 py-2 px-6 ${focusedIndex === i ? 'text-yellow-400 tracking-widest' : 'text-white hover:text-yellow-400 hover:tracking-widest'}`}
                         >
                             {item.label}
                             {/* Animated elegant underline */}
