@@ -66,12 +66,14 @@ export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationO
 
     return (
         <div
-            className={`fixed inset-0 z-[200] transition-transform duration-1000 ease-in-out overflow-hidden ${menuOpen ? 'translate-y-0' : '-translate-y-full'
+            className={`fixed inset-0 z-[200] transition-transform duration-1000 ease-in-out overflow-hidden backdrop-blur-xl ${menuOpen ? 'translate-y-0' : '-translate-y-full'
                 }`}
             onClick={() => setMenuOpen(false)}
         >
-            {/* Plain dark emerald green background */}
-            <div className="absolute inset-0 bg-[#022E22]"></div>
+            {/* Premium darker glass emerald gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#022E22]/60 via-[#011F17]/85 to-[#010C08]/95 border-b border-white/5"></div>
+            {/* Subtle radial glow in the center behind the links */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.12)_0%,transparent_60%)]"></div>
 
             <div className="absolute top-10 left-8 md:left-12 z-10">
                 <motion.img
@@ -106,9 +108,13 @@ export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationO
                             onMouseEnter={() => setFocusedIndex(i)}
                             onMouseLeave={() => setFocusedIndex(-1)}
                             onFocus={() => setFocusedIndex(i)}
-                            className={`font-['Playfair_Display'] text-2xl md:text-4xl transition-colors duration-300 ${focusedIndex === i ? 'text-yellow-400' : 'text-white hover:text-yellow-400'}`}
+                            className={`relative font-['Playfair_Display'] text-2xl md:text-4xl transition-colors duration-300 ${focusedIndex === i ? 'text-yellow-400' : 'text-white hover:text-yellow-400'}`}
                         >
                             {item.label}
+                            {/* Animated elegant underline */}
+                            <span 
+                                className={`absolute left-1/2 -bottom-2 h-[1px] bg-yellow-400 transition-all duration-300 ease-in-out -translate-x-1/2 ${focusedIndex === i ? 'w-full' : 'w-0'}`} 
+                            />
                         </motion.button>
                     ))}
                 </nav>
