@@ -66,17 +66,15 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        if (!isMuted) {
-                            video.muted = false;
-                        } else {
-                            video.muted = true;
-                        }
+                        video.play().catch(e => console.log("Play prevented:", e));
+                        video.muted = isMuted;
                     } else {
+                        video.pause();
                         video.muted = true;
                     }
                 });
             },
-            { threshold: 0.1 }
+            { threshold: 0.5 }
         );
 
         observer.observe(section);

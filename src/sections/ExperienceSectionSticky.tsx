@@ -28,9 +28,12 @@ export default function ExperienceSectionSticky({
 }: ExperienceSectionStickyProps) {
     const { data: dbPhilosophies } = usePhilosophies();
 
-    const philosophies: PhilosophyDisplayItem[] = dbPhilosophies && dbPhilosophies.length > 0
+    const rawPhilosophies: PhilosophyDisplayItem[] = dbPhilosophies && dbPhilosophies.length > 0
         ? dbPhilosophies.map((p: any) => ({ title: p.title, heading: p.heading, description: p.description, image: p.image_url }))
         : (philosophiesData as any[]).map((p: any) => ({ title: p.title, heading: p.heading, description: p.description, image: p.image }));
+        
+    // Only show first 3 philosophies on homepage
+    const philosophies = rawPhilosophies.slice(0, 3);
     const sectionRef = useRef<HTMLElement>(null);
     const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
     const imageRefs = useRef<(HTMLImageElement | null)[]>([]);
@@ -236,7 +239,7 @@ export default function ExperienceSectionSticky({
 
     if (!isDesktop) {
         return (
-            <section className="relative w-full py-16 md:py-24 px-6 md:px-12 overflow-hidden bg-transparent" id="experience">
+            <section className="relative w-full py-16 md:py-[72px] px-6 md:px-12 overflow-hidden bg-transparent" id="experience">
                 <div className="flex flex-col items-center text-center gap-6 mb-12">
                     <span className="liquid-gold-text text-[10px] tracking-[0.3em] uppercase font-medium">Experience</span>
                     <h2 className="font-serif text-white/95 text-4xl leading-[1.1] font-normal tracking-tight mx-auto max-w-[280px]">The Art of <span className="italic text-white/50">Details</span></h2>

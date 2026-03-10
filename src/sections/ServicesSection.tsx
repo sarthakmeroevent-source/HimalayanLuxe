@@ -80,7 +80,7 @@ export default function ServicesSection() {
     }, [displayServices]);
 
     return (
-        <section className="relative w-full py-16 md:py-24 px-6 md:px-12" id="services">
+        <section className="relative w-full py-16 md:py-[72px] px-6 md:px-12" id="services">
             {isLoading ? (
                 <div className="flex justify-center py-20">
                     <div className="w-8 h-8 border-2 border-white/10 border-t-[#D4AF37] rounded-full animate-spin" />

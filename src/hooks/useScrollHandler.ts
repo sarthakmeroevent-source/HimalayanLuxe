@@ -10,10 +10,7 @@ interface UseScrollHandlerProps {
     isHomePage: boolean;
     setIsScrolled: (scrolled: boolean) => void;
     setActiveSection: (section: string) => void;
-    setActivePhilosophy: (index: number) => void;
-    activePhilosophy: number;
     activeSectionRef: React.MutableRefObject<string>;
-    activePhilosophyRef: React.MutableRefObject<number>;
 }
 
 export function useScrollHandler({
@@ -21,35 +18,73 @@ export function useScrollHandler({
     isHomePage,
     setIsScrolled,
     setActiveSection,
-    setActivePhilosophy,
-    activePhilosophy,
     activeSectionRef,
-    activePhilosophyRef
 }: UseScrollHandlerProps) {
     useEffect(() => {
         if (showLoader) return;
 
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            orientation: 'vertical',
-            gestureOrientation: 'vertical',
-            smoothWheel: true,
-            wheelMultiplier: 1,
-            touchMultiplier: 2,
-            infinite: false,
-        });
+        const isMobile = window.innerWidth < 1024;
 
-        // Sync Lenis with GSAP ScrollTrigger
-        lenis.on('scroll', ScrollTrigger.update);
+        let lenis: Lenis | null = null;
+        let tick: ((time: number) => void) | null = null;
+        
+        if (!isMobile) {
+            lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                orientation: 'vertical',
+                gestureOrientation: 'vertical',
+                smoothWheel: true,
+                wheelMultiplier: 1,
+                touchMultiplier: 2,
+                infinite: false,
+            });
 
-        gsap.ticker.add((time) => {
-            lenis.raf(time * 1000);
-        });
+            // Sync Lenis with GSAP ScrollTrigger
+            lenis.on('scroll', ScrollTrigger.update);
 
-        gsap.ticker.lagSmoothing(0);
+            tick = (time: number) => {
+                lenis?.raf(time * 1000);
+            };
 
-        const handleScroll = () => {
+            gsap.ticker.add(tick);
+            gsap.ticker.lagSmoothing(0);
+
+            lenis.on('scroll', handleScroll);
+        } else {
+            // On mobile, just use the window scroll listener
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        }
+
+        // Use IntersectionObserver instead of getBoundingClientRect in a scroll loop
+        const sectionIds = ['hero', 'experience', 'destinations', 'services', 'about', 'cta', 'footer'];
+        const observers: IntersectionObserver[] = [];
+
+        if (isHomePage) {
+            const observerOptions = {
+                root: null,
+                rootMargin: '-20% 0px -20% 0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.id;
+                        setActiveSection(id);
+                        activeSectionRef.current = id;
+                    }
+                });
+            }, observerOptions);
+
+            sectionIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) observer.observe(el);
+            });
+            observers.push(observer);
+        }
+
+        function handleScroll() {
             const scrollY = window.scrollY;
             setIsScrolled(scrollY > 100);
 
@@ -60,38 +95,20 @@ export function useScrollHandler({
                 const heroHeight = heroSection.offsetHeight;
                 setIsScrolled(scrollY > heroHeight - 100);
             }
-
-            const sections = ['hero', 'experience', 'destinations', 'services', 'about', 'cta', 'footer'];
-            sections.forEach((sectionId) => {
-                const element = document.getElementById(sectionId);
-                if (element) {
-                    const rect = element.getBoundingClientRect();
-                    if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
-                        setActiveSection(sectionId);
-                        activeSectionRef.current = sectionId;
-                    }
-                }
-            });
-        };
-
-        lenis.on('scroll', handleScroll);
-
-        function raf(time: number) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
         }
 
-        const rafId = requestAnimationFrame(raf);
         handleScroll();
-
         ScrollTrigger.refresh();
 
         return () => {
-            lenis.destroy();
-            cancelAnimationFrame(rafId);
-            gsap.ticker.remove((time) => {
-                lenis.raf(time * 1000);
-            });
+            if (lenis) {
+                lenis.destroy();
+            }
+            if (tick) {
+                gsap.ticker.remove(tick);
+            }
+            window.removeEventListener('scroll', handleScroll);
+            observers.forEach(o => o.disconnect());
         };
-    }, [showLoader, isHomePage, setIsScrolled, setActiveSection, setActivePhilosophy, activeSectionRef, activePhilosophyRef]);
+    }, [showLoader, isHomePage, setIsScrolled, setActiveSection, activeSectionRef]);
 }

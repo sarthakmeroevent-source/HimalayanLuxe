@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function AboutSection() {
     return (
-        <section className="relative w-full flex flex-col items-center justify-center py-16 md:py-24 px-6 md:px-12 overflow-hidden" id="about">
+        <section className="relative w-full flex flex-col items-center justify-center py-16 md:py-[72px] px-6 md:px-12 overflow-hidden" id="about">
             <div className="w-full max-w-[1400px] mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}

@@ -14,6 +14,9 @@ import ContactPage from './pages/ContactPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import CookiesPage from './pages/CookiesPage';
 import TermsPage from './pages/TermsPage';
+import NotFoundPage from './pages/NotFoundPage';
+import InternalErrorPage from './pages/InternalErrorPage';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import { useScrollHandler } from './hooks/useScrollHandler';
 import PageViewTracker from './components/common/PageViewTracker';
 
@@ -70,10 +73,7 @@ function AppContent() {
         isHomePage,
         setIsScrolled,
         setActiveSection,
-        setActivePhilosophy,
-        activePhilosophy,
         activeSectionRef,
-        activePhilosophyRef
     });
 
     useEffect(() => {
@@ -110,32 +110,35 @@ function AppContent() {
                 menuOpen={menuOpen}
                 setMenuOpen={setMenuOpen}
             >
-                <Routes>
-                    <Route
-                        path="/"
-                        element={
-                            <HomePage
-                                activeSection={activeSection}
-                                setActiveSection={setActiveSection}
-                                activeSectionRef={activeSectionRef}
-                                activePhilosophy={activePhilosophy}
-                                setActivePhilosophy={setActivePhilosophy}
-                                activePhilosophyRef={activePhilosophyRef}
-                                showLoader={showLoader}
-                            />
-                        }
-                    />
-                    <Route path="/about" element={<AboutPage />} />
-                    <Route path="/experience" element={<ExperiencePage />} />
-                    <Route path="/destinations" element={<DestinationsPage />} />
-                    <Route path="/destinations/:id" element={<DestinationDetailPage />} />
-                    <Route path="/gallery" element={<GalleryPage />} />
-                    <Route path="/services" element={<ServicesDetailPage />} />
-                    <Route path="/contact" element={<ContactPage />} />
-                    <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-                    <Route path="/cookies" element={<CookiesPage />} />
-                    <Route path="/terms" element={<TermsPage />} />
-                </Routes>
+                <ErrorBoundary>
+                    <Routes>
+                        <Route
+                            path="/"
+                            element={
+                                <HomePage
+                                    activeSection={activeSection}
+                                    setActiveSection={setActiveSection}
+                                    activeSectionRef={activeSectionRef}
+                                    activePhilosophy={activePhilosophy}
+                                    setActivePhilosophy={setActivePhilosophy}
+                                    activePhilosophyRef={activePhilosophyRef}
+                                    showLoader={showLoader}
+                                />
+                            }
+                        />
+                        <Route path="/about" element={<AboutPage />} />
+                        <Route path="/experience" element={<ExperiencePage />} />
+                        <Route path="/destinations" element={<DestinationsPage />} />
+                        <Route path="/destinations/:id" element={<DestinationDetailPage />} />
+                        <Route path="/gallery" element={<GalleryPage />} />
+                        <Route path="/services" element={<ServicesDetailPage />} />
+                        <Route path="/contact" element={<ContactPage />} />
+                        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                        <Route path="/cookies" element={<CookiesPage />} />
+                        <Route path="/terms" element={<TermsPage />} />
+                        <Route path="*" element={<NotFoundPage />} />
+                    </Routes>
+                </ErrorBoundary>
             </AppLayout>
         </div>
     );
