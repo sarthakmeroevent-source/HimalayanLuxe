@@ -35,4 +35,5 @@ public/Video.mp4
 *.md
 
 # Environment variables
+.env
 .env*
