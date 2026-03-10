@@ -101,7 +101,7 @@ export default function ServicesDetailPage() {
                         transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
                         className="relative py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center"
                     >
-                        <div className={`lg:col-span-6 relative ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                        <div className={`lg:col-span-6 relative flex justify-center ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
                             <div className={`relative aspect-[10/12] rounded-[32px] md:rounded-[48px] overflow-hidden group max-w-[85%] ${index % 2 === 0 ? 'lg:ml-auto lg:mr-0' : 'lg:mr-auto lg:ml-0'}`}>
                                 <motion.img
                                     initial={{ scale: 1.2 }}
@@ -115,8 +115,8 @@ export default function ServicesDetailPage() {
                             </div>
                         </div>
 
-                        <div className={`lg:col-span-6 ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
-                            <div className={`relative z-10 max-w-[85%] ${index % 2 === 0 ? 'lg:mr-auto lg:ml-0' : 'lg:ml-auto lg:mr-0'}`}>
+                        <div className={`lg:col-span-6 flex justify-center lg:block ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
+                            <div className={`relative z-10 max-w-[85%] text-center lg:text-left ${index % 2 === 0 ? 'lg:mr-auto lg:ml-0' : 'lg:ml-auto lg:mr-0'}`}>
                                 <span className="liquid-gold-text text-[10px] tracking-[0.4em] uppercase font-bold mb-6 block">
                                     {service.subtitle}
                                 </span>
@@ -136,7 +136,7 @@ export default function ServicesDetailPage() {
                                                 whileInView={{ opacity: 1, x: 0 }}
                                                 viewport={{ once: true }}
                                                 transition={{ delay: 0.1 * fIndex }}
-                                                className="flex items-center gap-4 group/item"
+                                                className="flex items-center justify-center lg:justify-start gap-4 group/item"
                                             >
                                                 <div className="w-1.5 h-1.5 rounded-full bg-gold/50 group-hover/item:bg-gold transition-colors shadow-[0_0_8px_rgba(212,175,55,0.3)]" />
                                                 <span className="text-white/40 text-xs md:text-sm tracking-[0.1em] uppercase group-hover/item:text-white/70 transition-colors">
