@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function CTASection() {
     return (
-        <section className="section-container relative min-h-[70dvh] md:min-h-[100dvh] w-full flex items-center justify-center py-24 px-8 md:px-12 overflow-hidden" id="cta">            
+        <section className="section-container relative w-full flex items-center justify-center py-16 md:py-[72px] px-8 md:px-12 overflow-hidden" id="cta">            
             <div className="absolute inset-0 bg-gold/5 pointer-events-none"></div>
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}

@@ -89,7 +89,7 @@ export default function GalleryPage() {
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
                                             transition={{ duration: 0.8, delay: (index % INITIAL_COUNT) * 0.05, ease: [0.22, 1, 0.36, 1] }}
-                                            className="group relative overflow-hidden rounded-[4px] break-inside-avoid shadow-2xl cursor-pointer"
+                                            className="group relative overflow-hidden rounded-[24px] break-inside-avoid shadow-2xl cursor-pointer"
                                             onClick={() => setSelectedImageIndex(index)}
                                         >
                                             <div className="relative w-full overflow-hidden bg-white/5">
@@ -175,7 +175,7 @@ export default function GalleryPage() {
                                         <img
                                             src={images[selectedImageIndex].image_url}
                                             alt={images[selectedImageIndex].caption || ''}
-                                            className="max-w-full max-h-[85vh] object-contain rounded-[4px] shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+                                            className="max-w-full max-h-[85vh] object-contain rounded-[24px] shadow-[0_0_50px_rgba(0,0,0,0.5)]"
                                         />
                                     </motion.div>
                                 </AnimatePresence>
