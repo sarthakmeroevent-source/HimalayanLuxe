@@ -6,6 +6,7 @@ import ServicesSection from '../sections/ServicesSection';
 import AboutSection from '../sections/AboutSection';
 import GallerySection from '../sections/GallerySection';
 import CTASection from '../sections/CTASection';
+import { useDestinations } from '../hooks/useDestinations';
 
 interface HomePageProps {
     activeSection: string;
@@ -28,6 +29,9 @@ export default function HomePage({
 }: HomePageProps) {
     // Start muted to ensure autoplay works on all devices (especially mobile)
     const [isMuted, setIsMuted] = useState(true);
+    
+    // Prefetch destinations data early
+    useDestinations();
 
     return (
         <>

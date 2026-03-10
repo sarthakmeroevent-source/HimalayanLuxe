@@ -61,6 +61,7 @@ const HoverExpand_001 = ({
 }) => {
   const [activeImage, setActiveImage] = useState<number>(1);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   const navigate = useNavigate();
 
   // Memoize isMobile to prevent recalculation on every render
@@ -227,7 +228,11 @@ const HoverExpand_001 = ({
         </div>
 
         {/* Desktop Expand on Hover Layout */}
-        <div className="hidden md:flex w-full items-center justify-center gap-2 md:gap-3 py-4 lg:py-8">
+        <div 
+          className="hidden md:flex w-full items-center justify-center gap-2 md:gap-3 py-4 lg:py-8"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
           {images.map((image, index) => {
             return (
               <motion.div

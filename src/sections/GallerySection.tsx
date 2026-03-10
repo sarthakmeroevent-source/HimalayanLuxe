@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useGallery } from "../hooks/useGallery";
 import { cn } from "../lib/utils";
@@ -19,8 +19,8 @@ const GallerySection = () => {
 
   if (isLoading) {
     return (
-      <section className="relative w-full py-20 md:py-32 px-6 md:px-12" id="gallery">
-        <div className="flex justify-center py-16">
+      <section className="relative w-full py-16 md:py-[72px] px-6 md:px-12" id="gallery">
+        <div className="flex justify-center py-16 md:py-[72px]">
           <div className="w-8 h-8 border-2 border-white/10 border-t-[#D4AF37] rounded-full animate-spin" />
         </div>
       </section>
@@ -31,7 +31,7 @@ const GallerySection = () => {
 
   return (
     <section 
-      className="section-container relative min-h-[100dvh] w-full flex flex-col items-center justify-center py-16 md:py-24 px-6 md:px-12" 
+      className="section-container relative w-full flex flex-col items-center justify-center py-16 md:py-[72px] px-6 md:px-12" 
       id="gallery"
     >
       <div className="w-full flex flex-col items-center max-w-[1400px] mx-auto">
@@ -104,7 +104,16 @@ const GalleryExpand = ({
 }) => {
   const [activeImage, setActiveImage] = useState<number>(1);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const [isReadyForAnim, setIsReadyForAnim] = useState(false);
   const navigate = useNavigate();
+
+  // Defer animation allowance to prevent heavy synchronous reflows right after paint
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsReadyForAnim(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   const isMobile = useMemo(() => {
     return typeof window !== "undefined" && window.innerWidth < 1024;
@@ -129,17 +138,10 @@ const GalleryExpand = ({
           <motion.div
             className="relative overflow-hidden rounded-3xl border border-gold/30 h-[400px] w-full"
             initial={{ opacity: 0, y: 30 }}
-            animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            animate={hasAnimated && isReadyForAnim ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             onClick={() => navigate('/gallery')}
           >
-            <div className="absolute h-full w-full bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
-            <div className="absolute flex h-full w-full flex-col items-start justify-end p-6 z-20">
-              <div className="w-16 h-[2px] bg-gold mb-4" />
-              <p className="text-base text-gold font-medium tracking-[0.2em] uppercase mb-2">
-                {items[0].code}
-              </p>
-            </div>
             <img src={items[0].src} className="size-full object-cover" alt={items[0].alt} loading="lazy" />
           </motion.div>
 
@@ -150,17 +152,10 @@ const GalleryExpand = ({
                 key={idx + 1}
                 className="relative overflow-hidden rounded-2xl border border-gold/30 h-[240px]"
                 initial={{ opacity: 0, y: 30 }}
-                animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                animate={hasAnimated && isReadyForAnim ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                 transition={{ duration: 0.6, delay: 0.1 + idx * 0.05, ease: [0.22, 1, 0.36, 1] }}
                 onClick={() => navigate('/gallery')}
               >
-                <div className="absolute h-full w-full bg-gradient-to-t from-black/70 via-transparent to-transparent z-10" />
-                <div className="absolute flex h-full w-full flex-col items-start justify-end p-4 z-20">
-                  <div className="w-10 h-[2px] bg-gold mb-2" />
-                  <p className="text-xs text-gold font-medium tracking-[0.2em] uppercase">
-                    {image.code}
-                  </p>
-                </div>
                 <img src={image.src} className="size-full object-cover" alt={image.alt} loading="lazy" />
               </motion.div>
             ))}
@@ -173,16 +168,10 @@ const GalleryExpand = ({
                 key={idx + 3}
                 className="relative overflow-hidden rounded-2xl border border-gold/30 h-[180px]"
                 initial={{ opacity: 0, y: 30 }}
-                animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                animate={hasAnimated && isReadyForAnim ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                 transition={{ duration: 0.6, delay: 0.15 + idx * 0.05, ease: [0.22, 1, 0.36, 1] }}
                 onClick={() => navigate('/gallery')}
               >
-                <div className="absolute h-full w-full bg-gradient-to-t from-black/70 via-transparent to-transparent z-10" />
-                <div className="absolute flex h-full w-full flex-col items-center justify-end p-3 z-20">
-                  <p className="text-[10px] text-gold font-medium tracking-wider">
-                    {image.code}
-                  </p>
-                </div>
                 <img src={image.src} className="size-full object-cover" alt={image.alt} loading="lazy" />
               </motion.div>
             ))}
@@ -201,7 +190,7 @@ const GalleryExpand = ({
                 style={{ willChange: "transform, opacity, width" }}
                 initial={{ opacity: 0, x: 200 }}
                 animate={
-                  hasAnimated
+                  hasAnimated && isReadyForAnim
                     ? {
                         opacity: 1,
                         x: 0,
@@ -221,31 +210,19 @@ const GalleryExpand = ({
                   width: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
                   height: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
                 }}
-                onClick={() => setActiveImage(index)}
+                onClick={() => {
+                  if (activeImage === index) {
+                    navigate('/gallery');
+                  } else {
+                    setActiveImage(index);
+                  }
+                }}
                 onPointerEnter={() => setActiveImage(index)}
               >
                 <div
-                  className="absolute h-full w-full bg-gradient-to-t from-black/60 via-gold/10 to-transparent transition-opacity duration-300"
-                  style={{ opacity: activeImage === index ? 1 : 0 }}
+                  className="absolute h-full w-full bg-black/20 transition-opacity duration-300 pointer-events-none"
+                  style={{ opacity: activeImage === index ? 0 : 1 }}
                 />
-
-                <div
-                  className="absolute flex h-full w-full flex-col items-end justify-end p-4 transition-opacity duration-300 pointer-events-none"
-                  style={{ opacity: activeImage === index ? 1 : 0 }}
-                >
-                  <p className="text-left text-xs text-gold/80 font-medium tracking-wider mb-2">
-                    {image.code}
-                  </p>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/gallery`);
-                    }}
-                    className="pointer-events-auto px-4 py-2 bg-gold text-black rounded-full text-[10px] uppercase tracking-widest hover:bg-[#F2D06B] transition-colors"
-                  >
-                    View Gallery
-                  </button>
-                </div>
 
                 <img
                   src={image.src}

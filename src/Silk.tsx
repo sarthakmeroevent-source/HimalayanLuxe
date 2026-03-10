@@ -100,14 +100,8 @@ const SilkPlane = forwardRef<Mesh, SilkPlaneProps>(function SilkPlane({ uniforms
         }
     }, [ref, viewport]);
 
-    useFrame((_state: RootState, delta: number) => {
-        const mesh = ref as React.MutableRefObject<Mesh | null>;
-        if (mesh.current) {
-            const material = mesh.current.material as ShaderMaterial & {
-                uniforms: SilkUniforms;
-            };
-            material.uniforms.uTime.value += 0.1 * delta;
-        }
+    useFrame((_state: RootState, _delta: number) => {
+        // Disabled animation per user request: "should not move stuck so it doesnot be heavy"
     });
 
     return (
@@ -154,7 +148,7 @@ const Silk: React.FC<SilkProps> = ({ speed = 5, scale = 1, color = '#7B7481', no
     const canvasOptions = useMemo(() => ({
         // Use lower DPR on mobile for better performance
         dpr: (isMobile ? 1 : [1, 2]) as [number, number] | number,
-        frameloop: "always" as const, 
+        frameloop: "demand" as const, // Render once and stop to save heavy resources
         gl: { 
             antialias: false,
             powerPreference: "high-performance" as const,
