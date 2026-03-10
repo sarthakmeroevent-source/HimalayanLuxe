@@ -11,9 +11,9 @@ const menuItems = [
     { label: 'Home', path: '/', hash: '' },
     { label: 'Experience', path: '/experience', hash: '' },
     { label: 'Destinations', path: '/destinations', hash: '' },
-    { label: 'Gallery', path: '/gallery', hash: '' },
     { label: 'Services', path: '/services', hash: '' },
     { label: 'About', path: '/about', hash: '' },
+    { label: 'Gallery', path: '/gallery', hash: '' },
     { label: 'Contact', path: '/contact', hash: '' }
 ];
 

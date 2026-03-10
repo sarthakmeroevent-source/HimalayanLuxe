@@ -4,6 +4,7 @@ import ExperienceSectionSticky from '../sections/ExperienceSectionSticky';
 import DestinationsSection from '../sections/DestinationsSection';
 import ServicesSection from '../sections/ServicesSection';
 import AboutSection from '../sections/AboutSection';
+import GallerySection from '../sections/GallerySection';
 import CTASection from '../sections/CTASection';
 
 interface HomePageProps {
@@ -43,6 +44,8 @@ export default function HomePage({
             <ServicesSection />
 
             <AboutSection />
+
+            <GallerySection />
 
             <CTASection />
         </>
