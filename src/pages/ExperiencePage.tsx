@@ -81,12 +81,7 @@ export default function ExperiencePage() {
                                     {phil.description}
                                 </p>
                                 
-                                <div className="w-24 h-[1px] bg-gold/30 mb-8" />
-                                
-                                <div className="flex items-center gap-6">
-                                    <div className="w-2 h-2 rounded-full bg-gold shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
-                                    <span className="text-white/40 text-[10px] tracking-[0.3em] uppercase">Mastery in Execution</span>
-                                </div>
+                                <div className="w-24 h-[1px] bg-gold/30" />
                             </div>
                         </div>
                     </motion.section>

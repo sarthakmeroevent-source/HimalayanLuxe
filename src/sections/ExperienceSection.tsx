@@ -51,7 +51,7 @@ export default function ExperienceSection({
                     <div className="flex flex-col gap-8">
                         <button className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10 w-fit">
                             <span className="relative z-10 text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
-                                Discover The Art
+                                Explore Our Vision
                             </span>
                         </button>
 

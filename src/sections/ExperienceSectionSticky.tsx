@@ -277,10 +277,16 @@ export default function ExperienceSectionSticky({
                                 <div className="flex items-center justify-between gap-4">
                                     <Link
                                         to="/experience"
-                                        className="group relative overflow-hidden rounded-full border border-gold/30 px-6 py-3 transition-all duration-700 hover:border-gold hover:bg-gold/10"
+                                        className="group relative overflow-hidden rounded-full border border-gold/30 px-7 py-3.5 transition-all duration-700 hover:border-gold/80 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)]"
                                     >
-                                        <span className="relative z-10 text-[10px] font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
-                                            Discover Now
+                                        <span className="absolute inset-0 bg-gradient-to-r from-gold/0 via-gold/10 to-gold/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
+                                        <span className="relative z-10 flex items-center gap-2.5">
+                                            <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
+                                                Explore Our Vision
+                                            </span>
+                                            <svg className="w-3.5 h-3.5 text-gold transition-all duration-500 group-hover:text-white group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                            </svg>
                                         </span>
                                     </Link>
 
@@ -355,10 +361,16 @@ export default function ExperienceSectionSticky({
                                     <div className="flex flex-col gap-6 md:gap-8">
                                         <Link
                                             to="/experience"
-                                            className="group relative overflow-hidden rounded-full border border-gold/30 px-6 md:px-8 py-3 md:py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10 w-fit"
+                                            className="group relative overflow-hidden rounded-full border border-gold/30 px-7 md:px-9 py-3.5 md:py-4 transition-all duration-700 hover:border-gold/80 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)] w-fit"
                                         >
-                                            <span className="relative z-10 text-[10px] md:text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
-                                                Discover The Art
+                                            <span className="absolute inset-0 bg-gradient-to-r from-gold/0 via-gold/10 to-gold/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
+                                            <span className="relative z-10 flex items-center gap-2.5">
+                                                <span className="text-[10px] md:text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
+                                                    Explore Our Vision
+                                                </span>
+                                                <svg className="w-3.5 h-3.5 md:w-4 md:h-4 text-gold transition-all duration-500 group-hover:text-white group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                                </svg>
                                             </span>
                                         </Link>
 

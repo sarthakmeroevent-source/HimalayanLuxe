@@ -132,12 +132,14 @@ function ExpandedCard({
         return () => clearTimeout(timer);
     }, []);
 
+    const goToDetail = () => navigate(`/destinations/${destination.id}`);
+
     return (
         <motion.li
             ref={expandedRef}
             layout
             key={destination.id}
-            onClick={onClose}
+            onClick={goToDetail}
             transition={{ layout: { type: 'spring', stiffness: 200, damping: 30, mass: 0.8 } }}
             className="relative overflow-hidden rounded-[28px] cursor-pointer col-span-1 md:col-span-2 lg:col-span-3 border border-gold/30 list-none transform-gpu"
             style={{ zIndex: 10, willChange: 'transform' }}
@@ -205,7 +207,7 @@ function ExpandedCard({
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/destinations/${destination.id}`);
+                            goToDetail();
                         }}
                         className="w-full py-3.5 px-6 rounded-full bg-gold hover:bg-[#F2D06B] transition-colors duration-200 text-black text-[11px] uppercase tracking-[0.2em] font-medium flex items-center justify-center gap-2"
                     >
