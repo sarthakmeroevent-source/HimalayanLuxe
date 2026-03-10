@@ -36,7 +36,7 @@ export default function DestinationsSection() {
             </div>
 
             {/* Carousel Section */}
-            <div className="w-full mb-0 hidden md:block px-6 md:px-12">
+            <div className="w-full mb-0 hidden md:block">
                 <DestinationGradientCarousel />
             </div>
             <div className="w-full mb-0 md:hidden block">
