@@ -8,8 +8,12 @@ import AboutPage from './pages/AboutPage';
 import ExperiencePage from './pages/ExperiencePage';
 import DestinationsPage from './pages/DestinationsPage';
 import DestinationDetailPage from './pages/DestinationDetailPage';
+import GalleryPage from './pages/GalleryPage';
 import ServicesDetailPage from './pages/ServicesDetailPage';
 import ContactPage from './pages/ContactPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import CookiesPage from './pages/CookiesPage';
+import TermsPage from './pages/TermsPage';
 import { useScrollHandler } from './hooks/useScrollHandler';
 
 function ScrollToTop() {
@@ -124,8 +128,12 @@ function AppContent() {
                     <Route path="/experience" element={<ExperiencePage />} />
                     <Route path="/destinations" element={<DestinationsPage />} />
                     <Route path="/destinations/:id" element={<DestinationDetailPage />} />
+                    <Route path="/gallery" element={<GalleryPage />} />
                     <Route path="/services" element={<ServicesDetailPage />} />
                     <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                    <Route path="/cookies" element={<CookiesPage />} />
+                    <Route path="/terms" element={<TermsPage />} />
                 </Routes>
             </AppLayout>
         </div>
