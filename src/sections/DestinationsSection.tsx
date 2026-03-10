@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import DestinationGradientCarousel from '../components/ui/DestinationGradientCarousel';
+import DestinationCarousel from '../components/ui/DestinationCarousel';
 
 export default function DestinationsSection() {
 
@@ -32,12 +33,17 @@ export default function DestinationsSection() {
                         Crafting timeless <span className="liquid-gold-text italic">moments</span>
                     </motion.h2>
                 </div>
+            </div>
 
-                {/* Carousel Section */}
-                <div className="w-full mb-0">
-                    <DestinationGradientCarousel />
-                </div>
+            {/* Carousel Section */}
+            <div className="w-full mb-0 hidden md:block px-6 md:px-12">
+                <DestinationGradientCarousel />
+            </div>
+            <div className="w-full mb-0 md:hidden block">
+                <DestinationCarousel />
+            </div>
 
+            <div className="w-full flex flex-col items-center mx-auto z-20">
                 {/* View All button at bottom */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}

@@ -34,7 +34,7 @@ const DestinationCarousel = () => {
 
   return (
     <div 
-      className="w-full relative py-6 overflow-visible destination-ticker-wrapper"
+      className="w-full relative py-0 md:py-6 overflow-visible destination-ticker-wrapper"
       onMouseEnter={() => {
         setIsPaused(true);
         swiperRef.current?.autoplay?.pause();
@@ -85,8 +85,8 @@ const DestinationCarousel = () => {
         {displayDestinations.map((dest: DestinationItem, index: number) => (
           <SwiperSlide key={`${dest.id}-${index}`} className="!w-auto">
             <div 
-              onClick={() => navigate(`/destinations/${dest.id}`)}
-              className="relative w-[55vw] md:w-[280px] h-[350px] md:h-[420px] rounded-[24px] overflow-hidden group cursor-pointer border border-white/10 shadow-lg transition-all duration-700 hover:border-gold/40"
+              onClick={() => navigate(`/destinations/${dest.slug || dest.id}`)}
+              className="relative w-[70vw] md:w-[280px] h-[400px] md:h-[420px] rounded-[24px] overflow-hidden group cursor-pointer border border-white/10 shadow-lg transition-all duration-700 hover:border-gold/40"
             >
               <img 
                 src={dest.cover_image_url} 
