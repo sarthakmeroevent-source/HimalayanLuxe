@@ -45,7 +45,7 @@ export default function ExperiencePage() {
                         className="relative py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center"
                     >
                         {/* Media Column */}
-                        <div className={`lg:col-span-6 relative ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                        <div className={`lg:col-span-6 relative flex justify-center ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
                             <div className={`relative aspect-[10/12] rounded-[32px] md:rounded-[48px] overflow-hidden group max-w-[85%] ${index % 2 === 0 ? 'lg:ml-auto lg:mr-0' : 'lg:mr-auto lg:ml-0'}`}>
                                 <motion.img 
                                     initial={{ scale: 1.2 }}
@@ -69,8 +69,8 @@ export default function ExperiencePage() {
                         </div>
 
                         {/* Content Column */}
-                        <div className={`lg:col-span-6 ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
-                            <div className={`relative z-10 max-w-[85%] ${index % 2 === 0 ? 'lg:mr-auto lg:ml-0' : 'lg:ml-auto lg:mr-0'}`}>
+                        <div className={`lg:col-span-6 flex justify-center lg:block ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
+                            <div className={`relative z-10 max-w-[85%] text-center lg:text-left ${index % 2 === 0 ? 'lg:mr-auto lg:ml-0' : 'lg:ml-auto lg:mr-0'}`}>
                                 <span className="liquid-gold-text text-[10px] tracking-[0.4em] uppercase font-bold mb-6 block">
                                     {phil.title}
                                 </span>
@@ -81,7 +81,7 @@ export default function ExperiencePage() {
                                     {phil.description}
                                 </p>
                                 
-                                <div className="w-24 h-[1px] bg-gold/30" />
+                                <div className="w-24 h-[1px] bg-gold/30 mb-8 mx-auto lg:mx-0" />
                             </div>
                         </div>
                     </motion.section>
