@@ -53,7 +53,7 @@ export default function GalleryPage() {
         <div className="relative min-h-screen pt-32 pb-0">
             <section className="relative w-full px-8 md:px-16 py-10 z-10">
                 <div className="max-w-[1700px] mx-auto">
-                    <div className="text-center mb-10">
+                    <div className="text-center mb-16 md:mb-[104px]">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -62,7 +62,7 @@ export default function GalleryPage() {
                             <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-3 block">
                                 Glimpses
                             </span>
-                            <h1 className="font-serif text-white/95 text-[clamp(28px,4vw,56px)] leading-[1.1] font-normal tracking-tight mb-4">
+                            <h1 className="font-serif text-white/95 text-[clamp(32px,4vw,56px)] leading-[1.1] font-normal tracking-tight mb-4">
                                 Stories in <span className="liquid-gold-text">Every Frame</span>
                             </h1>
                             <p className="text-white/50 text-sm max-w-xl mx-auto leading-relaxed">

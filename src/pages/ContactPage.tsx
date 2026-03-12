@@ -96,7 +96,7 @@ export default function ContactPage() {
     };
 
     return (
-        <div className="relative min-h-screen pt-32 pb-0">
+        <div className="relative min-h-screen pt-32 pb-14">
             <section className="relative w-full px-8 md:px-16 py-10">
                 <div className="max-w-[1600px] mx-auto">
                     {/* Header */}
@@ -104,12 +104,12 @@ export default function ContactPage() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-center mb-10"
+                        className="text-center mb-16 md:mb-[104px]"
                     >
                         <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-3 block">
                             Get In Touch
                         </span>
-                        <h1 className="font-serif text-white/95 text-[clamp(28px,4vw,56px)] leading-[1.1] font-normal tracking-tight mb-4">
+                        <h1 className="font-serif text-white/95 text-[clamp(32px,4vw,56px)] leading-[1.1] font-normal tracking-tight mb-4">
                             Begin Your <span className="liquid-gold-text">Journey</span>
                         </h1>
                         <p className="text-white/50 text-sm max-w-xl mx-auto leading-relaxed">
