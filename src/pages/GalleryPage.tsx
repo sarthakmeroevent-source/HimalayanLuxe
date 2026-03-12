@@ -51,24 +51,22 @@ export default function GalleryPage() {
 
     return (
         <div className="relative min-h-screen pt-32 pb-0">
-            <section className="relative w-full px-6 md:px-12 py-20 z-10">
+            <section className="relative w-full px-8 md:px-16 py-10 z-10">
                 <div className="max-w-[1700px] mx-auto">
-                    <div className="text-center mb-16 md:mb-24">
+                    <div className="text-center mb-10">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                         >
-                            <span className="liquid-gold-text text-xs tracking-[0.5em] uppercase font-medium mb-6 block">
-                                Visual Legacy
+                            <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-3 block">
+                                Glimpses
                             </span>
-                            <h1 className="font-serif text-white/95 text-[clamp(32px,5vw,72px)] leading-[1.1] font-normal tracking-tight mb-8">
-                                Captured <span className="liquid-gold-text italic font-light">Elegance</span>
+                            <h1 className="font-serif text-white/95 text-[clamp(28px,4vw,56px)] leading-[1.1] font-normal tracking-tight mb-4">
+                                Stories in <span className="liquid-gold-text">Every Frame</span>
                             </h1>
-                            <div className="w-24 h-[1px] bg-gold/30 mx-auto mb-8"></div>
-                            <p className="text-white/50 text-base md:text-lg max-w-3xl mx-auto leading-relaxed font-light">
-                                A curated selection of our most prestigious celebrations,
-                                where nature and luxury meet in perfect harmony.
+                            <p className="text-white/50 text-sm max-w-xl mx-auto leading-relaxed">
+                                Where every detail tells a story of grandeur
                             </p>
                         </motion.div>
                     </div>

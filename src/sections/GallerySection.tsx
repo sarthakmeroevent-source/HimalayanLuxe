@@ -36,29 +36,29 @@ const GallerySection = () => {
     >
       <div className="w-full flex flex-col items-center max-w-[1400px] mx-auto">
         {/* Header - Consistent with Destinations */}
-        <div className="w-full flex items-center justify-center mb-4">
+        <div className="w-full flex flex-col items-center mb-16 px-6 md:px-12 text-center">
           <motion.div
             initial={{ opacity: 0, y: -30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px", amount: 0.3 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col items-center"
+            className="flex flex-col items-center mb-4"
           >
             <span className="liquid-gold-text text-[10px] md:text-xs tracking-[0.4em] uppercase font-medium block">
-              Visual Legacy
+              Our Gallery
             </span>
           </motion.div>
-        </div>
 
-        <motion.h2
-          initial={{ opacity: 0, y: -50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px", amount: 0.3 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-          className="font-serif text-white/95 text-[32px] md:text-[clamp(28px,3vw,48px)] font-normal leading-[1.15] md:leading-[1.1] tracking-tight drop-shadow-2xl mb-10 text-center"
-        >
-          Captured <span className="italic text-white/50">Elegance</span>
-        </motion.h2>
+          <motion.h2
+            initial={{ opacity: 0, y: -50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px", amount: 0.3 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+            className="font-serif text-white/95 text-[32px] md:text-[clamp(28px,3vw,56px)] font-normal leading-[1.1] tracking-tight drop-shadow-2xl mb-4 max-w-4xl"
+          >
+            Moments of <span className="liquid-gold-text italic">captured elegance</span>
+          </motion.h2>
+        </div>
 
         <motion.div
           initial={{ opacity: 0 }}

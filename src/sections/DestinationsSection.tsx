@@ -19,7 +19,7 @@ export default function DestinationsSection() {
                         className="flex flex-col items-center mb-4"
                     >
                         <span className="liquid-gold-text text-[10px] md:text-xs tracking-[0.4em] uppercase font-medium block">
-                            Explore Us
+                            Our Destinations
                         </span>
                     </motion.div>
 
@@ -30,7 +30,7 @@ export default function DestinationsSection() {
                         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
                         className="font-serif text-white/95 text-[32px] md:text-[clamp(28px,3vw,56px)] font-normal leading-[1.1] tracking-tight drop-shadow-2xl mb-4 max-w-4xl"
                     >
-                        Crafting timeless <span className="liquid-gold-text italic">moments</span>
+                        Where luxury meets <span className="liquid-gold-text italic">the extraordinary</span>
                     </motion.h2>
                 </div>
             </div>

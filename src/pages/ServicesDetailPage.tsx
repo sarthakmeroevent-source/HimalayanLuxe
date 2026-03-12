@@ -70,21 +70,22 @@ export default function ServicesDetailPage() {
 
     return (
         <div className="relative min-h-screen pt-32 pb-0">
-            <section className="relative w-full px-8 md:px-16 pt-20 pb-12 flex flex-col items-center justify-center">
-                <div className="max-w-[1200px] mx-auto text-center relative z-10">
+            <section className="relative w-full px-8 md:px-16 py-10 flex flex-col items-center justify-center">
+                <div className="max-w-[1600px] mx-auto text-center relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                        className="text-center mb-10"
                     >
-                        <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-6 block">
-                            The Masterlist
+                        <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-3 block">
+                            What We Do
                         </span>
-                        <h1 className="font-serif text-white text-[clamp(40px,5vw,80px)] leading-[1.1] font-normal tracking-tight mb-8">
-                            Our <span className="liquid-gold-text italic">Services</span>
+                        <h1 className="font-serif text-white/95 text-[clamp(28px,4vw,56px)] leading-[1.1] font-normal tracking-tight mb-4">
+                            Our <span className="liquid-gold-text">Services</span>
                         </h1>
-                        <p className="text-white/60 text-lg max-w-3xl mx-auto leading-relaxed">
-                            Crafting palatial transformations executed with microscopic precision and grand vision.
+                        <p className="text-white/50 text-sm max-w-xl mx-auto leading-relaxed">
+                            Precision-crafted experiences designed for the extraordinary
                         </p>
                     </motion.div>
                 </div>
