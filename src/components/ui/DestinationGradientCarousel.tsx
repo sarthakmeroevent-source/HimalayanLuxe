@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDestinations } from '../../hooks/useDestinations';
 import { imgSize } from '../../lib/imageOptimizer';
+import SectionUnavailable from '../common/SectionUnavailable';
 
 // Physics constants
 const FRICTION = 0.95;
@@ -13,7 +14,7 @@ const MIN_SCALE = 0.9;
 const SCALE_RANGE = 0.1;
 
 const DestinationGradientCarousel: React.FC = () => {
-  const { data: destinations, isLoading } = useDestinations();
+  const { data: destinations, isLoading, isError } = useDestinations();
   const navigate = useNavigate();
   
   const containerRef = useRef<HTMLDivElement>(null);
@@ -217,6 +218,10 @@ const DestinationGradientCarousel: React.FC = () => {
 
   if (isLoading) return (
     <div className="w-full h-[375px] md:h-[430px]" />
+  );
+
+  if (isError || !displayItems.length) return (
+    <SectionUnavailable message="Destinations are temporarily unavailable" />
   );
 
   return (

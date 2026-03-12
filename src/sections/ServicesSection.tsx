@@ -5,13 +5,14 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useServices } from '../hooks/useServices';
 import { useFadeInView } from '../hooks/useFadeInView';
 import { imgSize } from '../lib/imageOptimizer';
+import SectionUnavailable from '../components/common/SectionUnavailable';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function ServicesSection() {
     const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
     const navigate = useNavigate();
-    const { data: dbServices, isLoading } = useServices();
+    const { data: dbServices, isLoading, isError } = useServices();
     const headerRef = useFadeInView();
 
     const displayServices = useMemo(() => {
@@ -93,7 +94,9 @@ export default function ServicesSection() {
                 <div className="flex justify-center py-20">
                     <div className="w-8 h-8 border-2 border-white/10 border-t-[#D4AF37] rounded-full animate-spin" />
                 </div>
-            ) : displayServices.length === 0 ? null : (
+            ) : (isError || displayServices.length === 0) ? (
+                <SectionUnavailable message="Our services are temporarily unavailable" />
+            ) : (
                 <div className="w-full max-w-[1400px] mx-auto relative z-10">
                     {displayServices.map((service, i) => (
                         <div

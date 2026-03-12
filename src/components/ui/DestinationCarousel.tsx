@@ -4,13 +4,14 @@ import { Autoplay, FreeMode } from 'swiper/modules';
 import { useNavigate } from 'react-router-dom';
 import { useDestinations, DestinationItem } from '../../hooks/useDestinations';
 import { imgSize } from '../../lib/imageOptimizer';
+import SectionUnavailable from '../common/SectionUnavailable';
 import type { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/autoplay';
 import 'swiper/css/free-mode';
 
 const DestinationCarousel = () => {
-  const { data: destinations, isLoading } = useDestinations();
+  const { data: destinations, isLoading, isError } = useDestinations();
   const navigate = useNavigate();
   const swiperRef = useRef<SwiperType | null>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -31,7 +32,7 @@ const DestinationCarousel = () => {
     );
   }
 
-  if (!destinations || destinations.length === 0) return null;
+  if (!destinations || destinations.length === 0) return <SectionUnavailable message="Destinations are temporarily unavailable" />;
 
   return (
     <div 
