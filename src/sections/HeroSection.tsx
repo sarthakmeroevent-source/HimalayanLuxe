@@ -11,17 +11,10 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const sectionRef = useRef<HTMLElement>(null);
     const [fixedHeight, setFixedHeight] = useState<string | number>('100dvh');
-    const { data: hero } = useActiveHero();
     const [mediaError, setMediaError] = useState(false);
-
-    // Don't render anything if no hero data
-    if (!hero) {
-        return null;
-    }
-
-    const mediaUrl = !mediaError ? hero.media_url : null;
-    const tagline = hero.tagline;
-    const isVideo = hero.media_type === 'video';
+    
+    // Always call hooks at the top level - never conditionally
+    const { data: hero, isLoading, error } = useActiveHero();
 
     // Lock height on mobile to prevent address bar resizing jumps
     useLayoutEffect(() => {
@@ -50,19 +43,19 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
 
     useEffect(() => {
         const video = videoRef.current;
-        if (video) {
+        if (video && hero?.media_type === 'video') {
             video.muted = true;
             video.play().catch(error => {
                 console.log("Autoplay prevented:", error);
             });
         }
-    }, []);
+    }, [hero?.media_type]);
 
     useEffect(() => {
         const video = videoRef.current;
         const section = sectionRef.current;
 
-        if (!video || !section) return;
+        if (!video || !section || hero?.media_type !== 'video') return;
 
         const observer = new IntersectionObserver(
             (entries) => {
@@ -84,11 +77,68 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
         return () => {
             observer.disconnect();
         };
-    }, [isMuted, isVideo]);
+    }, [isMuted, hero?.media_type]);
 
-    // Don't render media if there's an error or no URL
+    // Determine what to render based on state
+    const mediaUrl = !mediaError ? hero?.media_url : null;
+    const tagline = hero?.tagline;
+    const isVideo = hero?.media_type === 'video';
+
+    // Show loading state while fetching hero data
+    if (isLoading) {
+        return (
+            <section
+                className="section-container relative w-full flex flex-col justify-center items-center overflow-visible bg-transparent"
+                id="hero"
+                style={{ minHeight: fixedHeight }}
+            >
+                <div className="flex items-center justify-center">
+                    <div className="w-8 h-8 border-2 border-white/10 border-t-gold rounded-full animate-spin" />
+                </div>
+            </section>
+        );
+    }
+
+    // Show error state if API fails
+    if (error || !hero) {
+        return (
+            <section
+                className="section-container relative w-full flex flex-col justify-center items-center overflow-visible bg-transparent"
+                id="hero"
+                style={{ minHeight: fixedHeight }}
+            >
+                <div className="text-center">
+                    <p className="text-white/60 text-sm mb-4">Unable to load hero content</p>
+                    <button 
+                        onClick={() => window.location.reload()} 
+                        className="px-6 py-2 rounded-full border border-gold/30 text-gold text-xs uppercase tracking-widest hover:bg-gold/10 transition-colors"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </section>
+        );
+    }
+
+    // Show error state if no media URL
     if (!mediaUrl) {
-        return null;
+        return (
+            <section
+                className="section-container relative w-full flex flex-col justify-center items-center overflow-visible bg-transparent"
+                id="hero"
+                style={{ minHeight: fixedHeight }}
+            >
+                <div className="text-center">
+                    <p className="text-white/60 text-sm mb-4">Media content unavailable</p>
+                    <button 
+                        onClick={() => setMediaError(false)} 
+                        className="px-6 py-2 rounded-full border border-gold/30 text-gold text-xs uppercase tracking-widest hover:bg-gold/10 transition-colors"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </section>
+        );
     }
 
     return (
