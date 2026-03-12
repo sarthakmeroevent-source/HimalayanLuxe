@@ -20,12 +20,21 @@ export function useGallery() {
   return useQuery({
     queryKey: ['gallery-aggregated'],
     queryFn: async () => {
-      // Fetch from all three sources in parallel
-      const [mediaRes, destGalleryRes, destinationsRes] = await Promise.all([
+      // Fetch from all sources in parallel (including team_members to exclude their photos)
+      const [mediaRes, destGalleryRes, destinationsRes, teamRes] = await Promise.all([
         supabase.from('media_files').select('id, url, filename, mime_type').not('mime_type', 'like', 'video/%').order('uploaded_at', { ascending: false }),
         supabase.from('destination_gallery').select('id, image_url').order('sort_order', { ascending: true }),
         supabase.from('destinations').select('id, cover_image_url, name').order('sort_order', { ascending: true }),
+        supabase.from('team_members').select('image_url'),
       ]);
+
+      // Collect team member image URLs to exclude from gallery
+      const teamUrls = new Set<string>();
+      if (teamRes.data) {
+        for (const t of teamRes.data) {
+          if (t.image_url) teamUrls.add(t.image_url);
+        }
+      }
 
       const images: GalleryImage[] = [];
       const seenUrls = new Set<string>();
@@ -50,10 +59,10 @@ export function useGallery() {
         }
       }
 
-      // 3. Media library images (only actual images, not videos)
+      // 3. Media library images (exclude videos and team member photos)
       if (mediaRes.data) {
         for (const m of mediaRes.data) {
-          if (m.url && !seenUrls.has(m.url)) {
+          if (m.url && !seenUrls.has(m.url) && !teamUrls.has(m.url)) {
             seenUrls.add(m.url);
             images.push({ id: `media-${m.id}`, image_url: m.url, caption: m.filename });
           }

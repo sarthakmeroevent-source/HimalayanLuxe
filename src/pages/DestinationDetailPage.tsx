@@ -26,7 +26,6 @@ export default function DestinationDetailPage() {
     const scrollLeftRef = useRef(0);
 
     const aboutRef = useFadeInView();
-    const bentoRef = useFadeInView();
 
     const handleMouseDown = (e: React.MouseEvent) => {
         if (!carouselRef.current) return;
@@ -158,7 +157,7 @@ export default function DestinationDetailPage() {
 
                 {/* Gallery preview — bento style */}
                 {destination.gallery && destination.gallery.length > 0 && (
-                    <div ref={bentoRef} className="fade-in-view mt-8">
+                    <div className="mt-8">
                         <div className="grid grid-cols-3 grid-rows-2 gap-1.5" style={{ height: 'clamp(250px, 32vw, 420px)' }}>
                             {/* Large left image — spans 2 rows */}
                             <div className="row-span-2 relative cursor-pointer group overflow-hidden rounded-xl"
