@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { MapPin, ArrowLeft, Sparkles, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { useDestinationBySlug, useDestinationGallery, useDestinations } from '../hooks/useDestinations';
+import { imgSize, optimizeImageUrl } from '../lib/imageOptimizer';
+import { useFadeInView } from '../hooks/useFadeInView';
 
 export default function DestinationDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -22,6 +24,9 @@ export default function DestinationDetailPage() {
     const hasMoved = useRef(false);
     const startX = useRef(0);
     const scrollLeftRef = useRef(0);
+
+    const aboutRef = useFadeInView();
+    const bentoRef = useFadeInView();
 
     const handleMouseDown = (e: React.MouseEvent) => {
         if (!carouselRef.current) return;
@@ -92,13 +97,17 @@ export default function DestinationDetailPage() {
                     style={{ y, opacity, WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)', maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)' }}
                     className="absolute inset-0 z-0"
                 >
-                    <motion.img initial={{ scale: 1.1 }} animate={{ scale: 1 }} transition={{ duration: 2, ease: "easeOut" }}
-                        src={destination.image} alt={destination.name} className="w-full h-full object-cover" />
+                    <img
+                        src={imgSize.hero(destination.image)}
+                        alt={destination.name}
+                        className="w-full h-full object-cover"
+                        decoding="async"
+                    />
                     <div className="absolute inset-0 bg-black/40" />
                 </motion.div>
 
                 <div className="absolute inset-0 z-10 flex flex-col justify-end p-8 md:p-12 lg:p-16 max-w-[1920px] mx-auto w-full pb-16">
-                    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.3 }}>
+                    <div className="animate-fade-in-up">
                         {/* Breadcrumb nav */}
                         <div className="inline-flex items-center gap-2.5 mb-6 text-[11px] tracking-[0.15em] uppercase bg-black/40 backdrop-blur-sm rounded-full px-5 py-2.5 border border-white/10">
                             <button onClick={() => navigate('/destinations')}
@@ -121,21 +130,19 @@ export default function DestinationDetailPage() {
                                 {destination.description}
                             </p>
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             </div>
 
             {/* Info + CTA — right after hero */}
             <section className="relative z-20 w-full px-4 sm:px-8 lg:px-12 py-4 md:py-6 max-w-[1920px] mx-auto">
                 {/* Section header */}
-                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                    className="flex items-center gap-3 mb-6">
+                <div ref={aboutRef} className="fade-in-view flex items-center gap-3 mb-6">
                     <h2 className="text-lg md:text-2xl font-serif text-white">About this <span className="liquid-gold-text">Destination</span></h2>
-                </motion.div>
+                </div>
 
                 <div className="max-w-4xl">
-                    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                        className="space-y-6">
+                    <div className="space-y-6">
                         <p className="text-white/60 text-sm md:text-base leading-[1.8]">{destination.fullDescription}</p>
                         {destination.features.length > 0 && (
                             <div className="flex flex-wrap gap-2.5">
@@ -146,29 +153,26 @@ export default function DestinationDetailPage() {
                                 ))}
                             </div>
                         )}
-                    </motion.div>
-
-                    {/* CTA — moved below gallery */}
+                    </div>
                 </div>
 
                 {/* Gallery preview — bento style */}
                 {destination.gallery && destination.gallery.length > 0 && (
-                    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                        className="mt-8">
+                    <div ref={bentoRef} className="fade-in-view mt-8">
                         <div className="grid grid-cols-3 grid-rows-2 gap-1.5" style={{ height: 'clamp(250px, 32vw, 420px)' }}>
                             {/* Large left image — spans 2 rows */}
                             <div className="row-span-2 relative cursor-pointer group overflow-hidden rounded-xl"
                                 onClick={() => setSelectedImageIndex(0)}>
-                                <img src={destination.gallery[0]} alt={`${destination.name} 1`}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                                <img src={imgSize.galleryLarge(destination.gallery[0])} alt={`${destination.name} 1`}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" decoding="async" />
                             </div>
 
                             {/* Top-right 2 images */}
                             {destination.gallery.slice(1, 3).map((img, idx) => (
                                 <div key={idx} className="relative cursor-pointer group overflow-hidden rounded-xl"
                                     onClick={() => setSelectedImageIndex(idx + 1)}>
-                                    <img src={img} alt={`${destination.name} ${idx + 2}`}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                                    <img src={imgSize.galleryThumb(img)} alt={`${destination.name} ${idx + 2}`}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
                                 </div>
                             ))}
 
@@ -182,8 +186,8 @@ export default function DestinationDetailPage() {
                                             setSelectedImageIndex(idx + 3);
                                         }
                                     }}>
-                                    <img src={img} alt={`${destination.name} ${idx + 4}`}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                                    <img src={imgSize.galleryThumb(img)} alt={`${destination.name} ${idx + 4}`}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
                                     {idx === 1 && destination.gallery.length > 5 && (
                                         <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center gap-2.5 rounded-xl hover:bg-black/50 transition-colors">
                                             <svg className="w-4 h-4 text-white/90" viewBox="0 0 24 24" fill="currentColor">
@@ -197,74 +201,33 @@ export default function DestinationDetailPage() {
                                 </div>
                             ))}
                         </div>
-                    </motion.div>
+                    </div>
                 )}
             </section>
 
             {/* Full Gallery */}
             {destination.gallery && destination.gallery.length > 5 && (
                 <section id="full-gallery" className="relative z-20 w-full px-4 sm:px-6 lg:px-10 pb-8 md:pb-12 max-w-[1920px] mx-auto">
-
-                    {/* Uniform Grid — skip first 5 shown in preview */}
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                         {destination.gallery.slice(5, 5 + visibleImages).map((img, idx) => {
                             const realIdx = idx + 5;
-
                             return (
-                                <motion.div
+                                <GalleryGridItem
                                     key={realIdx}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true, margin: "-50px" }}
-                                    transition={{ duration: 0.5, delay: (idx % 3) * 0.08 }}
-                                    className="relative aspect-[4/3] rounded-2xl md:rounded-[20px] overflow-hidden group cursor-pointer"
+                                    img={img}
+                                    idx={idx}
+                                    realIdx={realIdx}
+                                    totalCount={destination.gallery.length}
+                                    destinationName={destination.name}
                                     onClick={() => setSelectedImageIndex(realIdx)}
-                                >
-                                    <img
-                                        src={img}
-                                        alt={`${destination.name} ${idx + 1}`}
-                                        className="w-full h-full object-cover transition-all duration-[1.5s] ease-out group-hover:scale-110"
-                                        loading="lazy"
-                                    />
-
-                                    {/* Resting state — subtle bottom gradient with number */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent transition-opacity duration-500 group-hover:opacity-0" />
-                                    <span className="absolute bottom-4 left-5 text-white/25 text-[11px] font-mono tracking-wider transition-opacity duration-500 group-hover:opacity-0">
-                                        {String(idx + 1).padStart(2, '0')}
-                                    </span>
-
-                                    {/* Hover state — gold accent overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                                    <div className="absolute inset-0 border-2 border-gold/0 group-hover:border-gold/30 rounded-2xl md:rounded-[20px] transition-all duration-500 pointer-events-none" />
-
-                                    {/* Hover content */}
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
-                                        <div className="w-14 h-14 rounded-full bg-gold/20 backdrop-blur-xl border border-gold/40 flex items-center justify-center translate-y-6 group-hover:translate-y-0 transition-transform duration-500 shadow-[0_0_30px_rgba(212,175,55,0.2)]">
-                                            <ZoomIn className="text-gold" size={22} />
-                                        </div>
-                                        <span className="text-white/60 text-[10px] tracking-[0.3em] uppercase mt-3 translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
-                                            View
-                                        </span>
-                                    </div>
-
-                                    {/* Bottom info on hover */}
-                                    <div className="absolute bottom-0 left-0 right-0 p-5 flex items-end justify-between opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
-                                        <span className="text-white/50 text-[10px] font-mono tracking-wider">
-                                            {String(realIdx + 1).padStart(2, '0')} / {String(destination.gallery.length).padStart(2, '0')}
-                                        </span>
-                                        <span className="text-gold/60 text-[10px] tracking-[0.2em] uppercase">
-                                            Gallery
-                                        </span>
-                                    </div>
-                                </motion.div>
+                                />
                             );
                         })}
                     </div>
 
                     {/* Load More */}
                     {(5 + visibleImages) < destination.gallery.length && (
-                        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-                            className="flex flex-col items-center mt-16 gap-4">
+                        <div className="flex flex-col items-center mt-16 gap-4">
                             <div className="w-[1px] h-12 bg-gradient-to-b from-transparent via-gold/30 to-transparent" />
                             <button onClick={() => setVisibleImages(prev => prev + 8)}
                                 className="group relative overflow-hidden rounded-full border border-gold/30 px-10 py-4 transition-all duration-500 hover:border-gold hover:shadow-[0_0_30px_rgba(212,175,55,0.15)]">
@@ -276,7 +239,7 @@ export default function DestinationDetailPage() {
                             <span className="text-white/20 text-[10px] tracking-widest">
                                 {Math.min(5 + visibleImages, destination.gallery.length)} of {destination.gallery.length}
                             </span>
-                        </motion.div>
+                        </div>
                     )}
                 </section>
             )}
@@ -303,7 +266,7 @@ export default function DestinationDetailPage() {
                                 </button>
                                 <motion.img key={selectedImageIndex} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
                                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                    src={destination.gallery[selectedImageIndex]} alt={`Gallery view ${selectedImageIndex + 1}`}
+                                    src={imgSize.hero(destination.gallery[selectedImageIndex])} alt={`Gallery view ${selectedImageIndex + 1}`}
                                     className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl shadow-black/50" onClick={(e) => e.stopPropagation()} />
                                 <button onClick={(e) => { e.stopPropagation(); setSelectedImageIndex(prev => prev !== null && prev < destination.gallery.length - 1 ? prev + 1 : 0); }}
                                     className="absolute right-4 md:right-10 text-white/50 hover:text-gold transition-colors p-4 z-[110] bg-white/5 hover:bg-white/10 rounded-full hidden md:flex">
@@ -322,7 +285,7 @@ export default function DestinationDetailPage() {
                                         className={`relative shrink-0 snap-start h-full rounded-xl overflow-hidden transition-all duration-300 ${
                                             selectedImageIndex === idx ? 'w-24 md:w-32 border-2 border-gold' : 'w-16 md:w-20 opacity-40 hover:opacity-80'
                                         }`}>
-                                        <img src={thumb} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" />
+                                        <img src={optimizeImageUrl(thumb, { width: 150, quality: 60 })} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" decoding="async" />
                                     </button>
                                 ))}
                             </div>
@@ -392,15 +355,12 @@ export default function DestinationDetailPage() {
                             document.addEventListener('mouseup', onUp);
                         }}>
                         {otherDestinations.map(d => (
-                            <motion.div key={d.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
+                            <div key={d.id}
                                 className="group cursor-pointer shrink-0 w-[220px] md:w-[260px]"
                                 onClick={() => navigate(`/destinations/${d.slug || d.id}`)}>
                                 <div className="relative aspect-[4/3] rounded-lg overflow-hidden mb-1.5">
-                                    <img src={d.cover_image_url} alt={d.name}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" draggable={false} />
+                                    <img src={imgSize.destinationCard(d.cover_image_url)} alt={d.name}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" draggable={false} />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                                 </div>
                                 <h3 className="text-white text-xs font-medium group-hover:text-gold transition-colors truncate">{d.name}</h3>
@@ -408,12 +368,85 @@ export default function DestinationDetailPage() {
                                     <MapPin size={9} className="text-white/30" />
                                     <span className="text-white/30 text-[10px] truncate">{d.code || d.name}</span>
                                 </div>
-                            </motion.div>
+                            </div>
                         ))}
                     </div>
                 </section>
                 );
             })()}
+        </div>
+    );
+}
+
+/** Gallery grid item with CSS-based reveal animation */
+function GalleryGridItem({ img, idx, realIdx, totalCount, destinationName, onClick }: {
+    img: string; idx: number; realIdx: number; totalCount: number; destinationName: string; onClick: () => void;
+}) {
+    const ref = useRef<HTMLDivElement>(null);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setVisible(true);
+                    observer.unobserve(el);
+                }
+            },
+            { threshold: 0.05, rootMargin: '80px 0px' }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <div
+            ref={ref}
+            className="relative aspect-[4/3] rounded-2xl md:rounded-[20px] overflow-hidden group cursor-pointer transition-all duration-500 ease-out"
+            style={{
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'translateY(0)' : 'translateY(24px)',
+                transitionDelay: visible ? `${(idx % 3) * 60}ms` : '0ms',
+            }}
+            onClick={onClick}
+        >
+            <img
+                src={imgSize.galleryThumb(img)}
+                alt={`${destinationName} ${idx + 1}`}
+                className="w-full h-full object-cover transition-all duration-[1.5s] ease-out group-hover:scale-110"
+                loading="lazy"
+                decoding="async"
+            />
+
+            {/* Resting state */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent transition-opacity duration-500 group-hover:opacity-0" />
+            <span className="absolute bottom-4 left-5 text-white/25 text-[11px] font-mono tracking-wider transition-opacity duration-500 group-hover:opacity-0">
+                {String(idx + 1).padStart(2, '0')}
+            </span>
+
+            {/* Hover state */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
+            <div className="absolute inset-0 border-2 border-gold/0 group-hover:border-gold/30 rounded-2xl md:rounded-[20px] transition-all duration-500 pointer-events-none" />
+
+            <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+                <div className="w-14 h-14 rounded-full bg-gold/20 backdrop-blur-xl border border-gold/40 flex items-center justify-center translate-y-6 group-hover:translate-y-0 transition-transform duration-500 shadow-[0_0_30px_rgba(212,175,55,0.2)]">
+                    <ZoomIn className="text-gold" size={22} />
+                </div>
+                <span className="text-white/60 text-[10px] tracking-[0.3em] uppercase mt-3 translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
+                    View
+                </span>
+            </div>
+
+            <div className="absolute bottom-0 left-0 right-0 p-5 flex items-end justify-between opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
+                <span className="text-white/50 text-[10px] font-mono tracking-wider">
+                    {String(realIdx + 1).padStart(2, '0')} / {String(totalCount).padStart(2, '0')}
+                </span>
+                <span className="text-gold/60 text-[10px] tracking-[0.2em] uppercase">
+                    Gallery
+                </span>
+            </div>
         </div>
     );
 }

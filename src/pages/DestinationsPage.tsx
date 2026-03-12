@@ -1,6 +1,8 @@
-import { motion } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDestinations } from '../hooks/useDestinations';
+import { imgSize } from '../lib/imageOptimizer';
+import { useFadeInView } from '../hooks/useFadeInView';
 
 /**
  * Map DB destinations to the shape the UI expects
@@ -16,7 +18,7 @@ function mapDestinations(dbData: ReturnType<typeof useDestinations>['data']) {
         image: d.cover_image_url,
         events: d.events || '',
         features: d.features || [],
-        gallery: [] as string[], // gallery loaded on detail page
+        gallery: [] as string[],
     }));
 }
 
@@ -41,24 +43,39 @@ function DestinationCard({
     index: number;
 }) {
     const navigate = useNavigate();
+    const cardRef = useRef<HTMLLIElement>(null);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const el = cardRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setVisible(true);
+                    observer.unobserve(el);
+                }
+            },
+            { threshold: 0.05, rootMargin: '100px 0px' }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
 
     return (
-        <motion.li
-            layout
-            key={destination.id}
+        <li
+            ref={cardRef}
             onClick={() => navigate(`/destinations/${destination.id}`)}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-                opacity: { duration: 0.6, delay: index * 0.08 },
-                y: { duration: 0.6, delay: index * 0.08 },
+            className="group relative overflow-hidden rounded-[24px] cursor-pointer aspect-[3/4] border border-gold/10 hover:border-gold/40 list-none transform-gpu transition-all duration-500 ease-out"
+            style={{
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'translateY(0)' : 'translateY(24px)',
+                transitionDelay: visible ? `${Math.min(index, 7) * 60}ms` : '0ms',
             }}
-            className="group relative overflow-hidden rounded-[24px] cursor-pointer aspect-[3/4] border border-gold/10 hover:border-gold/40 list-none transform-gpu"
-            style={{ willChange: 'transform' }}
         >
             <div className="absolute inset-0 z-0 overflow-hidden">
                 <img
-                    src={destination.image}
+                    src={imgSize.destinationCard(destination.image)}
                     alt={destination.name}
                     loading="lazy"
                     decoding="async"
@@ -78,7 +95,7 @@ function DestinationCard({
                     {destination.description}
                 </p>
             </div>
-        </motion.li>
+        </li>
     );
 }
 
@@ -86,17 +103,16 @@ function DestinationCard({
 export default function DestinationsPage() {
     const { data: dbDestinations, isLoading, error, refetch } = useDestinations();
     const destinations = mapDestinations(dbDestinations);
+    const headerRef = useFadeInView();
 
     return (
         <div className="relative min-h-screen pt-32 pb-0">
             <section className="relative w-full px-8 md:px-16 py-10 z-10">
                 <div className="max-w-[1600px] mx-auto">
                     {/* Header */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-center mb-16 md:mb-[104px]"
+                    <div
+                        ref={headerRef}
+                        className="fade-in-view text-center mb-16 md:mb-[104px]"
                     >
                         <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-3 block">
                             Our Venues
@@ -107,7 +123,7 @@ export default function DestinationsPage() {
                         <p className="text-white/50 text-sm max-w-xl mx-auto leading-relaxed">
                             Handpicked locations crafted for extraordinary celebrations
                         </p>
-                    </motion.div>
+                    </div>
 
                     {/* Grid */}
                     {isLoading ? (
