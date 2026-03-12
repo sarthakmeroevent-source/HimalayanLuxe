@@ -27,7 +27,7 @@ export function useScrollHandler({
 
         let lenis: Lenis | null = null;
         let tick: ((time: number) => void) | null = null;
-        
+
         if (!isMobile) {
             lenis = new Lenis({
                 duration: 1.2,
@@ -40,7 +40,6 @@ export function useScrollHandler({
                 infinite: false,
             });
 
-            // Sync Lenis with GSAP ScrollTrigger
             lenis.on('scroll', ScrollTrigger.update);
 
             tick = (time: number) => {
@@ -49,33 +48,58 @@ export function useScrollHandler({
 
             gsap.ticker.add(tick);
             gsap.ticker.lagSmoothing(0);
+        }
 
+        // Cache hero height once — don't read it on every scroll
+        let cachedHeroHeight = 0;
+        const heroSection = document.getElementById('hero');
+        if (heroSection) {
+            cachedHeroHeight = heroSection.offsetHeight;
+        }
+
+        // Debounced scroll state — only update React state when the value actually changes
+        let lastIsScrolled = false;
+
+        function handleScroll() {
+            const scrollY = window.scrollY;
+            const threshold = isHomePage && cachedHeroHeight > 0
+                ? cachedHeroHeight - 100
+                : 100;
+            const nowScrolled = scrollY > threshold;
+
+            if (nowScrolled !== lastIsScrolled) {
+                lastIsScrolled = nowScrolled;
+                setIsScrolled(nowScrolled);
+            }
+        }
+
+        if (lenis) {
             lenis.on('scroll', handleScroll);
         } else {
-            // On mobile, just use the window scroll listener
             window.addEventListener('scroll', handleScroll, { passive: true });
         }
 
-        // Use IntersectionObserver instead of getBoundingClientRect in a scroll loop
-        const sectionIds = ['hero', 'experience', 'destinations', 'services', 'about', 'cta', 'footer'];
+        // Section tracking via IntersectionObserver (no scroll-loop reads)
         const observers: IntersectionObserver[] = [];
 
         if (isHomePage) {
-            const observerOptions = {
-                root: null,
-                rootMargin: '-20% 0px -20% 0px',
-                threshold: 0.1
-            };
+            const sectionIds = ['hero', 'experience', 'destinations', 'services', 'about', 'cta', 'footer'];
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const id = entry.target.id;
-                        setActiveSection(id);
-                        activeSectionRef.current = id;
+                        if (activeSectionRef.current !== id) {
+                            activeSectionRef.current = id;
+                            setActiveSection(id);
+                        }
                     }
                 });
-            }, observerOptions);
+            }, {
+                root: null,
+                rootMargin: '-20% 0px -20% 0px',
+                threshold: 0.1
+            });
 
             sectionIds.forEach(id => {
                 const el = document.getElementById(id);
@@ -84,30 +108,22 @@ export function useScrollHandler({
             observers.push(observer);
         }
 
-        function handleScroll() {
-            const scrollY = window.scrollY;
-            setIsScrolled(scrollY > 100);
-
-            if (!isHomePage) return;
-
-            const heroSection = document.getElementById('hero');
+        // Recache hero height on resize
+        const handleResize = () => {
             if (heroSection) {
-                const heroHeight = heroSection.offsetHeight;
-                setIsScrolled(scrollY > heroHeight - 100);
+                cachedHeroHeight = heroSection.offsetHeight;
             }
-        }
+        };
+        window.addEventListener('resize', handleResize);
 
         handleScroll();
         ScrollTrigger.refresh();
 
         return () => {
-            if (lenis) {
-                lenis.destroy();
-            }
-            if (tick) {
-                gsap.ticker.remove(tick);
-            }
+            if (lenis) lenis.destroy();
+            if (tick) gsap.ticker.remove(tick);
             window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleResize);
             observers.forEach(o => o.disconnect());
         };
     }, [showLoader, isHomePage, setIsScrolled, setActiveSection, activeSectionRef]);

@@ -1,9 +1,10 @@
-import { motion } from 'framer-motion';
 import { useLayoutEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useServices } from '../hooks/useServices';
+import { useFadeInView } from '../hooks/useFadeInView';
+import { imgSize } from '../lib/imageOptimizer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,6 +12,7 @@ export default function ServicesSection() {
     const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
     const navigate = useNavigate();
     const { data: dbServices, isLoading } = useServices();
+    const headerRef = useFadeInView();
 
     const displayServices = useMemo(() => {
         if (!dbServices) return [];
@@ -69,13 +71,8 @@ export default function ServicesSection() {
             ScrollTrigger.refresh();
         });
 
-        const refreshTimer = setTimeout(() => {
-            ScrollTrigger.refresh();
-        }, 100);
-
         return () => {
             ctx.revert();
-            clearTimeout(refreshTimer);
         };
     }, [displayServices]);
 
@@ -87,18 +84,15 @@ export default function ServicesSection() {
                 </div>
             ) : displayServices.length === 0 ? null : (
                 <>
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px", amount: 0.3 }}
-                        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                        className="mb-16 flex flex-col items-center text-center"
+                    <div
+                        ref={headerRef}
+                        className="fade-in-view mb-16 flex flex-col items-center text-center"
                     >
                         <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-6">Masterpieces</span>
                         <h2 className="font-serif text-white/95 text-[32px] md:text-[clamp(28px,3vw,48px)] font-normal leading-[1.15] md:leading-[1.1] tracking-tight">
                             Curated <span className="italic text-white/50">Excellence</span>
                         </h2>
-                    </motion.div>
+                    </div>
 
                     <div className="w-full max-w-[1400px] mx-auto relative z-10">
                         {displayServices.map((service, i) => (
@@ -113,15 +107,11 @@ export default function ServicesSection() {
                                     zIndex: i + 1
                                 }}
                             >
-                                <img src={service.img} alt={service.title} className="absolute inset-0 w-full h-full object-cover" />
+                                <img src={imgSize.serviceCard(service.img)} alt={service.title} className="absolute inset-0 w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-black/40"></div>
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 
-                                <motion.div
-                                    initial={{ opacity: 0, y: 50 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true, amount: 0.4 }}
-                                    transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                                <div
                                     className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl w-full"
                                 >
                                     <h3 className="font-serif text-white/95 text-[clamp(32px,5vw,72px)] leading-[1.1] mb-6 drop-shadow-2xl">
@@ -130,7 +120,7 @@ export default function ServicesSection() {
                                     <h4 className="text-white/80 font-sans tracking-[0.15em] md:tracking-[0.2em] text-[clamp(10px,1.2vw,14px)] font-semibold uppercase drop-shadow-lg">
                                         {service.subtitle}
                                     </h4>
-                                </motion.div>
+                                </div>
                             </div>
                         ))}
                     </div>

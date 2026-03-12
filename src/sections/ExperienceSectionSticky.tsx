@@ -5,6 +5,7 @@ import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { imgSize } from '../lib/imageOptimizer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -74,15 +75,18 @@ export default function ExperienceSectionSticky({
             onUpdate: (self) => {
                 const progress = self.progress;
 
-                // Update active philosophy index
+                // Update active philosophy index — only update React state when it actually changes
                 const currentIndex = Math.min(
                     Math.floor(progress * totalPhilosophies),
                     totalPhilosophies - 1
                 );
 
                 if (currentIndex !== activePhilosophyRef.current) {
-                    setActivePhilosophy(currentIndex);
                     activePhilosophyRef.current = currentIndex;
+                    // Defer React state update to avoid blocking the scroll frame
+                    requestAnimationFrame(() => {
+                        setActivePhilosophy(currentIndex);
+                    });
                 }
 
                 // Animate content with smooth, continuous scrolling
@@ -268,7 +272,7 @@ export default function ExperienceSectionSticky({
                     {philosophies.map((philosophy: PhilosophyDisplayItem, index: number) => (
                         <div key={index} className="flex-shrink-0 w-[85vw] snap-center flex flex-col gap-6">
                             <div className="relative aspect-[4/5] rounded-[24px] overflow-hidden border border-gold/20 shadow-2xl p-1 bg-transparent">
-                                <img src={philosophy.image} alt={philosophy.title} className="w-full h-full object-cover rounded-[20px] brightness-105" />
+                                <img src={imgSize.philosophy(philosophy.image)} alt={philosophy.title} className="w-full h-full object-cover rounded-[20px] brightness-105" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
                                 <div className="absolute bottom-6 left-6">
                                     <span className="liquid-gold-text text-[10px] tracking-[0.2em] uppercase font-medium block mb-2">{philosophy.title}</span>
@@ -329,7 +333,7 @@ export default function ExperienceSectionSticky({
                                     <img
                                         key={index}
                                         ref={(el) => (imageRefs.current[index] = el)}
-                                        src={philosophy.image}
+                                        src={imgSize.philosophy(philosophy.image)}
                                         alt={philosophy.title}
                                         className="absolute inset-0 w-full h-full object-cover rounded-[14px] md:rounded-[28px] will-change-opacity brightness-105"
                                         style={{

@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, FreeMode } from 'swiper/modules';
 import { useNavigate } from 'react-router-dom';
 import { useDestinations, DestinationItem } from '../../hooks/useDestinations';
+import { imgSize } from '../../lib/imageOptimizer';
 import type { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/autoplay';
@@ -89,7 +90,7 @@ const DestinationCarousel = () => {
               className="relative w-[70vw] md:w-[280px] h-[400px] md:h-[420px] rounded-[24px] overflow-hidden group cursor-pointer border border-white/10 shadow-lg transition-all duration-700 hover:border-gold/40"
             >
               <img 
-                src={dest.cover_image_url} 
+                src={imgSize.destinationCard(dest.cover_image_url)} 
                 alt={dest.name} 
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2s] ease-out group-hover:scale-110"
               />

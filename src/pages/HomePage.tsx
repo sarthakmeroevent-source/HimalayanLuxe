@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import HeroSection from '../sections/HeroSection';
 import ExperienceSectionSticky from '../sections/ExperienceSectionSticky';
 import DestinationsSection from '../sections/DestinationsSection';
@@ -7,6 +7,9 @@ import AboutSection from '../sections/AboutSection';
 import GallerySection from '../sections/GallerySection';
 import CTASection from '../sections/CTASection';
 import { useDestinations } from '../hooks/useDestinations';
+import { useGallery } from '../hooks/useGallery';
+import { useImagePreloader } from '../hooks/useImagePreloader';
+import { imgSize } from '../lib/imageOptimizer';
 
 interface HomePageProps {
     activeSection: string;
@@ -30,8 +33,26 @@ export default function HomePage({
     // Start muted to ensure autoplay works on all devices (especially mobile)
     const [isMuted, setIsMuted] = useState(true);
     
-    // Prefetch destinations data early
-    useDestinations();
+    // Prefetch destinations & gallery data early so images start loading before scroll
+    const { data: destinations } = useDestinations();
+    const { data: galleryImages } = useGallery();
+
+    const preloadUrls = useMemo(() => {
+        const urls: string[] = [];
+        if (destinations) {
+            destinations.slice(0, 10).forEach((d) => {
+                if (d.cover_image_url) urls.push(imgSize.destinationCard(d.cover_image_url));
+            });
+        }
+        if (galleryImages) {
+            galleryImages.slice(0, 9).forEach((img) => {
+                if (img.image_url) urls.push(imgSize.galleryThumb(img.image_url));
+            });
+        }
+        return urls;
+    }, [destinations, galleryImages]);
+
+    useImagePreloader(preloadUrls);
 
     return (
         <>

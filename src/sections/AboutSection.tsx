@@ -1,17 +1,15 @@
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useFadeInView } from '../hooks/useFadeInView';
 
 export default function AboutSection() {
+    const headerRef = useFadeInView();
+    const statsRef = useFadeInView();
+    const buttonRef = useFadeInView();
+
     return (
         <section className="relative w-full flex flex-col items-center justify-center py-16 md:py-[72px] px-6 md:px-12 overflow-hidden" id="about">
             <div className="w-full max-w-[1400px] mx-auto">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ margin: "-100px", amount: 0.3 }}
-                    transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                    className="text-center mb-16"
-                >
+                <div ref={headerRef} className="fade-in-view text-center mb-16">
                     <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-6 block">
                         Our Story
                     </span>
@@ -22,15 +20,9 @@ export default function AboutSection() {
                         We are not event planners. We are architects of emotion, curators of the extraordinary,
                         and guardians of your most precious moments.
                     </p>
-                </motion.div>
+                </div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                    className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12"
-                >
+                <div ref={statsRef} className="fade-in-view grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
                     {[
                         { number: '500+', label: 'Luxury Events' },
                         { number: '50+', label: 'Countries' },
@@ -46,15 +38,9 @@ export default function AboutSection() {
                             </div>
                         </div>
                     ))}
-                </motion.div>
+                </div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-                    className="text-center"
-                >
+                <div ref={buttonRef} className="fade-in-view text-center">
                     <Link
                         to="/about"
                         className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10 inline-block"
@@ -63,7 +49,7 @@ export default function AboutSection() {
                             Learn More About Us
                         </span>
                     </Link>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

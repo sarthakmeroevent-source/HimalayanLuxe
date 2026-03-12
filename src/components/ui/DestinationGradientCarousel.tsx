@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useMemo, useState } from 'react';
+import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDestinations } from '../../hooks/useDestinations';
+import { imgSize } from '../../lib/imageOptimizer';
 
 // Physics constants
 const FRICTION = 0.95;
@@ -18,8 +19,7 @@ const DestinationGradientCarousel: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const cardsRootRef = useRef<HTMLDivElement>(null);
   
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const [isHovered, setIsHovered] = useState(false);
+  // Use refs instead of state for animation values to avoid React re-renders during rAF
   const isHoveredRef = useRef(false);
   
   // State for animation
@@ -38,7 +38,8 @@ const DestinationGradientCarousel: React.FC = () => {
     lastDelta: 0,
     dragDist: 0,
     clickedDestId: null as string | null,
-    isInView: true
+    isInView: false,
+    initialized: false,
   });
 
   const displayItems = useMemo(() => {
@@ -49,24 +50,16 @@ const DestinationGradientCarousel: React.FC = () => {
   // Utility: Modulo
   const mod = (n: number, m: number) => ((n % m) + m) % m;
 
-  const updateTransforms = () => {
+  const updateTransforms = useCallback(() => {
     const s = stateRef.current;
     if (!s.track) return;
 
     const half = s.track / 2;
-    let closestIdx = -1;
-    let closestDist = Infinity;
 
-    s.items.forEach((it, i) => {
+    s.items.forEach((it) => {
       let pos = it.x - s.scrollX;
       if (pos < -half) pos += s.track;
       if (pos > half) pos -= s.track;
-
-      const dist = Math.abs(pos);
-      if (dist < closestDist) {
-        closestDist = dist;
-        closestIdx = i;
-      }
 
       const norm = Math.max(-1, Math.min(1, pos / s.vwHalf));
       const absNorm = Math.abs(norm);
@@ -76,46 +69,41 @@ const DestinationGradientCarousel: React.FC = () => {
       const tz = invNorm * MAX_DEPTH;
       const scale = MIN_SCALE + invNorm * SCALE_RANGE;
 
-      // Applied transformations without blur
       it.el.style.transform = `translate3d(${pos}px, -50%, ${tz}px) rotateY(${ry}deg) scale(${scale})`;
       it.el.style.zIndex = String(1000 + Math.round(tz));
       it.el.style.opacity = String(1 - absNorm * 0.5);
     });
+  }, []);
 
-    if (closestIdx !== activeIndex && closestIdx !== -1) {
-      setActiveIndex(closestIdx);
-    }
-  };
-
-  const tick = (t: number) => {
+  const tick = useCallback((t: number) => {
     const s = stateRef.current;
     
-    // Always request the next frame so the engine stays alive
     s.rafId = requestAnimationFrame(tick);
     
-    // But completely skip heavy calculations if the carousel is not currently visible
+    // Skip heavy calculations if the carousel is not visible
     if (!s.isInView) {
-        s.lastTime = t;
+        s.lastTime = 0;
         return;
     }
 
     const dt = s.lastTime ? (t - s.lastTime) / 1000 : 0;
     s.lastTime = t;
 
+    // Clamp dt to avoid huge jumps after tab switch or long pause
+    const clampedDt = Math.min(dt, 0.05);
+
     if (!isHoveredRef.current && !s.dragging) {
-      // Smoothly accelerate to AUTO_SPEED
       s.vX += (AUTO_SPEED - s.vX) * 0.1;
     } else {
-      // Smoothly decelerate to 0
       s.vX *= FRICTION;
       if (Math.abs(s.vX) < 1) s.vX = 0;
     }
 
     if (!s.dragging) {
-      s.scrollX = mod(s.scrollX + s.vX * dt, s.track);
+      s.scrollX = mod(s.scrollX + s.vX * clampedDt, s.track);
       updateTransforms();
     }
-  };
+  }, [updateTransforms]);
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return; // Only primary button
@@ -168,12 +156,13 @@ const DestinationGradientCarousel: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isLoading || !displayItems.length || !cardsRootRef.current) return;
+    if (isLoading || !displayItems.length || !cardsRootRef.current || !containerRef.current) return;
 
-    // Use a small timeout to avoid synchronous layout thrashing (causing scroll lag) immediately on mount
-    const initTimer = setTimeout(() => {
-      const s = stateRef.current;
-      if (!cardsRootRef.current) return;
+    const s = stateRef.current;
+    const container = containerRef.current;
+
+    const initCarousel = () => {
+      if (s.initialized || !cardsRootRef.current) return;
       
       const els = Array.from(cardsRootRef.current.children) as HTMLElement[];
       if (els.length === 0) return;
@@ -188,43 +177,43 @@ const DestinationGradientCarousel: React.FC = () => {
         x: i * step
       }));
 
-      // Force one explicit initial render so cards don't stack while off-screen and paused
       updateTransforms();
-
+      s.initialized = true;
       s.rafId = requestAnimationFrame(tick);
+    };
 
-      const handleResize = () => {
-        s.vwHalf = window.innerWidth * 0.5;
-        if (els[0]) s.cardW = els[0].offsetWidth || 300;
-        const newStep = s.cardW + GAP;
-        s.track = displayItems.length * newStep;
-        s.items.forEach((it, i) => it.x = i * newStep);
-      };
+    const handleResize = () => {
+      if (!s.initialized || !cardsRootRef.current) return;
+      const els = Array.from(cardsRootRef.current.children) as HTMLElement[];
+      s.vwHalf = window.innerWidth * 0.5;
+      if (els[0]) s.cardW = els[0].offsetWidth || 300;
+      const newStep = s.cardW + GAP;
+      s.track = displayItems.length * newStep;
+      s.items.forEach((it, i) => it.x = i * newStep);
+    };
 
-      window.addEventListener('resize', handleResize);
-      
-      const observer = new IntersectionObserver(([entry]) => {
-         s.isInView = entry.isIntersecting;
-      }, { threshold: 0 });
-      if (containerRef.current) observer.observe(containerRef.current);
-      
-      // Save cleanup to state ref to handle unmount cleanly
-      (s as any)._cleanupResize = () => window.removeEventListener('resize', handleResize);
-      (s as any)._cleanupObserver = () => observer.disconnect();
-    }, 100);
+    // Use IntersectionObserver with a large rootMargin so we initialize
+    // BEFORE the user actually scrolls to the section (no pause on arrival)
+    const observer = new IntersectionObserver(([entry]) => {
+      s.isInView = entry.isIntersecting;
+      if (entry.isIntersecting && !s.initialized) {
+        // Use rAF to avoid layout thrashing during scroll
+        requestAnimationFrame(() => {
+          initCarousel();
+        });
+      }
+    }, { threshold: 0, rootMargin: '200px 0px' });
+
+    observer.observe(container);
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      clearTimeout(initTimer);
-      const s = stateRef.current;
+      observer.disconnect();
+      window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(s.rafId);
-      if ((s as any)._cleanupResize) {
-        (s as any)._cleanupResize();
-      }
-      if ((s as any)._cleanupObserver) {
-        (s as any)._cleanupObserver();
-      }
+      s.initialized = false;
     };
-  }, [isLoading, displayItems]); // REMOVED isHovered from dependencies to stop re-running start/stop intervals
+  }, [isLoading, displayItems, tick, updateTransforms]);
 
   if (isLoading) return (
     <div className="w-full h-[375px] md:h-[430px]" />
@@ -235,11 +224,9 @@ const DestinationGradientCarousel: React.FC = () => {
       className="relative w-full h-[375px] md:h-[430px] overflow-hidden perspective-[1800px] bg-transparent cursor-grab active:cursor-grabbing"
       ref={containerRef}
       onMouseEnter={() => {
-        setIsHovered(true);
         isHoveredRef.current = true;
       }}
       onMouseLeave={() => {
-        setIsHovered(false);
         isHoveredRef.current = false;
       }}
       onPointerDown={onPointerDown}
@@ -251,7 +238,7 @@ const DestinationGradientCarousel: React.FC = () => {
         ref={cardsRootRef}
         className="absolute inset-0 preserve-3d pointer-events-none"
       >
-        {displayItems.map((dest, i) => (
+        {displayItems.map((dest) => (
           <article 
             key={dest.id}
             data-id={dest.slug || dest.id}
@@ -259,11 +246,11 @@ const DestinationGradientCarousel: React.FC = () => {
             style={{ willChange: 'transform' }}
           >
             <img 
-              src={dest.cover_image_url} 
+              src={imgSize.destinationCard(dest.cover_image_url)} 
               alt={dest.name}
               className="w-full h-full object-cover"
               draggable={false}
-              loading="lazy"
+              decoding="async"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
             
