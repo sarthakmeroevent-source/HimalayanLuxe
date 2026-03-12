@@ -91,14 +91,16 @@ interface SilkPlaneProps {
 }
 
 const SilkPlane = forwardRef<Mesh, SilkPlaneProps>(function SilkPlane({ uniforms }, ref) {
-    const { viewport } = useThree();
+    const { viewport, invalidate } = useThree();
 
     useLayoutEffect(() => {
         const mesh = ref as React.MutableRefObject<Mesh | null>;
         if (mesh.current) {
             mesh.current.scale.set(viewport.width, viewport.height, 1);
+            // Trigger a re-render when viewport changes
+            invalidate();
         }
-    }, [ref, viewport]);
+    }, [ref, viewport, invalidate]);
 
     useFrame((_state: RootState, _delta: number) => {
         // Disabled animation per user request: "should not move stuck so it doesnot be heavy"
@@ -125,10 +127,15 @@ export interface SilkProps {
 const Silk: React.FC<SilkProps> = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, rotation = 0 }) => {
     const meshRef = useRef<Mesh>(null);
     const [isMobile, setIsMobile] = useState(false);
+    const [canvasKey, setCanvasKey] = useState(0);
 
     useEffect(() => {
         setIsMobile(window.innerWidth < 768);
-        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+            // Force canvas to re-render by changing key
+            setCanvasKey(prev => prev + 1);
+        };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
@@ -162,6 +169,7 @@ const Silk: React.FC<SilkProps> = ({ speed = 5, scale = 1, color = '#7B7481', no
 
     return (
         <Canvas 
+            key={canvasKey} // Force re-mount on resize
             {...canvasOptions}
             onCreated={({ gl }) => {
                 // Handle context loss

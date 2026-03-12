@@ -97,8 +97,16 @@ export default function ContactFloat() {
         className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${
           open
             ? 'bg-white/10 backdrop-blur-md border border-white/20 rotate-45 scale-95'
-            : 'bg-gradient-to-br from-[#D4AF37] to-[#B8962E] hover:scale-110 shadow-[0_4px_20px_rgba(212,175,55,0.4)]'
+            : 'hover:scale-110 shadow-[0_8px_32px_rgba(212,175,55,0.4)] backdrop-blur-xl border border-gold/40'
         }`}
+        style={{
+          background: open 
+            ? undefined 
+            : 'linear-gradient(135deg, rgba(184,150,46,0.5) 0%, rgba(212,175,55,0.5) 25%, rgba(184,150,46,0.5) 50%, rgba(154,123,26,0.5) 75%, rgba(184,150,46,0.5) 100%)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), 0 8px 32px rgba(212,175,55,0.3)',
+        }}
         aria-label={open ? 'Close contact options' : 'Open contact options'}
       >
         <svg

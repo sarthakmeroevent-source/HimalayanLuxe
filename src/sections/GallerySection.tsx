@@ -179,7 +179,7 @@ const GalleryExpand = ({
         </div>
 
         {/* Desktop Expand on Hover Layout - Same as Destination */}
-        <div className="hidden md:flex w-full items-center justify-center gap-2 md:gap-3 py-4 lg:py-8">
+        <div className="hidden md:flex w-full items-center justify-center gap-2 md:gap-3">
           {items.map((image, index) => {
             return (
               <motion.div
