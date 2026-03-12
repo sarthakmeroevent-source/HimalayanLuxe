@@ -6,7 +6,7 @@ import SimpleCTA from '../components/common/SimpleCTA';
 import { useGallery } from '../hooks/useGallery';
 
 const INITIAL_COUNT = 6;
-const LOAD_MORE_AMOUNT = 3;
+const LOAD_MORE_AMOUNT = 8;
 
 export default function GalleryPage() {
     const { data: galleryImages, isLoading } = useGallery();
