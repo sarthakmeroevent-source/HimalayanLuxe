@@ -125,8 +125,8 @@ export default function ExperienceSection({
                                 key={activePhilosophy}
                                 className="flex flex-col"
                             >
-                                <span className="text-[40px] font-serif text-gold/20 leading-none mb-2">0{activePhilosophy + 1}</span>
-                                <span className="text-[10px] tracking-[0.3em] uppercase text-white/40 font-medium">Philosophy</span>
+                                <span className="text-[28px] font-serif text-gold/20 leading-none mb-2">0{activePhilosophy + 1}</span>
+                                <span className="text-[8px] tracking-[0.3em] uppercase text-white/40 font-medium">Philosophy</span>
                             </motion.div>
                         </div>
                     </div>

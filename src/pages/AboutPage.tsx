@@ -95,11 +95,11 @@ export default function AboutPage() {
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gold/5 rounded-full blur-[150px] pointer-events-none -mr-40 -mt-20" />
 
             {/* Page Header */}
-            <section className="relative w-full px-8 md:px-16 pt-10 pb-4 z-10">
+            <section className="relative w-full px-8 md:px-16 pt-10 pb-6 md:pb-10 z-10">
                 <div className="max-w-[1400px] mx-auto">
-                    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }} className="text-center mb-6">
+                    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }} className="text-center mb-0">
                         <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-3 block">Our Legacy</span>
-                        <h1 className="font-serif text-white/95 text-[clamp(28px,4vw,56px)] leading-[1.1] font-normal tracking-tight mb-4">
+                        <h1 className="font-serif text-white/95 text-[clamp(32px,4vw,56px)] leading-[1.1] font-normal tracking-tight mb-0">
                             About <span className="liquid-gold-text">Us</span>
                         </h1>
                     </motion.div>
@@ -108,33 +108,81 @@ export default function AboutPage() {
 
             {/* About Content */}
             <section className="relative w-full px-8 md:px-16 py-10 md:py-16 z-10">
-                <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-12 lg:gap-16 items-start">
-                    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
-                        <h2 className="font-serif text-white/90 text-2xl md:text-3xl lg:text-[2.5rem] leading-[1.25] mb-8">
-                            {heading.includes('.') ? (
-                                <>
-                                    {heading.split('.')[0]}.{' '}
-                                    <span className="text-gold italic">{heading.split('.').slice(1).join('.').trim()}</span>
-                                </>
-                            ) : heading}
-                        </h2>
-                        <div className="w-16 h-[1px] bg-gold/40 mb-8" />
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 text-white/55 text-sm leading-[1.9] font-light">
-                            {bodyParagraphs.map((p, i) => <p key={i}>{p}</p>)}
-                        </div>
-                    </motion.div>
+                <div className="max-w-[1400px] mx-auto">
+                    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-12 lg:gap-16 items-start">
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }} 
+                            whileInView={{ opacity: 1, y: 0 }} 
+                            viewport={{ once: true }} 
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="relative"
+                        >
+                            {/* Decorative background element */}
+                            <div className="absolute -top-8 -left-8 w-32 h-32 bg-gold/5 rounded-full blur-[60px] pointer-events-none" />
+                            
+                            <div className="glass-card rounded-3xl p-8 md:p-12 border border-gold/20 bg-gradient-to-br from-gold/5 via-transparent to-gold/5 backdrop-blur-sm relative z-10">
+                                <span className="liquid-gold-text text-[10px] tracking-[0.4em] uppercase font-medium mb-6 block">
+                                    Our Story
+                                </span>
+                                
+                                <h2 className="font-serif text-white/90 text-xl md:text-2xl lg:text-[2rem] leading-loose mb-8">
+                                    {heading.includes('.') ? (
+                                        <>
+                                            <span className="block">{heading.split('.')[0]}.</span>
+                                            <span className="text-gold italic font-light block mt-2">{heading.split('.').slice(1).join('.').trim()}</span>
+                                        </>
+                                    ) : heading}
+                                </h2>
+                                
+                                <div className="w-16 h-[2px] bg-gradient-to-r from-gold to-gold/30 mb-10 rounded-full" />
+                                
+                                <div className="space-y-6">
+                                    <motion.p
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                                        className="text-white/70 text-base leading-[1.8] font-light tracking-wide"
+                                    >
+                                        We transform Nepal's breathtaking landscapes into extraordinary celebration venues, creating unforgettable moments that honor both tradition and luxury.
+                                    </motion.p>
+                                    
+                                    <motion.p
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                                        className="text-white/60 text-sm leading-[1.8] font-light"
+                                    >
+                                        Our curated network of artisans and venues ensures every detail reflects the unparalleled beauty of the Himalayas.
+                                    </motion.p>
+                                </div>
+                            </div>
+                        </motion.div>
 
-                    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }} className="hidden lg:block">
-                        <div className="glass-card rounded-2xl p-8 border border-gold/20 text-center sticky top-32">
-                            <p className="font-serif text-white/90 text-lg leading-snug mb-1">Plan Your Dream</p>
-                            <p className="font-serif text-gold text-lg leading-snug mb-6">Himalayan Celebration</p>
-                            <div className="w-8 h-[1px] bg-gold/30 mx-auto mb-6" />
-                            <p className="text-white/40 text-xs tracking-wide mb-6 leading-relaxed">Let's create something extraordinary together</p>
-                            <Link to="/contact" className="inline-block px-8 py-3 rounded-full bg-gold/10 border border-gold/30 text-gold text-[11px] tracking-[0.2em] uppercase hover:bg-gold/20 hover:border-gold/50 transition-all duration-300">
-                                Contact Us
-                            </Link>
-                        </div>
-                    </motion.div>
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }} 
+                            whileInView={{ opacity: 1, y: 0 }} 
+                            viewport={{ once: true }} 
+                            transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }} 
+                            className="hidden lg:block"
+                        >
+                            <div className="glass-card rounded-2xl p-8 border border-gold/20 text-center sticky top-32">
+                                <p className="font-serif text-white/90 text-2xl leading-snug mb-1">Plan Your Dream</p>
+                                <p className="font-serif text-gold text-2xl leading-snug mb-6">Himalayan Celebration</p>
+                                
+                                <div className="w-8 h-[1px] bg-gold/30 mx-auto mb-6" />
+                                
+                                <p className="text-white/40 text-base tracking-wide mb-6 leading-relaxed">
+                                    Let's create something extraordinary together
+                                </p>
+                                
+                                <Link to="/contact" className="inline-block px-8 py-3 rounded-full bg-gold/10 border border-gold/30 text-gold text-xs tracking-[0.2em] uppercase hover:bg-gold/20 hover:border-gold/50 transition-all duration-300">
+                                    Contact Us
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </div>
                 </div>
             </section>
 
@@ -144,7 +192,7 @@ export default function AboutPage() {
                     <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                         className="text-center mb-14">
                         <span className="text-gold text-[11px] tracking-[0.4em] uppercase font-medium block mb-4">The Visionaries</span>
-                        <h2 className="font-serif text-white/95 text-3xl lg:text-4xl">Our Team</h2>
+                        <h2 className="font-serif text-white/95 text-2xl md:text-3xl lg:text-[2.5rem]">Our Team</h2>
                     </motion.div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         {team.map((member, i) => (

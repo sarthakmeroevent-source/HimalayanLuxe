@@ -70,18 +70,18 @@ export default function ServicesDetailPage() {
 
     return (
         <div className="relative min-h-screen pt-32 pb-0">
-            <section className="relative w-full px-8 md:px-16 py-10 flex flex-col items-center justify-center">
+            <section className="relative w-full px-8 md:px-16 pt-10 pb-6 md:py-10 flex flex-col items-center justify-center">
                 <div className="max-w-[1600px] mx-auto text-center relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-center mb-10"
+                        className="text-center mb-2"
                     >
                         <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-3 block">
                             What We Do
                         </span>
-                        <h1 className="font-serif text-white/95 text-[clamp(28px,4vw,56px)] leading-[1.1] font-normal tracking-tight mb-4">
+                        <h1 className="font-serif text-white/95 text-[clamp(32px,4vw,56px)] leading-[1.1] font-normal tracking-tight mb-4">
                             Our <span className="liquid-gold-text">Services</span>
                         </h1>
                         <p className="text-white/50 text-sm max-w-xl mx-auto leading-relaxed">
@@ -100,7 +100,7 @@ export default function ServicesDetailPage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: "-100px" }}
                         transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                        className="relative py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center"
+                        className="relative py-10 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center"
                     >
                         <div className={`lg:col-span-6 relative flex justify-center ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
                             <div className={`relative aspect-[10/12] rounded-[32px] md:rounded-[48px] overflow-hidden group max-w-[85%] ${index % 2 === 0 ? 'lg:ml-auto lg:mr-0' : 'lg:mr-auto lg:ml-0'}`}>
@@ -118,18 +118,18 @@ export default function ServicesDetailPage() {
 
                         <div className={`lg:col-span-6 flex justify-center lg:block ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
                             <div className={`relative z-10 max-w-[85%] text-center lg:text-left ${index % 2 === 0 ? 'lg:mr-auto lg:ml-0' : 'lg:ml-auto lg:mr-0'}`}>
-                                <span className="liquid-gold-text text-[10px] tracking-[0.4em] uppercase font-bold mb-6 block">
+                                <span className="liquid-gold-text text-[8px] tracking-[0.4em] uppercase font-bold mb-4 block">
                                     {service.subtitle}
                                 </span>
-                                <h2 className="font-serif text-white text-[clamp(28px,4vw,56px)] leading-[1.1] mb-8">
+                                <h2 className="font-serif text-white text-[clamp(22px,3vw,42px)] leading-[1.1] mb-6">
                                     {service.title}
                                 </h2>
-                                <p className="text-white/50 text-base md:text-xl leading-relaxed mb-10 font-light tracking-wide italic">
+                                <p className="text-white/50 text-sm md:text-base leading-relaxed mb-8 font-light tracking-wide italic">
                                     {service.description}
                                 </p>
 
                                 {service.features.length > 0 && (
-                                    <ul className="grid grid-cols-1 gap-4 mb-12">
+                                    <ul className="grid grid-cols-1 gap-4 mb-8">
                                         {service.features.map((feature, fIndex) => (
                                             <motion.li
                                                 key={fIndex}
