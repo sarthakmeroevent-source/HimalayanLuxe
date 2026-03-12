@@ -5,7 +5,7 @@ export default function CTASection() {
     const cardRef = useFadeInView();
 
     return (
-        <section className="section-container relative w-full flex items-center justify-center py-16 md:py-[72px] px-8 md:px-12 overflow-hidden" id="cta">
+        <section className="relative w-full flex items-center justify-center py-16 md:py-[72px] px-8 md:px-12 overflow-hidden" id="cta">
             <div className="absolute inset-0 bg-gold/5 pointer-events-none"></div>
             <div
                 ref={cardRef}

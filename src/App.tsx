@@ -75,6 +75,12 @@ function AppContent() {
         activeSectionRef,
     });
 
+    // Reset scroll state on route change — ScrollToTop scrolls to 0,
+    // so the nav should always start in the "not scrolled" state.
+    useEffect(() => {
+        setIsScrolled(false);
+    }, [location.pathname]);
+
     useEffect(() => {
         setIsDesktop(window.innerWidth >= 768);
         const handleResize = () => setIsDesktop(window.innerWidth >= 768);
