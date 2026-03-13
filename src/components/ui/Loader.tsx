@@ -42,8 +42,8 @@ export default function Loader({ showLoader, isDesktop }: LoaderProps) {
             // Move to exactly match the header logo coordinates
             tl.to(logoRef.current, {
                 height: '4rem',
-                left: isDesktop ? '48px' : '32px',
-                top: isDesktop ? '40px' : '48px',
+                left: isDesktop ? '48px' : '24px', // px-6 = 24px on mobile
+                top: isDesktop ? '40px' : '32px',  // py-8 = 32px on mobile
                 xPercent: 0,
                 yPercent: 0,
                 duration: 2.2,
@@ -90,8 +90,8 @@ export default function Loader({ showLoader, isDesktop }: LoaderProps) {
                             style={{
                                 width: 'auto',
                                 height: '4rem',
-                                left: isDesktop ? '48px' : '32px',
-                                top: isDesktop ? '40px' : '48px'
+                                left: isDesktop ? '48px' : '24px', // px-6 = 24px on mobile
+                                top: isDesktop ? '40px' : '32px'   // py-8 = 32px on mobile
                             }}
                         />
                     </motion.div>
