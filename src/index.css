@@ -35,6 +35,7 @@
         background-color: #000000;
         overscroll-behavior: none;
         /* Prevent elastic scroll gaps */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
 
     body {

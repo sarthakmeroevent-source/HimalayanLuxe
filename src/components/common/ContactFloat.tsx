@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
 
@@ -8,9 +8,13 @@ const FALLBACK_INSTAGRAM = 'https://www.instagram.com/himalayan_luxe/';
 
 export default function ContactFloat() {
   const [open, setOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const isHomePage = location.pathname === '/';
 
   const { data: settings } = useQuery({
     queryKey: ['site-settings-public'],
@@ -23,6 +27,31 @@ export default function ContactFloat() {
 
   const number = settings?.whatsapp_number || FALLBACK_NUMBER;
   const instaUrl = settings?.social_instagram || FALLBACK_INSTAGRAM;
+
+  // Handle scroll-based visibility for homepage
+  useEffect(() => {
+    if (!isHomePage) {
+      setIsVisible(true);
+      return;
+    }
+
+    const handleScroll = () => {
+      const heroSection = document.getElementById('hero');
+      if (heroSection) {
+        const heroHeight = heroSection.offsetHeight;
+        const scrollPosition = window.scrollY;
+        const halfHeroHeight = heroHeight / 2;
+        
+        setIsVisible(scrollPosition > halfHeroHeight);
+      }
+    };
+
+    // Initial check
+    handleScroll();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isHomePage]);
 
   // Close on outside click
   useEffect(() => {
@@ -86,10 +115,12 @@ export default function ContactFloat() {
   return (
     <div
       ref={containerRef}
-      className="fixed bottom-6 right-6 z-[9999] flex flex-col-reverse items-center gap-3"
+      className={`fixed bottom-6 right-6 z-[9999] flex flex-col-reverse items-center gap-3 transition-all duration-500 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+      }`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      style={{ pointerEvents: 'auto' }}
+      style={{ pointerEvents: isVisible ? 'auto' : 'none' }}
     >
       {/* Main toggle button */}
       <button

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import HeroSection from '../sections/HeroSection';
 import ExperienceSectionSticky from '../sections/ExperienceSectionSticky';
 import DestinationsSection from '../sections/DestinationsSection';
@@ -30,7 +30,9 @@ export default function HomePage({
     activePhilosophyRef,
     showLoader
 }: HomePageProps) {
-    // Start muted to ensure autoplay works on all devices (especially mobile)
+    // Start with sound off (muted) for both mobile and desktop
+    // This matches the actual video state (muted for autoplay compliance)
+    // User can click volume button to unmute
     const [isMuted, setIsMuted] = useState(true);
     
     // Prefetch destinations & gallery data early so images start loading before scroll

@@ -92,19 +92,19 @@ interface SilkPlaneProps {
 
 const SilkPlane = forwardRef<Mesh, SilkPlaneProps>(function SilkPlane({ uniforms }, ref) {
     const { viewport, invalidate } = useThree();
+    const hasRendered = useRef(false);
 
     useLayoutEffect(() => {
         const mesh = ref as React.MutableRefObject<Mesh | null>;
         if (mesh.current) {
             mesh.current.scale.set(viewport.width, viewport.height, 1);
-            // Trigger a re-render when viewport changes
-            invalidate();
+            // Only invalidate once on initial setup or significant viewport changes
+            if (!hasRendered.current || Math.abs(viewport.width - viewport.height) > 0.1) {
+                invalidate();
+                hasRendered.current = true;
+            }
         }
-    }, [ref, viewport, invalidate]);
-
-    useFrame((_state: RootState, _delta: number) => {
-        // Disabled animation per user request: "should not move stuck so it doesnot be heavy"
-    });
+    }, [ref, viewport.width, viewport.height, invalidate]);
 
     return (
         <mesh ref={ref}>
@@ -127,14 +127,11 @@ export interface SilkProps {
 const Silk: React.FC<SilkProps> = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, rotation = 0 }) => {
     const meshRef = useRef<Mesh>(null);
     const [isMobile, setIsMobile] = useState(false);
-    const [canvasKey, setCanvasKey] = useState(0);
 
     useEffect(() => {
         setIsMobile(window.innerWidth < 768);
         const handleResize = () => {
             setIsMobile(window.innerWidth < 768);
-            // Force canvas to re-render by changing key
-            setCanvasKey(prev => prev + 1);
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -153,9 +150,9 @@ const Silk: React.FC<SilkProps> = ({ speed = 5, scale = 1, color = '#7B7481', no
     );
 
     const canvasOptions = useMemo(() => ({
-        // Use lower DPR on mobile for better performance
-        dpr: (isMobile ? 1 : [1, 2]) as [number, number] | number,
-        frameloop: "demand" as const, // Render once and stop to save heavy resources
+        // Use consistent DPR and avoid re-renders
+        dpr: 1, // Fixed DPR to prevent canvas size changes
+        frameloop: "demand" as const, // Render on demand only
         gl: { 
             antialias: false,
             powerPreference: "high-performance" as const,
@@ -163,15 +160,23 @@ const Silk: React.FC<SilkProps> = ({ speed = 5, scale = 1, color = '#7B7481', no
             stencil: false,
             depth: false,
             alpha: true,
-            preserveDrawingBuffer: false,
+            preserveDrawingBuffer: true, // Keep buffer to prevent flicker
         }
-    }), [isMobile]);
+    }), []);
 
     return (
         <Canvas 
-            key={canvasKey} // Force re-mount on resize
             {...canvasOptions}
-            onCreated={({ gl }) => {
+            onCreated={({ gl, invalidate }) => {
+                // Render once on creation
+                invalidate();
+                
+                // Mobile-specific fixes for the canvas element only
+                if (window.innerWidth < 768) {
+                    gl.domElement.style.transform = 'translateZ(0)';
+                    gl.domElement.style.backfaceVisibility = 'hidden';
+                }
+                
                 // Handle context loss
                 gl.domElement.addEventListener('webglcontextlost', (event) => {
                     event.preventDefault();
@@ -180,11 +185,18 @@ const Silk: React.FC<SilkProps> = ({ speed = 5, scale = 1, color = '#7B7481', no
 
                 gl.domElement.addEventListener('webglcontextrestored', () => {
                     console.log('WebGL context restored');
+                    invalidate();
                 }, false);
             }}
             style={{ 
                 pointerEvents: 'none',
-                touchAction: 'none' // Prevent interaction issues
+                touchAction: 'none',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 0
             }}
         >
             <SilkPlane ref={meshRef} uniforms={uniforms} />

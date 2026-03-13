@@ -42,6 +42,78 @@ export function optimizeImageUrl(
 }
 
 /**
+ * Video optimization utilities
+ */
+export function getOptimizedVideoUrl(url: string): string {
+  if (!url) return url;
+  
+  // Skip local assets
+  if (!url.startsWith('http')) return url;
+
+  // For now, return original URL until we have actual optimized variants
+  // This prevents 404 errors when _mobile/_desktop variants don't exist
+  return url;
+  
+  // TODO: Implement when video variants are available
+  // const isMobile = window.innerWidth < 768;
+  // const isSlowConnection = 'connection' in navigator && 
+  //   (navigator as any).connection?.effectiveType === '2g';
+  // 
+  // if (isSlowConnection || isMobile) {
+  //   return getVideoVariant(url, 'mobile');
+  // } else {
+  //   return getVideoVariant(url, 'desktop');
+  // }
+}
+
+function getVideoVariant(url: string, quality: 'mobile' | 'desktop'): string {
+  // If the URL already has quality indicators, return as-is
+  if (url.includes('_mobile') || url.includes('_desktop') || url.includes('_compressed')) {
+    return url;
+  }
+
+  // Try to find mobile/compressed variants by URL manipulation
+  const baseUrl = url.replace(/\.[^/.]+$/, ''); // Remove extension
+  const extension = url.match(/\.[^/.]+$/)?.[0] || '.mp4';
+
+  if (quality === 'mobile') {
+    // Try mobile-specific variants
+    const mobileVariants = [
+      `${baseUrl}_mobile${extension}`,
+      `${baseUrl}_compressed${extension}`,
+      `${baseUrl}_720p${extension}`,
+      url // fallback to original
+    ];
+    return mobileVariants[0]; // For now, return the first variant
+  } else {
+    // Desktop variants
+    const desktopVariants = [
+      `${baseUrl}_desktop${extension}`,
+      `${baseUrl}_1080p${extension}`,
+      url // fallback to original
+    ];
+    return desktopVariants[0]; // For now, return the first variant
+  }
+}
+
+/**
+ * Get video poster image (thumbnail)
+ */
+export function getVideoPoster(videoUrl: string): string {
+  if (!videoUrl) return '';
+  
+  // Convert video URL to poster image URL
+  const posterUrl = videoUrl.replace(/\.(mp4|webm|mov)$/i, '.jpg');
+  
+  // Only optimize if it's an external URL, otherwise return as-is
+  if (posterUrl.startsWith('http')) {
+    return optimizeImageUrl(posterUrl, { width: 1920, quality: 60 });
+  }
+  
+  return posterUrl;
+}
+
+/**
  * Preset sizes for common use cases
  */
 export const imgSize = {
@@ -68,4 +140,15 @@ export const imgSize = {
   /** Full-width hero or detail page images */
   hero: (url: string) =>
     optimizeImageUrl(url, { width: 1920, quality: 80 }),
+} as const;
+
+/**
+ * Video optimization presets
+ */
+export const videoSize = {
+  /** Hero section video - optimized for device and connection */
+  hero: (url: string) => getOptimizedVideoUrl(url),
+  
+  /** Get poster image for video */
+  poster: (url: string) => getVideoPoster(url),
 } as const;
