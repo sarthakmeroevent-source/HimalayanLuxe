@@ -1,26 +1,108 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import SimpleCTA from '../components/common/SimpleCTA';
-import { useGallery } from '../hooks/useGallery';
+import { useGallery, GalleryImage } from '../hooks/useGallery';
+import { optimizeImageUrl } from '../lib/imageOptimizer';
 
-const INITIAL_COUNT = 6;
-const LOAD_MORE_AMOUNT = 8;
+const BATCH_SIZE = 12;
+
+/* ── Pinterest-style card with lazy load + blur-up ── */
+function PinCard({
+    image,
+    index,
+    onClick,
+}: {
+    image: GalleryImage;
+    index: number;
+    onClick: () => void;
+}) {
+    const cardRef = useRef<HTMLDivElement>(null);
+    const [visible, setVisible] = useState(false);
+    const [loaded, setLoaded] = useState(false);
+
+    useEffect(() => {
+        const el = cardRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setVisible(true);
+                    observer.unobserve(el);
+                }
+            },
+            { threshold: 0.01, rootMargin: '300px 0px' }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
+
+    const thumbUrl = optimizeImageUrl(image.image_url, { width: 400, quality: 70 });
+
+    return (
+        <div
+            ref={cardRef}
+            className="group relative overflow-hidden rounded-2xl break-inside-avoid cursor-pointer transform-gpu transition-all duration-500 ease-out mb-3 md:mb-4"
+            style={{
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'translateY(0)' : 'translateY(16px)',
+                transitionDelay: visible ? `${Math.min(index % BATCH_SIZE, 8) * 40}ms` : '0ms',
+            }}
+            onClick={onClick}
+        >
+            <div className="relative w-full overflow-hidden bg-white/5 rounded-2xl">
+                {visible ? (
+                    <img
+                        src={thumbUrl}
+                        alt={image.caption || ''}
+                        decoding="async"
+                        loading="lazy"
+                        onLoad={() => setLoaded(true)}
+                        className={`w-full h-auto object-cover transition-all duration-700 ease-out group-hover:scale-105 ${loaded ? 'opacity-100' : 'opacity-0 blur-sm'}`}
+                    />
+                ) : (
+                    <div className="w-full aspect-[3/4] bg-white/5" />
+                )}
+            </div>
+
+            {/* Hover overlay */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-500 flex items-center justify-center pointer-events-none rounded-2xl">
+                <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                    <ZoomIn className="text-white" size={18} />
+                </div>
+            </div>
+        </div>
+    );
+}
 
 export default function GalleryPage() {
     const { data: galleryImages, isLoading } = useGallery();
-    const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
+    const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+    const sentinelRef = useRef<HTMLDivElement>(null);
 
     const images = galleryImages ?? [];
     const displayedImages = images.slice(0, visibleCount);
-    const hasMore = visibleCount < images.length;
 
-    const handleLoadMore = () => {
-        setVisibleCount(prev => prev + LOAD_MORE_AMOUNT);
-    };
+    // Infinite scroll — load more when sentinel enters viewport
+    useEffect(() => {
+        const el = sentinelRef.current;
+        if (!el || visibleCount >= images.length) return;
 
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setVisibleCount(prev => Math.min(prev + BATCH_SIZE, images.length));
+                }
+            },
+            { rootMargin: '600px 0px' }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [visibleCount, images.length]);
+
+    // Keyboard nav for lightbox
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (selectedImageIndex === null) return;
@@ -39,10 +121,20 @@ export default function GalleryPage() {
     if (isLoading) {
         return (
             <div className="relative min-h-screen pt-32 pb-0">
-                <section className="relative w-full px-6 md:px-12 py-20">
-                    <div className="max-w-[1700px] mx-auto text-center">
+                <section className="relative w-full px-4 md:px-8 py-10">
+                    <div className="max-w-[1400px] mx-auto text-center">
                         <div className="h-4 w-32 mx-auto rounded bg-white/5 animate-pulse mb-6" />
                         <div className="h-12 w-64 mx-auto rounded bg-white/5 animate-pulse mb-8" />
+                        {/* Skeleton pins */}
+                        <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-3 md:gap-4">
+                            {Array.from({ length: 15 }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="mb-3 md:mb-4 rounded-2xl bg-white/5 animate-pulse break-inside-avoid"
+                                    style={{ height: `${180 + (i % 3) * 60}px` }}
+                                />
+                            ))}
+                        </div>
                     </div>
                 </section>
             </div>
@@ -51,9 +143,10 @@ export default function GalleryPage() {
 
     return (
         <div className="relative min-h-screen pt-32 pb-0">
-            <section className="relative w-full px-8 md:px-16 py-10 z-10">
-                <div className="max-w-[1700px] mx-auto">
-                    <div className="text-center mb-16 md:mb-[104px]">
+            <section className="relative w-full px-4 md:px-8 py-10 z-10">
+                <div className="max-w-[1400px] mx-auto">
+                    {/* Header */}
+                    <div className="text-center mb-12 md:mb-16">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -77,63 +170,28 @@ export default function GalleryPage() {
                         </div>
                     ) : (
                         <>
-                            <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8 min-h-[400px]">
-                                <AnimatePresence mode='popLayout'>
-                                    {displayedImages.map((image, index) => (
-                                        <motion.div
-                                            key={image.id}
-                                            layout
-                                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                                            transition={{ duration: 0.8, delay: (index % INITIAL_COUNT) * 0.05, ease: [0.22, 1, 0.36, 1] }}
-                                            className="group relative overflow-hidden rounded-[24px] break-inside-avoid shadow-2xl cursor-pointer"
-                                            onClick={() => setSelectedImageIndex(index)}
-                                        >
-                                            <div className="relative w-full overflow-hidden bg-white/5">
-                                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-                                                    <img src="/LOGO.svg" alt="" className="w-24 md:w-32" />
-                                                </div>
-                                                <img
-                                                    src={image.image_url}
-                                                    alt={image.caption || ''}
-                                                    className="w-full h-auto object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110 relative z-10"
-                                                    loading="lazy"
-                                                />
-                                            </div>
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 flex items-center justify-center pointer-events-none z-20">
-                                                <div className="w-14 h-14 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center translate-y-8 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                                                    <ZoomIn className="text-white" size={24} />
-                                                </div>
-                                            </div>
-                                            <div className="absolute inset-0 border border-white/0 group-hover:border-white/10 transition-colors duration-700 pointer-events-none z-30"></div>
-                                        </motion.div>
-                                    ))}
-                                </AnimatePresence>
+                            {/* Pinterest masonry grid — tighter columns, smaller cards */}
+                            <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-3 md:gap-4">
+                                {displayedImages.map((image, index) => (
+                                    <PinCard
+                                        key={image.id}
+                                        image={image}
+                                        index={index}
+                                        onClick={() => setSelectedImageIndex(index)}
+                                    />
+                                ))}
                             </div>
 
-                            {hasMore && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    className="flex justify-center mt-20"
-                                >
-                                    <button
-                                        onClick={handleLoadMore}
-                                        className="group relative overflow-hidden rounded-full border border-gold/30 px-12 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10"
-                                    >
-                                        <span className="relative z-10 text-[10px] font-medium uppercase tracking-[0.4em] text-gold transition-colors duration-700 group-hover:text-white">
-                                            Discover More
-                                        </span>
-                                    </button>
-                                </motion.div>
+                            {/* Infinite scroll sentinel */}
+                            {visibleCount < images.length && (
+                                <div ref={sentinelRef} className="h-10" />
                             )}
                         </>
                     )}
                 </div>
             </section>
 
+            {/* Lightbox */}
             {typeof document !== 'undefined' && createPortal(
                 <AnimatePresence>
                     {selectedImageIndex !== null && images[selectedImageIndex] && (
@@ -171,9 +229,9 @@ export default function GalleryPage() {
                                         onClick={(e) => e.stopPropagation()}
                                     >
                                         <img
-                                            src={images[selectedImageIndex].image_url}
+                                            src={optimizeImageUrl(images[selectedImageIndex].image_url, { width: 1400, quality: 85 })}
                                             alt={images[selectedImageIndex].caption || ''}
-                                            className="max-w-full max-h-[85vh] object-contain rounded-[24px] shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+                                            className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)]"
                                         />
                                     </motion.div>
                                 </AnimatePresence>

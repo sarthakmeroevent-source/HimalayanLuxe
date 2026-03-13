@@ -28,23 +28,27 @@ function ScrollToTop() {
             window.history.scrollRestoration = 'manual';
         }
 
-        // Multiple aggressive scroll resets
+        // If Lenis smooth scroll is active, use it to scroll to top immediately
+        const lenis = (window as any).__lenis;
+        if (lenis) {
+            lenis.scrollTo(0, { immediate: true });
+        }
+
+        // Also reset native scroll for mobile / fallback
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
 
-        // Also scroll the primary scroll container if it exists
-        const scrollContainer = document.querySelector('main') || document.documentElement;
-        if (scrollContainer) {
-            scrollContainer.scrollTop = 0;
-        }
-
-        // Additional reset after a tiny delay to catch any post-render adjustments
+        // Additional reset after a tiny delay to catch post-render adjustments
         const timer = setTimeout(() => {
+            const lenisDelayed = (window as any).__lenis;
+            if (lenisDelayed) {
+                lenisDelayed.scrollTo(0, { immediate: true });
+            }
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
-        }, 10);
+        }, 50);
 
         return () => clearTimeout(timer);
     }, [pathname, search]);
