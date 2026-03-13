@@ -25,6 +25,10 @@ export default function DestinationDetailPage() {
     const startX = useRef(0);
     const scrollLeftRef = useRef(0);
 
+    // Touch/swipe handling for modal
+    const touchStartX = useRef(0);
+    const touchStartY = useRef(0);
+
     const aboutRef = useFadeInView();
 
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -41,6 +45,32 @@ export default function DestinationDetailPage() {
         const x = e.pageX - carouselRef.current.offsetLeft;
         if (Math.abs(x - startX.current) > 5) hasMoved.current = true;
         carouselRef.current.scrollLeft = scrollLeftRef.current - (x - startX.current) * 1.5;
+    };
+
+    // Touch handlers for modal swipe
+    const handleTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX;
+        touchStartY.current = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        if (selectedImageIndex === null || !destination) return;
+        
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+        const deltaX = touchStartX.current - touchEndX;
+        const deltaY = Math.abs(touchStartY.current - touchEndY);
+        
+        // Only trigger swipe if horizontal movement is greater than vertical (prevent conflict with scroll)
+        if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > deltaY) {
+            if (deltaX > 0) {
+                // Swipe left - next image
+                setSelectedImageIndex(prev => prev !== null && prev < destination.gallery.length - 1 ? prev + 1 : 0);
+            } else {
+                // Swipe right - previous image
+                setSelectedImageIndex(prev => prev !== null && prev > 0 ? prev - 1 : destination.gallery.length - 1);
+            }
+        }
     };
 
     const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end start"] });
@@ -105,10 +135,10 @@ export default function DestinationDetailPage() {
                     <div className="absolute inset-0 bg-black/40" />
                 </motion.div>
 
-                <div className="absolute inset-0 z-10 flex flex-col justify-end p-8 md:p-12 lg:p-16 max-w-[1920px] mx-auto w-full pb-16">
+                <div className="absolute inset-0 z-10 flex flex-col justify-end p-8 md:p-12 lg:p-16 max-w-[1920px] mx-auto w-full pb-14 md:pb-16">
                     <div className="animate-fade-in-up">
-                        {/* Breadcrumb nav */}
-                        <div className="inline-flex items-center gap-2.5 mb-6 text-[11px] tracking-[0.15em] uppercase bg-black/40 backdrop-blur-sm rounded-full px-5 py-2.5 border border-white/10">
+                        {/* Breadcrumb nav - hidden on mobile */}
+                        <div className="hidden md:inline-flex items-center gap-2.5 mb-6 text-[11px] tracking-[0.15em] uppercase bg-black/40 backdrop-blur-sm rounded-full px-5 py-2.5 border border-white/10">
                             <button onClick={() => navigate('/destinations')}
                                 className="text-white/80 hover:text-gold transition-colors flex items-center gap-2 group">
                                 <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
@@ -135,14 +165,27 @@ export default function DestinationDetailPage() {
 
             {/* Info + CTA — right after hero */}
             <section className="relative z-20 w-full px-4 sm:px-8 lg:px-12 py-4 md:py-6 max-w-[1920px] mx-auto">
-                {/* Section header */}
-                <div ref={aboutRef} className="fade-in-view flex items-center gap-3 mb-6">
-                    <h2 className="text-lg md:text-2xl font-serif text-white">About this <span className="liquid-gold-text">Destination</span></h2>
-                </div>
-
                 <div className="max-w-4xl">
                     <div className="space-y-6">
-                        <p className="text-white/60 text-sm md:text-base leading-[1.8]">{destination.fullDescription}</p>
+                        {/* Description in a styled box with title inside */}
+                        <div className="relative p-6 md:p-8 rounded-2xl bg-gradient-to-br from-white/[0.05] to-white/[0.02] border border-white/[0.12] backdrop-blur-md shadow-2xl shadow-black/20">
+                            {/* Decorative corner accent */}
+                            <div className="absolute top-0 left-0 w-12 h-12 border-l-2 border-t-2 border-gold/40 rounded-tl-2xl"></div>
+                            <div className="absolute bottom-0 right-0 w-12 h-12 border-r-2 border-b-2 border-gold/40 rounded-br-2xl"></div>
+                            
+                            {/* Subtle inner glow */}
+                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold/[0.02] via-transparent to-gold/[0.01] pointer-events-none"></div>
+                            
+                            {/* Title inside the box */}
+                            <div className="flex items-center gap-3 mb-6 relative z-10">
+                                <h2 className="text-lg md:text-2xl font-serif text-white">About this <span className="liquid-gold-text">Destination</span></h2>
+                            </div>
+                            
+                            <p className="text-white/70 text-sm md:text-base leading-[1.8] relative z-10">
+                                {destination.fullDescription}
+                            </p>
+                        </div>
+                        
                         {destination.features.length > 0 && (
                             <div className="flex flex-wrap gap-2.5">
                                 {destination.features.map((f, i) => (
@@ -155,50 +198,83 @@ export default function DestinationDetailPage() {
                     </div>
                 </div>
 
-                {/* Gallery preview — bento style */}
+                {/* Gallery preview — mobile: large + thumbnails, desktop: bento style */}
                 {destination.gallery && destination.gallery.length > 0 && (
                     <div className="mt-8">
-                        <div className="grid grid-cols-3 grid-rows-2 gap-1.5" style={{ height: 'clamp(250px, 32vw, 420px)' }}>
-                            {/* Large left image — spans 2 rows */}
-                            <div className="row-span-2 relative cursor-pointer group overflow-hidden rounded-xl"
+                        {/* Mobile Layout: Large image + small thumbnails */}
+                        <div className="block md:hidden">
+                            {/* Large main image */}
+                            <div className="relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group mb-3"
                                 onClick={() => setSelectedImageIndex(0)}>
                                 <img src={imgSize.galleryLarge(destination.gallery[0])} alt={`${destination.name} 1`}
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" decoding="async" />
+                                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-300"></div>
                             </div>
-
-                            {/* Top-right 2 images */}
-                            {destination.gallery.slice(1, 3).map((img, idx) => (
-                                <div key={idx} className="relative cursor-pointer group overflow-hidden rounded-xl"
-                                    onClick={() => setSelectedImageIndex(idx + 1)}>
-                                    <img src={imgSize.galleryThumb(img)} alt={`${destination.name} ${idx + 2}`}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
-                                </div>
-                            ))}
-
-                            {/* Bottom-right 2 images */}
-                            {destination.gallery.slice(3, 5).map((img, idx) => (
-                                <div key={idx} className="relative cursor-pointer group overflow-hidden rounded-xl"
-                                    onClick={() => {
-                                        if (idx === 1 && destination.gallery.length > 5) {
-                                            document.getElementById('full-gallery')?.scrollIntoView({ behavior: 'smooth' });
-                                        } else {
-                                            setSelectedImageIndex(idx + 3);
-                                        }
-                                    }}>
-                                    <img src={imgSize.galleryThumb(img)} alt={`${destination.name} ${idx + 4}`}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
-                                    {idx === 1 && destination.gallery.length > 5 && (
-                                        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center gap-2.5 rounded-xl hover:bg-black/50 transition-colors">
-                                            <svg className="w-4 h-4 text-white/90" viewBox="0 0 24 24" fill="currentColor">
-                                                <circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/>
-                                                <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
-                                                <circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/>
-                                            </svg>
-                                            <span className="text-white text-sm font-medium tracking-wide">More images</span>
+                            
+                            {/* Small thumbnails row */}
+                            {destination.gallery.length > 1 && (
+                                <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+                                    {destination.gallery.slice(1, Math.min(destination.gallery.length, 6)).map((img, idx) => (
+                                        <div key={idx} className="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden cursor-pointer group"
+                                            onClick={() => setSelectedImageIndex(idx + 1)}>
+                                            <img src={imgSize.galleryThumb(img)} alt={`${destination.name} ${idx + 2}`}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" decoding="async" />
+                                        </div>
+                                    ))}
+                                    {destination.gallery.length > 6 && (
+                                        <div className="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden cursor-pointer bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center"
+                                            onClick={() => document.getElementById('full-gallery')?.scrollIntoView({ behavior: 'smooth' })}>
+                                            <span className="text-white text-sm font-medium">+{destination.gallery.length - 6}</span>
                                         </div>
                                     )}
                                 </div>
-                            ))}
+                            )}
+                        </div>
+
+                        {/* Desktop Layout: Bento grid */}
+                        <div className="hidden md:block">
+                            <div className="grid grid-cols-3 grid-rows-2 gap-1.5" style={{ height: 'clamp(250px, 32vw, 420px)' }}>
+                                {/* Large left image — spans 2 rows */}
+                                <div className="row-span-2 relative cursor-pointer group overflow-hidden rounded-xl"
+                                    onClick={() => setSelectedImageIndex(0)}>
+                                    <img src={imgSize.galleryLarge(destination.gallery[0])} alt={`${destination.name} 1`}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" decoding="async" />
+                                </div>
+
+                                {/* Top-right 2 images */}
+                                {destination.gallery.slice(1, 3).map((img, idx) => (
+                                    <div key={idx} className="relative cursor-pointer group overflow-hidden rounded-xl"
+                                        onClick={() => setSelectedImageIndex(idx + 1)}>
+                                        <img src={imgSize.galleryThumb(img)} alt={`${destination.name} ${idx + 2}`}
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
+                                    </div>
+                                ))}
+
+                                {/* Bottom-right 2 images */}
+                                {destination.gallery.slice(3, 5).map((img, idx) => (
+                                    <div key={idx} className="relative cursor-pointer group overflow-hidden rounded-xl"
+                                        onClick={() => {
+                                            if (idx === 1 && destination.gallery.length > 5) {
+                                                document.getElementById('full-gallery')?.scrollIntoView({ behavior: 'smooth' });
+                                            } else {
+                                                setSelectedImageIndex(idx + 3);
+                                            }
+                                        }}>
+                                        <img src={imgSize.galleryThumb(img)} alt={`${destination.name} ${idx + 4}`}
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
+                                        {idx === 1 && destination.gallery.length > 5 && (
+                                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center gap-2.5 rounded-xl hover:bg-black/50 transition-colors">
+                                                <svg className="w-4 h-4 text-white/90" viewBox="0 0 24 24" fill="currentColor">
+                                                    <circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/>
+                                                    <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+                                                    <circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/>
+                                                </svg>
+                                                <span className="text-white text-sm font-medium tracking-wide">More images</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 )}
@@ -249,7 +325,9 @@ export default function DestinationDetailPage() {
                     {selectedImageIndex !== null && destination && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/90 backdrop-blur-md p-4 md:p-8"
-                            onClick={() => setSelectedImageIndex(null)}>
+                            onClick={() => setSelectedImageIndex(null)}
+                            onTouchStart={handleTouchStart}
+                            onTouchEnd={handleTouchEnd}>
                             <div className="absolute top-8 left-6 md:top-10 md:left-12 z-[110]">
                                 <img src="/LOGO.svg" alt="Himalayan Luxe" className="h-10 md:h-12 w-auto opacity-70" />
                             </div>
@@ -257,6 +335,18 @@ export default function DestinationDetailPage() {
                                 className="absolute top-6 right-6 md:top-10 md:right-10 text-white/70 hover:text-gold transition-colors z-[110] p-3 bg-white/5 hover:bg-white/10 rounded-full">
                                 <X size={28} />
                             </button>
+
+                            {/* Mobile swipe indicator */}
+                            <div className="absolute top-20 left-1/2 transform -translate-x-1/2 md:hidden z-[110]">
+                                <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm rounded-full px-4 py-2 border border-white/10">
+                                    <span className="text-white/60 text-xs">Swipe to navigate</span>
+                                    <div className="flex gap-1">
+                                        <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+                                        <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+                                        <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div className="relative flex-1 w-full flex items-center justify-center min-h-0 py-8">
                                 <button onClick={(e) => { e.stopPropagation(); setSelectedImageIndex(prev => prev !== null && prev > 0 ? prev - 1 : destination.gallery.length - 1); }}
@@ -266,7 +356,8 @@ export default function DestinationDetailPage() {
                                 <motion.img key={selectedImageIndex} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
                                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                     src={imgSize.hero(destination.gallery[selectedImageIndex])} alt={`Gallery view ${selectedImageIndex + 1}`}
-                                    className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl shadow-black/50" onClick={(e) => e.stopPropagation()} />
+                                    className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl shadow-black/50" 
+                                    onClick={(e) => e.stopPropagation()} />
                                 <button onClick={(e) => { e.stopPropagation(); setSelectedImageIndex(prev => prev !== null && prev < destination.gallery.length - 1 ? prev + 1 : 0); }}
                                     className="absolute right-4 md:right-10 text-white/50 hover:text-gold transition-colors p-4 z-[110] bg-white/5 hover:bg-white/10 rounded-full hidden md:flex">
                                     <ChevronRight size={36} />
@@ -298,7 +389,7 @@ export default function DestinationDetailPage() {
             {allDestinations && allDestinations.length > 1 && (() => {
                 const otherDestinations = allDestinations.filter(d => (d.slug || d.id) !== id);
                 return (
-                <section className="relative z-20 w-full py-10 md:py-14 max-w-[1920px] mx-auto">
+                <section className="relative z-20 w-full py-16 md:py-16 max-w-[1920px] mx-auto">
                     <div className="flex items-center justify-between mb-6 px-4 sm:px-8 lg:px-12">
                         <div>
                             <h2 className="text-lg md:text-xl font-serif text-white">Explore More <span className="liquid-gold-text">Destinations</span></h2>
@@ -309,20 +400,20 @@ export default function DestinationDetailPage() {
                                 const el = document.getElementById('more-dest-scroll');
                                 if (el) el.scrollBy({ left: -340, behavior: 'smooth' });
                             }}
-                                className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:border-gold/50 hover:text-gold transition-all duration-300">
-                                <ArrowLeft size={20} />
+                                className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:border-gold/50 hover:text-gold transition-all duration-300">
+                                <ArrowLeft size={14} />
                             </button>
                             <button onClick={() => {
                                 const el = document.getElementById('more-dest-scroll');
                                 if (el) el.scrollBy({ left: 340, behavior: 'smooth' });
                             }}
-                                className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:border-gold/50 hover:text-gold transition-all duration-300">
-                                <ChevronRight size={20} />
+                                className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:border-gold/50 hover:text-gold transition-all duration-300">
+                                <ChevronRight size={14} />
                             </button>
                             <button onClick={() => navigate('/destinations')}
-                                className="hidden sm:flex items-center gap-2 px-6 py-3 md:px-8 md:py-3.5 rounded-full border border-white/20 text-white/60 text-xs md:text-sm tracking-wide hover:border-gold/50 hover:text-gold transition-all duration-300">
+                                className="hidden sm:flex items-center gap-1.5 px-4 py-2 md:px-5 md:py-2.5 rounded-full border border-white/20 text-white/60 text-[10px] md:text-xs tracking-wide hover:border-gold/50 hover:text-gold transition-all duration-300">
                                 View All
-                                <ChevronRight size={16} />
+                                <ChevronRight size={12} />
                             </button>
                         </div>
                     </div>

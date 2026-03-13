@@ -209,7 +209,7 @@ export default function ExperienceSectionSticky({
 
     const isAnimatingRef = useRef(false);
 
-    // Auto-play logic for mobile carousel
+    // Auto-play logic for mobile carousel - optimized for performance
     useEffect(() => {
         if (isDesktop || isInteracting || !carouselRef.current) return;
 
@@ -220,24 +220,27 @@ export default function ExperienceSectionSticky({
             const nextIndex = (activePhilosophy + 1) % philosophies.length;
             const cardWidth = container.offsetWidth * 0.85;
             const gap = 24; // gap-6
+            const targetScroll = nextIndex * (cardWidth + gap);
 
             isAnimatingRef.current = true;
 
-            gsap.to(container, {
-                scrollLeft: nextIndex * (cardWidth + gap),
-                duration: 0.8,
-                ease: "power2.inOut",
-                onComplete: () => {
-                    isAnimatingRef.current = false;
-                    setActivePhilosophy(nextIndex);
-                    activePhilosophyRef.current = nextIndex;
-                }
+            // Use native smooth scrolling instead of GSAP for better mobile performance
+            container.scrollTo({
+                left: targetScroll,
+                behavior: 'smooth'
             });
+
+            // Update state after animation completes
+            setTimeout(() => {
+                isAnimatingRef.current = false;
+                setActivePhilosophy(nextIndex);
+                activePhilosophyRef.current = nextIndex;
+            }, 600); // Slightly less than scroll duration
+
         }, 3000);
 
         return () => {
             clearTimeout(timer);
-            gsap.killTweensOf(carouselRef.current);
         };
     }, [isDesktop, isInteracting, activePhilosophy, philosophies.length, setActivePhilosophy]);
 
@@ -252,18 +255,26 @@ export default function ExperienceSectionSticky({
                 <div
                     ref={carouselRef}
                     className="flex overflow-x-auto gap-6 snap-x snap-proximity scrollbar-hide pb-8"
-                    style={{ WebkitOverflowScrolling: 'touch' }}
+                    style={{ 
+                        WebkitOverflowScrolling: 'touch',
+                        transform: 'translateZ(0)', // Force GPU acceleration
+                        willChange: 'scroll-position' // Optimize for scrolling
+                    }}
                     onMouseEnter={() => setIsInteracting(true)}
                     onMouseLeave={() => setIsInteracting(false)}
                     onTouchStart={() => setIsInteracting(true)}
                     onTouchEnd={() => setIsInteracting(false)}
                     onScroll={(e) => {
                         if (isAnimatingRef.current) return;
+                        
+                        // Throttle scroll events for better performance
                         const target = e.target as HTMLDivElement;
                         const cardWidth = target.offsetWidth * 0.85;
                         const gap = 24;
                         const index = Math.round(target.scrollLeft / (cardWidth + gap));
-                        if (index !== activePhilosophy) {
+                        
+                        // Only update if index actually changed
+                        if (index !== activePhilosophy && index >= 0 && index < philosophies.length) {
                             setActivePhilosophy(index);
                             activePhilosophyRef.current = index;
                         }

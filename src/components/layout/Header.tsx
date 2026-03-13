@@ -63,20 +63,19 @@ export default function Header({ isScrolled, showLoader, menuOpen, setMenuOpen }
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="flex items-center gap-3"
+                    className="flex items-center"
                 >
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
-                        className="text-white hover:opacity-70 transition-opacity font-['Manrope'] text-[11px] md:text-[13px] tracking-[0.3em] uppercase font-medium focus:outline-none"
+                        className="text-white hover:opacity-70 transition-opacity flex items-center gap-3 focus:outline-none py-3 px-2"
                     >
-                        MENU
-                    </button>
-                    <button
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        className="text-white hover:opacity-70 transition-opacity flex flex-col items-end gap-[6px] focus:outline-none"
-                    >
-                        <div className="w-8 h-[1px] bg-white opacity-80"></div>
-                        <div className="w-12 h-[1px] bg-white opacity-80"></div>
+                        <span className="font-['Manrope'] text-[11px] md:text-[13px] tracking-[0.3em] uppercase font-medium">
+                            MENU
+                        </span>
+                        <div className="flex flex-col items-end gap-[6px]">
+                            <div className="w-8 h-[1px] bg-white opacity-80"></div>
+                            <div className="w-12 h-[1px] bg-white opacity-80"></div>
+                        </div>
                     </button>
                 </motion.div>
             )}

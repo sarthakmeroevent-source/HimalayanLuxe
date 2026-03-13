@@ -57,6 +57,69 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
 
     useEffect(() => {
         const video = videoRef.current;
+        const section = sectionRef.current;
+        
+        if (!video || !section || hero?.media_type !== 'video') return;
+
+        // Intersection Observer to pause video when out of view
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.target === section) {
+                        if (entry.isIntersecting) {
+                            // Video is in view - resume if it was playing
+                            if (video.paused && !isIOS) {
+                                video.play().catch(e => console.log("Resume play failed:", e));
+                            }
+                        } else {
+                            // Video is out of view - pause to save resources
+                            if (!video.paused) {
+                                video.pause();
+                                console.log("Video paused - out of view");
+                            }
+                        }
+                    }
+                });
+            },
+            {
+                threshold: 0.5, // Trigger when 50% of video is visible
+                rootMargin: '0px 0px -30% 0px' // Very aggressive margin to pause sooner
+            }
+        );
+
+        observer.observe(section);
+
+        // Additional scroll-based fallback
+        const handleScroll = () => {
+            if (!section || !video) return;
+            
+            const rect = section.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            
+            // If hero section is mostly out of view (less than 40% visible)
+            if (rect.bottom < windowHeight * 0.4) {
+                if (!video.paused) {
+                    video.pause();
+                    console.log("Video paused - scroll fallback");
+                }
+            } else if (rect.top < windowHeight * 0.6) {
+                // If hero section is mostly in view and video is paused
+                if (video.paused && !isIOS) {
+                    video.play().catch(e => console.log("Resume play failed - scroll fallback:", e));
+                }
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, [hero?.media_type, isIOS]);
+
+    useEffect(() => {
+        const video = videoRef.current;
         if (video && hero?.media_type === 'video') {
             // Mobile-specific optimizations
             if (isMobile) {
