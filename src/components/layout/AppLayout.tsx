@@ -4,6 +4,7 @@ import Loader from '../ui/Loader';
 import Header from './Header';
 import NavigationOverlay from './NavigationOverlay';
 import Footer from './Footer';
+import OfflineBanner from '../common/OfflineBanner';
 
 interface AppLayoutProps {
     children: ReactNode;
@@ -36,6 +37,8 @@ export default function AppLayout({
             </div>
 
             <Loader showLoader={showLoader} isDesktop={isDesktop} />
+
+            <OfflineBanner />
 
             <Header
                 isScrolled={isScrolled}

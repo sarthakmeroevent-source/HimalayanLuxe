@@ -5,9 +5,10 @@ import { useGallery } from "../hooks/useGallery";
 import { cn } from "../lib/utils";
 import { useFadeInView } from "../hooks/useFadeInView";
 import { imgSize } from "../lib/imageOptimizer";
+import SectionUnavailable from "../components/common/SectionUnavailable";
 
 const GallerySection = () => {
-  const { data: images, isLoading } = useGallery();
+  const { data: images, isLoading, isError } = useGallery();
   const headerRef = useFadeInView();
   const buttonRef = useFadeInView();
 
@@ -43,7 +44,9 @@ const GallerySection = () => {
           <div className="flex justify-center py-16 md:py-[72px]">
             <div className="w-8 h-8 border-2 border-white/10 border-t-[#D4AF37] rounded-full animate-spin" />
           </div>
-        ) : galleryItems.length === 0 ? null : (
+        ) : (isError || galleryItems.length === 0) ? (
+          <SectionUnavailable message="Gallery is temporarily unavailable" />
+        ) : (
           <div className="w-full mb-12">
             <div className="flex h-full w-full items-center justify-center overflow-hidden bg-transparent">
               <GalleryExpand items={galleryItems} />

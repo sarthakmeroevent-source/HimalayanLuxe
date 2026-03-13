@@ -40,6 +40,9 @@ export function useScrollHandler({
                 infinite: false,
             });
 
+            // Expose Lenis globally so ScrollToTop can reset scroll position
+            (window as any).__lenis = lenis;
+
             lenis.on('scroll', ScrollTrigger.update);
 
             tick = (time: number) => {
@@ -120,7 +123,10 @@ export function useScrollHandler({
         ScrollTrigger.refresh();
 
         return () => {
-            if (lenis) lenis.destroy();
+            if (lenis) {
+                lenis.destroy();
+                (window as any).__lenis = null;
+            }
             if (tick) gsap.ticker.remove(tick);
             window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('resize', handleResize);

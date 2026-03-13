@@ -3,33 +3,18 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SimpleCTA from '../components/common/SimpleCTA';
 import { Sparkles, Heart, Crown, Award } from 'lucide-react';
-import { useAboutContent, useAboutStats, useTeamMembers } from '../hooks/useAboutContent';
-
-// Fallback data
-const fallbackStats = [
-    { id: '1', number: '500+', label: 'Luxury Events', sort_order: 0 },
-    { id: '2', number: '50+', label: 'Countries', sort_order: 1 },
-    { id: '3', number: '15+', label: 'Years Excellence', sort_order: 2 },
-    { id: '4', number: '100%', label: 'Satisfaction', sort_order: 3 },
-];
+import { useAboutContent, useAboutStats, useTeamMembers, type TeamMember, type AboutStat } from '../hooks/useAboutContent';
+import SectionUnavailable from '../components/common/SectionUnavailable';
 
 const statIcons = [Crown, Sparkles, Award, Heart];
 
-const fallbackTeam = [
-    { id: '1', name: 'Sarthak Sharma', role: 'Founder & CEO', image_url: '/ceo.png', bio: 'Visionary leader with a passion for transforming Nepal into a world-class luxury event destination.', sort_order: 0 },
-    { id: '2', name: 'Aashan Khatri', role: 'Head of Operations', image_url: '/HERO.png', bio: 'The engine behind every seamless celebration. Orchestrates logistics and execution with precision.', sort_order: 1 },
-    { id: '3', name: 'Priya Thapa', role: 'Design Lead', image_url: '/HERO.png', bio: 'A creative force who translates emotions into spaces with elegance and deep aesthetic understanding.', sort_order: 2 },
-];
+function getInitials(name: string) {
+    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
 
-const fallbackBody = [
-    'We know these landscapes intimately — from the snow-capped peaks to the serene lakesides. Our clients don\'t just visit Nepal; they experience it as honored guests of the land itself.',
-    'Our curated network of the finest vendors, venues, and artisans ensures every celebration is flawless. Relationships built on trust and a shared pursuit of excellence.',
-    'A team of diverse backgrounds in event design, logistics, hospitality, and creative direction. No detail overlooked, no vision too ambitious.',
-    'From the first conversation to the last dance — we make the entire journey as pleasurable and stress-free as possible. You dream it, we orchestrate it.',
-];
-
-function FlipCard({ member, index }: { member: typeof fallbackTeam[0]; index: number }) {
+function FlipCard({ member, index }: { member: TeamMember; index: number }) {
     const [flipped, setFlipped] = useState(false);
+    const [imgFailed, setImgFailed] = useState(!member.image_url);
     return (
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
             transition={{ duration: 0.7, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
@@ -39,7 +24,15 @@ function FlipCard({ member, index }: { member: typeof fallbackTeam[0]; index: nu
                 style={{ transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
                 {/* Front */}
                 <div className="absolute inset-0 rounded-2xl overflow-hidden [backface-visibility:hidden] border border-white/10">
-                    <img src={member.image_url} alt={member.name} className="w-full h-full object-cover" draggable={false} />
+                    {imgFailed ? (
+                        <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: 'linear-gradient(160deg, rgba(10,25,18,0.97), rgba(5,15,10,0.97))' }}>
+                            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-2 border-gold/30 flex items-center justify-center mb-4">
+                                <span className="font-serif text-gold/80 text-3xl md:text-4xl tracking-wide">{getInitials(member.name)}</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <img src={member.image_url} alt={member.name} className="w-full h-full object-cover" draggable={false} onError={() => setImgFailed(true)} />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
                         <h3 className="font-serif text-white text-xl md:text-2xl mb-1">{member.name}</h3>
@@ -71,16 +64,8 @@ function FlipCard({ member, index }: { member: typeof fallbackTeam[0]; index: nu
 
 export default function AboutPage() {
     const { data: aboutContent } = useAboutContent();
-    const { data: dbStats } = useAboutStats();
-    const { data: dbTeam } = useTeamMembers();
-
-    const stats = dbStats && dbStats.length > 0 ? dbStats : fallbackStats;
-    const team = dbTeam && dbTeam.length > 0 ? dbTeam : fallbackTeam;
-
-    // Parse body: DB stores paragraphs separated by blank lines, or use fallback
-    const bodyParagraphs = aboutContent?.body
-        ? aboutContent.body.split(/\n\s*\n/).filter(Boolean)
-        : fallbackBody;
+    const { data: stats } = useAboutStats();
+    const { data: team } = useTeamMembers();
 
     const heading = aboutContent?.subtitle || 'Curating memories beyond your imagination. Promoting Nepal as a global wedding destination hub.';
 
@@ -117,7 +102,6 @@ export default function AboutPage() {
                             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             className="relative"
                         >
-                            {/* Decorative background element */}
                             <div className="absolute -top-8 -left-8 w-32 h-32 bg-gold/5 rounded-full blur-[60px] pointer-events-none" />
                             
                             <div className="glass-card rounded-3xl p-8 md:p-12 border border-gold/20 bg-gradient-to-br from-gold/5 via-transparent to-gold/5 backdrop-blur-sm relative z-10">
@@ -194,35 +178,43 @@ export default function AboutPage() {
                         <span className="text-gold text-[11px] tracking-[0.4em] uppercase font-medium block mb-4">The Visionaries</span>
                         <h2 className="font-serif text-white/95 text-2xl md:text-3xl lg:text-[2.5rem]">Our Team</h2>
                     </motion.div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                        {team.map((member, i) => (
-                            <FlipCard key={member.id} member={member} index={i} />
-                        ))}
-                    </div>
+                    {team && team.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                            {team.map((member, i) => (
+                                <FlipCard key={member.id} member={member} index={i} />
+                            ))}
+                        </div>
+                    ) : (
+                        <SectionUnavailable message="Team information is temporarily unavailable" />
+                    )}
                 </div>
             </section>
 
             {/* Metrics */}
             <section className="relative w-full px-8 md:px-16 py-12 md:py-20 z-10">
                 <div className="max-w-[1400px] mx-auto">
-                    <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                        className="glass-card relative overflow-hidden rounded-[40px] p-8 md:p-16 border border-gold/20">
-                        <div className="absolute inset-0 bg-gradient-to-r from-gold/5 via-transparent to-gold/5" />
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 relative z-10">
-                            {stats.map((stat, i) => {
-                                const Icon = statIcons[i % statIcons.length];
-                                return (
-                                    <div key={stat.id} className="flex flex-col items-center text-center group">
-                                        <div className="mb-6 p-4 rounded-full bg-white/5 border border-white/10 group-hover:border-gold/50 transition-colors duration-500">
-                                            <Icon className="w-6 h-6 text-gold opacity-80" />
+                    {stats && stats.length > 0 ? (
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                            className="glass-card relative overflow-hidden rounded-[40px] p-8 md:p-16 border border-gold/20">
+                            <div className="absolute inset-0 bg-gradient-to-r from-gold/5 via-transparent to-gold/5" />
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 relative z-10">
+                                {stats.map((stat, i) => {
+                                    const Icon = statIcons[i % statIcons.length];
+                                    return (
+                                        <div key={stat.id} className="flex flex-col items-center text-center group">
+                                            <div className="mb-6 p-4 rounded-full bg-white/5 border border-white/10 group-hover:border-gold/50 transition-colors duration-500">
+                                                <Icon className="w-6 h-6 text-gold opacity-80" />
+                                            </div>
+                                            <div className="font-serif text-4xl md:text-5xl lg:text-6xl text-white/95 mb-3 drop-shadow-[0_0_15px_rgba(212,175,55,0.3)] group-hover:scale-105 transition-transform duration-500">{stat.number}</div>
+                                            <div className="text-gold text-xs tracking-[0.2em] uppercase font-medium">{stat.label}</div>
                                         </div>
-                                        <div className="font-serif text-4xl md:text-5xl lg:text-6xl text-white/95 mb-3 drop-shadow-[0_0_15px_rgba(212,175,55,0.3)] group-hover:scale-105 transition-transform duration-500">{stat.number}</div>
-                                        <div className="text-gold text-xs tracking-[0.2em] uppercase font-medium">{stat.label}</div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </motion.div>
+                                    );
+                                })}
+                            </div>
+                        </motion.div>
+                    ) : (
+                        <SectionUnavailable message="Statistics are temporarily unavailable" />
+                    )}
                 </div>
             </section>
 
