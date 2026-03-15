@@ -200,7 +200,7 @@ export default function DestinationDetailPage() {
 
                 {/* Gallery preview — mobile: large + thumbnails, desktop: bento style */}
                 {destination.gallery && destination.gallery.length > 0 && (
-                    <div className="mt-8">
+                    <div className="mt-8 max-w-full">
                         {/* Mobile Layout: Large image + small thumbnails */}
                         <div className="block md:hidden">
                             {/* Large main image */}
@@ -233,7 +233,7 @@ export default function DestinationDetailPage() {
 
                         {/* Desktop Layout: Bento grid */}
                         <div className="hidden md:block">
-                            <div className="grid grid-cols-3 grid-rows-2 gap-1.5" style={{ height: 'clamp(250px, 32vw, 420px)' }}>
+                            <div className="grid grid-cols-3 grid-rows-2 gap-2" style={{ height: 'clamp(320px, 42vw, 560px)' }}>
                                 {/* Large left image — spans 2 rows */}
                                 <div className="row-span-2 relative cursor-pointer group overflow-hidden rounded-xl"
                                     onClick={() => setSelectedImageIndex(0)}>

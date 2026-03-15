@@ -33,6 +33,8 @@ export function useAboutContent() {
       if (error) throw error;
       return data as AboutContent;
     },
+    staleTime: 1000 * 60, // 1 minute
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -44,6 +46,8 @@ export function useAboutStats() {
       if (error) throw error;
       return data as AboutStat[];
     },
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -55,5 +59,7 @@ export function useTeamMembers() {
       if (error) throw error;
       return data as TeamMember[];
     },
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: true,
   });
 }

@@ -170,25 +170,23 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* Team Grid — Flip Cards */}
-            <section className="relative w-full px-8 md:px-16 py-12 md:py-20 z-10">
-                <div className="max-w-[1400px] mx-auto">
-                    <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-center mb-14">
-                        <span className="text-gold text-[11px] tracking-[0.4em] uppercase font-medium block mb-4">The Visionaries</span>
-                        <h2 className="font-serif text-white/95 text-2xl md:text-3xl lg:text-[2.5rem]">Our Team</h2>
-                    </motion.div>
-                    {team && team.length > 0 ? (
+            {/* Team Grid — Flip Cards (hidden when no team data) */}
+            {team && team.length > 0 && (
+                <section className="relative w-full px-8 md:px-16 py-12 md:py-20 z-10">
+                    <div className="max-w-[1400px] mx-auto">
+                        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                            className="text-center mb-14">
+                            <span className="text-gold text-[11px] tracking-[0.4em] uppercase font-medium block mb-4">The Visionaries</span>
+                            <h2 className="font-serif text-white/95 text-2xl md:text-3xl lg:text-[2.5rem]">Our Team</h2>
+                        </motion.div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                             {team.map((member, i) => (
                                 <FlipCard key={member.id} member={member} index={i} />
                             ))}
                         </div>
-                    ) : (
-                        <SectionUnavailable message="Team information is temporarily unavailable" />
-                    )}
-                </div>
-            </section>
+                    </div>
+                </section>
+            )}
 
             {/* Metrics */}
             <section className="relative w-full px-8 md:px-16 py-12 md:py-20 z-10">
