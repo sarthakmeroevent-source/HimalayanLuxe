@@ -58,7 +58,7 @@ export default function HomePage({
 
     return (
         <>
-            <HeroSection isMuted={isMuted} setIsMuted={setIsMuted} />
+            <HeroSection isMuted={isMuted} setIsMuted={setIsMuted} showLoader={showLoader} />
 
             <ExperienceSectionSticky
                 activePhilosophy={activePhilosophy}

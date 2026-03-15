@@ -6,9 +6,10 @@ import { videoSize } from '../lib/imageOptimizer';
 interface HeroSectionProps {
     isMuted: boolean;
     setIsMuted: (muted: boolean) => void;
+    showLoader?: boolean;
 }
 
-export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
+export default function HeroSection({ isMuted, setIsMuted, showLoader = false }: HeroSectionProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const sectionRef = useRef<HTMLElement>(null);
     const [fixedHeight, setFixedHeight] = useState<string | number>('100dvh');
@@ -61,8 +62,21 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
         
         if (!video || !section || hero?.media_type !== 'video') return;
 
+        // Don't set up scroll/observer logic while loader is active
+        // The loader locks scroll (body position:fixed) which makes
+        // getBoundingClientRect and IntersectionObserver unreliable
+        if (showLoader) {
+            // Ensure video is paused during loader
+            if (!video.paused) {
+                video.pause();
+            }
+            return;
+        }
+
         // Function to check if video should be playing based on current position
         const shouldVideoPlay = () => {
+            // Extra safety: if body is still position:fixed, don't trust rect values
+            if (document.body.style.position === 'fixed') return false;
             const rect = section.getBoundingClientRect();
             const windowHeight = window.innerHeight;
             return rect.bottom >= windowHeight * 0.4 && rect.top <= windowHeight * 0.6;
@@ -82,74 +96,95 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                             // Video is out of view - pause to save resources
                             if (!video.paused) {
                                 video.pause();
-                                console.log("Video paused - out of view");
                             }
                         }
                     }
                 });
             },
             {
-                threshold: 0.5, // Trigger when 50% of video is visible
-                rootMargin: '0px 0px -30% 0px' // Very aggressive margin to pause sooner
+                threshold: 0.5,
+                rootMargin: '0px 0px -30% 0px'
             }
         );
 
         observer.observe(section);
 
-        // Additional scroll-based fallback
+        // Scroll handler that works for both native and Lenis scroll
         const handleScroll = () => {
             if (!section || !video) return;
             
             const rect = section.getBoundingClientRect();
             const windowHeight = window.innerHeight;
             
-            // If hero section is mostly out of view (less than 40% visible)
             if (rect.bottom < windowHeight * 0.4) {
                 if (!video.paused) {
                     video.pause();
-                    console.log("Video paused - scroll fallback");
                 }
             } else if (rect.top < windowHeight * 0.6) {
-                // If hero section is mostly in view and video is paused
-                if (video.paused && !isIOS) {
-                    video.play().catch(e => console.log("Resume play failed - scroll fallback:", e));
+                if (video.paused && !isIOS && shouldVideoPlay()) {
+                    video.play().catch(e => console.log("Resume play failed - scroll:", e));
                 }
             }
         };
 
-        // Video event listeners to handle play/pause events
-        const handlePlay = () => {
-            // Immediately check if video should be playing when it starts
-            if (!shouldVideoPlay()) {
+        // Position monitoring interval as a reliable fallback
+        const positionInterval = setInterval(() => {
+            if (!section || !video || video.paused) return;
+            
+            const rect = section.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            
+            if (rect.bottom < windowHeight * 0.5 || rect.top > windowHeight * 0.5) {
                 video.pause();
-                console.log("Video paused immediately - not in view on play");
             }
+        }, 200);
+
+        // Video play event guard - immediately pause if out of view
+        const handlePlay = () => {
+            requestAnimationFrame(() => {
+                if (!shouldVideoPlay()) {
+                    video.pause();
+                }
+            });
         };
 
         video.addEventListener('play', handlePlay);
         window.addEventListener('scroll', handleScroll, { passive: true });
 
-        // Initial check in case video is already playing
-        if (!video.paused && !shouldVideoPlay()) {
-            video.pause();
-            console.log("Video paused - initial position check");
+        // Also listen to Lenis scroll events for desktop smooth scrolling
+        const lenis = (window as any).__lenis;
+        if (lenis) {
+            lenis.on('scroll', handleScroll);
         }
+
+        // After loader finishes, do an initial play attempt if hero is in view
+        // Small delay to let the body position unlock fully settle
+        const startupTimer = setTimeout(() => {
+            if (shouldVideoPlay() && video.paused && !isIOS) {
+                video.play().catch(e => console.log("Post-loader play attempt failed:", e));
+            } else if (!shouldVideoPlay() && !video.paused) {
+                video.pause();
+            }
+        }, 150);
 
         return () => {
             observer.disconnect();
+            clearInterval(positionInterval);
+            clearTimeout(startupTimer);
             video.removeEventListener('play', handlePlay);
             window.removeEventListener('scroll', handleScroll);
+            if (lenis) {
+                lenis.off('scroll', handleScroll);
+            }
         };
-    }, [hero?.media_type, isIOS]);
+    }, [hero?.media_type, isIOS, showLoader]);
 
     useEffect(() => {
         const video = videoRef.current;
         if (video && hero?.media_type === 'video') {
             // Mobile-specific optimizations
             if (isMobile) {
-                // Reduce quality for mobile performance
                 video.preload = 'metadata';
-                // Disable picture-in-picture on mobile
                 video.disablePictureInPicture = true;
             }
             
@@ -157,53 +192,54 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
             video.muted = true;
             video.defaultMuted = true;
             
-            // Multiple attempts to ensure video plays
+            // While loader is active, keep video paused
+            if (showLoader) {
+                video.pause();
+                return;
+            }
+            
+            // Helper to check position
+            const isInView = () => {
+                if (document.body.style.position === 'fixed') return false;
+                const section = sectionRef.current;
+                if (!section) return false;
+                const rect = section.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                return rect.bottom >= windowHeight * 0.4 && rect.top <= windowHeight * 0.6;
+            };
+            
+            // Attempt to play only if in view
             const attemptPlay = async () => {
                 try {
-                    // For iOS, don't attempt autoplay - wait for user interaction
-                    if (isIOS) {
-                        console.log("iOS detected - waiting for user interaction");
-                        return;
-                    }
-                    
+                    if (isIOS) return;
+                    if (!isInView()) return;
                     await video.play();
-                    console.log("Video playing successfully");
                 } catch (error) {
                     console.log("Play attempt failed:", error);
-                    // For Android, retry with lower quality settings
                     if (isMobile && !isIOS) {
                         video.preload = 'none';
                         setTimeout(() => {
                             video.load();
-                            video.play().catch(e => console.log("Retry failed:", e));
+                            if (isInView()) {
+                                video.play().catch(e => console.log("Retry failed:", e));
+                            }
                         }, 1000);
                     }
                 }
             };
             
-            // Try to play immediately (except on iOS)
-            if (!isIOS) {
-                attemptPlay();
-            }
-            
-            // Also try when video loads
-            video.addEventListener('loadeddata', attemptPlay);
-            video.addEventListener('canplay', attemptPlay);
-            
-            // Handle page visibility changes (mobile address bar issues)
+            // Handle page visibility changes
             const handleVisibilityChange = () => {
-                if (!document.hidden && video.paused && !isIOS) {
-                    console.log("Page became visible, restarting video");
+                if (!document.hidden && video.paused && !isIOS && isInView()) {
                     attemptPlay();
                 }
             };
             
             document.addEventListener('visibilitychange', handleVisibilityChange);
             
-            // Handle focus/blur events
+            // Handle focus events
             const handleFocus = () => {
-                if (video.paused && !isIOS) {
-                    console.log("Window focused, restarting video");
+                if (video.paused && !isIOS && isInView()) {
                     attemptPlay();
                 }
             };
@@ -211,13 +247,11 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
             window.addEventListener('focus', handleFocus);
             
             return () => {
-                video.removeEventListener('loadeddata', attemptPlay);
-                video.removeEventListener('canplay', attemptPlay);
                 document.removeEventListener('visibilitychange', handleVisibilityChange);
                 window.removeEventListener('focus', handleFocus);
             };
         }
-    }, [hero?.media_type, isMobile, isIOS]);
+    }, [hero?.media_type, isMobile, isIOS, showLoader]);
 
     // Handle mobile hero click for sound toggle
     const handleMobileHeroClick = () => {
@@ -368,7 +402,7 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                         <video
                             key={videoSrc}
                             ref={videoRef}
-                            autoPlay={!isIOS}
+                            autoPlay={false}
                             loop
                             playsInline
                             muted
@@ -389,23 +423,49 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                                 console.log("Video load started");
                             }}
                             onLoadedData={() => {
-                                console.log("Video data loaded");
                                 const video = videoRef.current;
-                                if (video) {
+                                const section = sectionRef.current;
+                                if (video && section) {
                                     video.muted = true;
-                                    video.play().catch(e => console.log("onLoadedData play failed:", e));
+                                    // Don't auto-play while loader is active
+                                    if (showLoader || document.body.style.position === 'fixed') return;
+                                    const rect = section.getBoundingClientRect();
+                                    const windowHeight = window.innerHeight;
+                                    if (rect.bottom >= windowHeight * 0.4 && rect.top <= windowHeight * 0.6) {
+                                        video.play().catch(e => console.log("onLoadedData play failed:", e));
+                                    }
                                 }
                             }}
                             onCanPlay={() => {
-                                console.log("Video can play");
                                 const video = videoRef.current;
-                                if (video && video.paused) {
+                                const section = sectionRef.current;
+                                if (video && video.paused && section) {
                                     video.muted = true;
-                                    video.play().catch(e => console.log("onCanPlay play failed:", e));
+                                    // Don't auto-play while loader is active
+                                    if (showLoader || document.body.style.position === 'fixed') return;
+                                    const rect = section.getBoundingClientRect();
+                                    const windowHeight = window.innerHeight;
+                                    if (rect.bottom >= windowHeight * 0.4 && rect.top <= windowHeight * 0.6) {
+                                        video.play().catch(e => console.log("onCanPlay play failed:", e));
+                                    }
                                 }
                             }}
                             onPlay={() => {
-                                console.log("Video started playing");
+                                // Immediate position check when video starts playing
+                                const video = videoRef.current;
+                                const section = sectionRef.current;
+                                if (video && section) {
+                                    // If loader is still showing, force pause
+                                    if (showLoader || document.body.style.position === 'fixed') {
+                                        video.pause();
+                                        return;
+                                    }
+                                    const rect = section.getBoundingClientRect();
+                                    const windowHeight = window.innerHeight;
+                                    if (rect.bottom < windowHeight * 0.4) {
+                                        video.pause();
+                                    }
+                                }
                             }}
                             onStalled={() => {
                                 // Handle Android stuttering
