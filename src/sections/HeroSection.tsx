@@ -61,14 +61,21 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
         
         if (!video || !section || hero?.media_type !== 'video') return;
 
+        // Function to check if video should be playing based on current position
+        const shouldVideoPlay = () => {
+            const rect = section.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            return rect.bottom >= windowHeight * 0.4 && rect.top <= windowHeight * 0.6;
+        };
+
         // Intersection Observer to pause video when out of view
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.target === section) {
                         if (entry.isIntersecting) {
-                            // Video is in view - resume if it was playing
-                            if (video.paused && !isIOS) {
+                            // Video is in view - resume if it was playing and should play
+                            if (video.paused && !isIOS && shouldVideoPlay()) {
                                 video.play().catch(e => console.log("Resume play failed:", e));
                             }
                         } else {
@@ -110,10 +117,27 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
             }
         };
 
+        // Video event listeners to handle play/pause events
+        const handlePlay = () => {
+            // Immediately check if video should be playing when it starts
+            if (!shouldVideoPlay()) {
+                video.pause();
+                console.log("Video paused immediately - not in view on play");
+            }
+        };
+
+        video.addEventListener('play', handlePlay);
         window.addEventListener('scroll', handleScroll, { passive: true });
+
+        // Initial check in case video is already playing
+        if (!video.paused && !shouldVideoPlay()) {
+            video.pause();
+            console.log("Video paused - initial position check");
+        }
 
         return () => {
             observer.disconnect();
+            video.removeEventListener('play', handlePlay);
             window.removeEventListener('scroll', handleScroll);
         };
     }, [hero?.media_type, isIOS]);
@@ -203,6 +227,8 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
         const newMutedState = !isMuted;
         setIsMuted(newMutedState);
         const video = videoRef.current;
+        const section = sectionRef.current;
+        
         if (video) {
             // On iOS, first interaction should start the video
             if (isIOS && video.paused) {
@@ -210,12 +236,31 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                 video.play().then(() => {
                     // Then apply user's mute preference
                     video.muted = newMutedState;
+                    // Immediately check if video should be playing based on scroll position
+                    if (section) {
+                        const rect = section.getBoundingClientRect();
+                        const windowHeight = window.innerHeight;
+                        if (rect.bottom < windowHeight * 0.4) {
+                            video.pause();
+                            console.log("Video paused immediately after iOS interaction - out of view");
+                        }
+                    }
                 }).catch(e => console.log("iOS play failed:", e));
             } else {
                 video.muted = newMutedState;
                 // Ensure video plays when unmuting
                 if (!newMutedState && video.paused) {
-                    video.play().catch(e => console.log("Play failed:", e));
+                    video.play().then(() => {
+                        // Immediately check position after starting video
+                        if (section) {
+                            const rect = section.getBoundingClientRect();
+                            const windowHeight = window.innerHeight;
+                            if (rect.bottom < windowHeight * 0.4) {
+                                video.pause();
+                                console.log("Video paused immediately after mobile interaction - out of view");
+                            }
+                        }
+                    }).catch(e => console.log("Play failed:", e));
                 }
             }
         }
@@ -450,11 +495,22 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                         const newMutedState = !isMuted;
                         setIsMuted(newMutedState);
                         const video = videoRef.current;
+                        const section = sectionRef.current;
                         if (video) {
                             video.muted = newMutedState;
                             // Ensure video plays when unmuting
                             if (!newMutedState && video.paused) {
-                                video.play().catch(e => console.log("Play failed:", e));
+                                video.play().then(() => {
+                                    // Immediately check position after starting video
+                                    if (section) {
+                                        const rect = section.getBoundingClientRect();
+                                        const windowHeight = window.innerHeight;
+                                        if (rect.bottom < windowHeight * 0.4) {
+                                            video.pause();
+                                            console.log("Video paused immediately after desktop interaction - out of view");
+                                        }
+                                    }
+                                }).catch(e => console.log("Play failed:", e));
                             }
                         }
                     }}
@@ -492,6 +548,7 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                             const newMutedState = !isMuted;
                             setIsMuted(newMutedState);
                             const video = videoRef.current;
+                            const section = sectionRef.current;
                             if (video) {
                                 // On iOS, first interaction should start the video
                                 if (isIOS && video.paused) {
@@ -499,12 +556,31 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                                     video.play().then(() => {
                                         // Then apply user's mute preference
                                         video.muted = newMutedState;
+                                        // Immediately check position after starting video
+                                        if (section) {
+                                            const rect = section.getBoundingClientRect();
+                                            const windowHeight = window.innerHeight;
+                                            if (rect.bottom < windowHeight * 0.4) {
+                                                video.pause();
+                                                console.log("Video paused immediately after mobile button interaction - out of view");
+                                            }
+                                        }
                                     }).catch(e => console.log("iOS play failed:", e));
                                 } else {
                                     video.muted = newMutedState;
                                     // Ensure video plays when unmuting
                                     if (!newMutedState && video.paused) {
-                                        video.play().catch(e => console.log("Play failed:", e));
+                                        video.play().then(() => {
+                                            // Immediately check position after starting video
+                                            if (section) {
+                                                const rect = section.getBoundingClientRect();
+                                                const windowHeight = window.innerHeight;
+                                                if (rect.bottom < windowHeight * 0.4) {
+                                                    video.pause();
+                                                    console.log("Video paused immediately after mobile button interaction - out of view");
+                                                }
+                                            }
+                                        }).catch(e => console.log("Play failed:", e));
                                     }
                                 }
                             }
