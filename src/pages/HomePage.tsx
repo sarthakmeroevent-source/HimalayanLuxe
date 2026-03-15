@@ -70,9 +70,9 @@ export default function HomePage({
 
             <ServicesSection />
 
-            <AboutSection />
-
             <GallerySection />
+
+            <AboutSection />
 
             <CTASection />
         </>
