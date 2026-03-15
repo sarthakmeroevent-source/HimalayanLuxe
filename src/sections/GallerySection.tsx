@@ -134,22 +134,6 @@ const GalleryExpand = ({
               </div>
             ))}
           </div>
-
-          <div className="grid grid-cols-3 gap-3">
-            {items.slice(3, 6).map((image, idx) => (
-              <div
-                key={idx + 3}
-                className={cn(
-                  "relative overflow-hidden rounded-2xl border border-gold/30 h-[180px] transition-all duration-600 ease-out",
-                  hasAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                )}
-                style={{ transitionDelay: hasAnimated ? `${150 + idx * 50}ms` : '0ms' }}
-                onClick={() => navigate('/gallery')}
-              >
-                <img src={image.src} className="size-full object-cover" alt={image.alt} decoding="async" />
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Desktop Expand on Hover Layout */}
