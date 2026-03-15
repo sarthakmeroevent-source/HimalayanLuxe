@@ -166,6 +166,17 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                         return;
                     }
                     
+                    // Check position before attempting to play
+                    const section = sectionRef.current;
+                    if (section) {
+                        const rect = section.getBoundingClientRect();
+                        const windowHeight = window.innerHeight;
+                        if (rect.bottom < windowHeight * 0.4) {
+                            console.log("Video not played in attemptPlay - out of view");
+                            return;
+                        }
+                    }
+                    
                     await video.play();
                     console.log("Video playing successfully");
                 } catch (error) {
@@ -175,7 +186,17 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                         video.preload = 'none';
                         setTimeout(() => {
                             video.load();
-                            video.play().catch(e => console.log("Retry failed:", e));
+                            // Check position again before retry
+                            const section = sectionRef.current;
+                            if (section) {
+                                const rect = section.getBoundingClientRect();
+                                const windowHeight = window.innerHeight;
+                                if (rect.bottom >= windowHeight * 0.4 && rect.top <= windowHeight * 0.6) {
+                                    video.play().catch(e => console.log("Retry failed:", e));
+                                } else {
+                                    console.log("Retry cancelled - out of view");
+                                }
+                            }
                         }, 1000);
                     }
                 }
@@ -193,8 +214,17 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
             // Handle page visibility changes (mobile address bar issues)
             const handleVisibilityChange = () => {
                 if (!document.hidden && video.paused && !isIOS) {
-                    console.log("Page became visible, restarting video");
-                    attemptPlay();
+                    console.log("Page became visible, checking position before restarting video");
+                    const section = sectionRef.current;
+                    if (section) {
+                        const rect = section.getBoundingClientRect();
+                        const windowHeight = window.innerHeight;
+                        if (rect.bottom >= windowHeight * 0.4 && rect.top <= windowHeight * 0.6) {
+                            attemptPlay();
+                        } else {
+                            console.log("Video not restarted on visibility - out of view");
+                        }
+                    }
                 }
             };
             
@@ -203,8 +233,17 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
             // Handle focus/blur events
             const handleFocus = () => {
                 if (video.paused && !isIOS) {
-                    console.log("Window focused, restarting video");
-                    attemptPlay();
+                    console.log("Window focused, checking position before restarting video");
+                    const section = sectionRef.current;
+                    if (section) {
+                        const rect = section.getBoundingClientRect();
+                        const windowHeight = window.innerHeight;
+                        if (rect.bottom >= windowHeight * 0.4 && rect.top <= windowHeight * 0.6) {
+                            attemptPlay();
+                        } else {
+                            console.log("Video not restarted on focus - out of view");
+                        }
+                    }
                 }
             };
             
@@ -391,17 +430,33 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                             onLoadedData={() => {
                                 console.log("Video data loaded");
                                 const video = videoRef.current;
-                                if (video) {
+                                const section = sectionRef.current;
+                                if (video && section) {
                                     video.muted = true;
-                                    video.play().catch(e => console.log("onLoadedData play failed:", e));
+                                    // Check position before playing
+                                    const rect = section.getBoundingClientRect();
+                                    const windowHeight = window.innerHeight;
+                                    if (rect.bottom >= windowHeight * 0.4 && rect.top <= windowHeight * 0.6) {
+                                        video.play().catch(e => console.log("onLoadedData play failed:", e));
+                                    } else {
+                                        console.log("Video not played on loadedData - out of view");
+                                    }
                                 }
                             }}
                             onCanPlay={() => {
                                 console.log("Video can play");
                                 const video = videoRef.current;
-                                if (video && video.paused) {
+                                const section = sectionRef.current;
+                                if (video && video.paused && section) {
                                     video.muted = true;
-                                    video.play().catch(e => console.log("onCanPlay play failed:", e));
+                                    // Check position before playing
+                                    const rect = section.getBoundingClientRect();
+                                    const windowHeight = window.innerHeight;
+                                    if (rect.bottom >= windowHeight * 0.4 && rect.top <= windowHeight * 0.6) {
+                                        video.play().catch(e => console.log("onCanPlay play failed:", e));
+                                    } else {
+                                        console.log("Video not played on canPlay - out of view");
+                                    }
                                 }
                             }}
                             onPlay={() => {
